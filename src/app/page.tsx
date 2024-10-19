@@ -38,7 +38,7 @@ export default function CareerLeapLanding() {
             About
           </Link>
           <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
-            Contact
+            Contact us
           </Link>
         </nav>
       </header>
