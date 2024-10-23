@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { Box, Spinner, Text } from '@chakra-ui/react';
-import { signIn } from 'next-auth/react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
-import { Carousel } from 'react-responsive-carousel';
+import { Box, Spinner, Text } from "@chakra-ui/react";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
     try {
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         redirect: false,
         email,
         password,
@@ -31,17 +31,17 @@ const Login = () => {
         setError(result.error);
       } else {
         setIsLoading(false);
-        router.push('/onboard');
+        router.push("/onboard");
       }
     } catch (err) {
-      console.error('Sign in error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      console.error("Sign in error:", err);
+      setError("An unexpected error occurred. Please try again.");
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-[90vh]">
       {/* Left side - Carousel */}
       <div className="w-1/2 bg-gray-200">
         <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false}>
@@ -64,10 +64,15 @@ const Login = () => {
       <div className="w-1/2 flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full space-y-8 p-8">
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to {process.env.NEXT_PUBLIC_APP_NAME}</h2>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+              Sign in to {process.env.NEXT_PUBLIC_APP_NAME}
+            </h2>
           </div>
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+              role="alert"
+            >
               <span className="block sm:inline">{error}</span>
             </div>
           )}
@@ -75,7 +80,9 @@ const Login = () => {
             <input type="hidden" name="remember" value="true" />
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
-                <label htmlFor="email-address" className="sr-only">Email address</label>
+                <label htmlFor="email-address" className="sr-only">
+                  Email address
+                </label>
                 <input
                   id="email-address"
                   name="email"
@@ -89,7 +96,9 @@ const Login = () => {
                 />
               </div>
               <div>
-                <label htmlFor="password" className="sr-only">Password</label>
+                <label htmlFor="password" className="sr-only">
+                  Password
+                </label>
                 <input
                   id="password"
                   name="password"
@@ -116,7 +125,9 @@ const Login = () => {
           </form>
           <div className="flex justify-center gap-1">
             <Text color="gray.500">Don't have an account?</Text>
-            <Link className="text-blue-500" href="/register">Register</Link>
+            <Link className="text-blue-500" href="/register">
+              Register
+            </Link>
           </div>
         </div>
       </div>

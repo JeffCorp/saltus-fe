@@ -1,40 +1,56 @@
-'use client'
+"use client";
 
 import { Button } from "@/components/ui/button";
-import { Bell, BookOpen, BriefcaseIcon, GraduationCap, Home, LineChart, LogOut, MessageSquare, Rocket, Users } from 'lucide-react';
-import { signOut } from 'next-auth/react';
-import Link from 'next/link';
-import { useState } from 'react';
+import {
+  Bell,
+  BookOpen,
+  BriefcaseIcon,
+  GraduationCap,
+  Home,
+  LineChart,
+  LogOut,
+  MessageSquare,
+  Rocket,
+  Users,
+} from "lucide-react";
+import { signOut } from "next-auth/react";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function Dashboard({ children }: { children: React.ReactNode }) {
-  const [activeTab, setActiveTab] = useState('Home')
+  const [activeTab, setActiveTab] = useState("Home");
 
   const navItems = [
-    { name: 'Home', icon: Home, link: '/dashboard' },
-    { name: 'Career Path', icon: LineChart, link: '/dashboard/career-path' },
-    { name: 'Mentors', icon: Users, link: '/dashboard/mentors' },
-    { name: 'Network', icon: MessageSquare, link: '/dashboard/network' },
-    { name: 'Skills', icon: BookOpen, link: '/dashboard/skills' },
-    { name: 'Projects', icon: BriefcaseIcon, link: '/dashboard/projects' },
-    { name: 'Trends', icon: LineChart, link: '/dashboard/trends' },
-    { name: 'Interview Prep', icon: GraduationCap, link: '/dashboard/interview-prep' },
-  ]
+    { name: "Home", icon: Home, link: "/dashboard" },
+    { name: "Career Path", icon: LineChart, link: "/dashboard/career-path" },
+    { name: "Mentors", icon: Users, link: "/dashboard/mentors" },
+    { name: "Network", icon: MessageSquare, link: "/dashboard/network" },
+    { name: "Skills", icon: BookOpen, link: "/dashboard/skills" },
+    { name: "Projects", icon: BriefcaseIcon, link: "/dashboard/projects" },
+    { name: "Trends", icon: LineChart, link: "/dashboard/trends" },
+    {
+      name: "Interview Prep",
+      icon: GraduationCap,
+      link: "/dashboard/interview-prep",
+    },
+  ];
 
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <aside className="min-w-64 bg-white shadow-md flex-1">
         <div className="p-4">
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+          <Link href="/" className="text-2xl font-bold text-gray-800 flex items-center">
             <Rocket className="h-6 w-6 mr-2" />
-            {process.env.NEXT_PUBLIC_APP_NAME}</h1>
+            {process.env.NEXT_PUBLIC_APP_NAME}
+          </Link>
         </div>
         <nav className="mt-6 min-h-[calc(100%-200px)]">
           {navItems.map((item) => (
             <Link
               key={item.name}
               href={item.link}
-              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${activeTab === item.name ? 'bg-gray-100 text-gray-800' : ''
+              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${activeTab === item.name ? "bg-gray-100 text-gray-800" : ""
                 }`}
               onClick={() => setActiveTab(item.name)}
             >
@@ -43,8 +59,12 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center justify-center mx-4">
-          <Button variant="outline" className="w-full flex items-center justify-center" onClick={() => signOut()}>
+        <div className="flex items-center justify-center ml-3">
+          <Button
+            variant="outline"
+            className="w-full flex items-center justify-center"
+            onClick={() => signOut()}
+          >
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>
@@ -56,7 +76,9 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
         {/* Header */}
         <header className="bg-white fixed top-0 right-0 w-[calc(100%-16rem)] bg-white">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate">{activeTab}</h2>
+            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate">
+              {activeTab}
+            </h2>
             <div className="flex items-center">
               <Button variant="outline" className="mr-2">
                 <Bell className="h-5 w-5" />
@@ -85,10 +107,8 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <div className="pt-[80px] bg-white">
-          {children}
-        </div>
+        <div className="pt-[80px] bg-white">{children}</div>
       </main>
     </div>
-  )
+  );
 }
