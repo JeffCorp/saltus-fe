@@ -34,7 +34,7 @@ const Hero: React.FC = () => {
             <Button className="bg-black text-white" onClick={handleGetStarted} variant="default">
               Get Started
             </Button>
-            <Button className="border-black" variant="outline">Learn More</Button>
+            <Button onClick={()=>router.push("/about")} className="border-black" variant="outline">Learn More</Button>
           </div>
         </div>
       </div>

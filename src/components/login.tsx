@@ -34,6 +34,7 @@ const Login = () => {
       if (result?.error) {
         setIsLoading(false);
         setError(result.error);
+        console.log(result);
       } else {
         setIsLoading(false);
         router.push("/onboard");
@@ -76,6 +77,7 @@ const Login = () => {
             <Image
               src={image3}
               alt="Login Image 3"
+              // className="w-full h-full object-fill object-cover"
               layout="fill"
               objectFit="cover"
               width={0}
@@ -115,10 +117,7 @@ const Login = () => {
             <input type="hidden" name="remember" value="true" />
             <div className="rounded-md space-y-2">
               <div>
-                <label
-                  htmlFor="email-address"
-                  className="sr-only focus:not-sr-only"
-                >
+                <label htmlFor="email-address" className="sr-only">
                   Email address
                 </label>
                 <input
@@ -127,7 +126,7 @@ const Login = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none relative block w-full px-3 py-4 border-b-2 border-gray-400 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="peer appearance-none relative block w-full px-3 py-4 border-b-2 border-gray-400 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
