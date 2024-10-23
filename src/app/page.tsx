@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/ui/Hero";
 import { Input } from "@/components/ui/input";
-import Navbar from "@/components/ui/Navbar";
 import Section from "@/components/ui/Section";
 import { Rocket, Settings, Star, TrendingUp } from "lucide-react";
 import { useSession } from "next-auth/react";
