@@ -1,11 +1,13 @@
 'use client'
 
+import ViewDetailedPlan from '@/components/career-path/view-detailed-plan'
 import { useProfile } from "@/services/useProfile"
+import { useSkills } from "@/services/useSkills"
 import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
 import { Badge, Box, Button, Card, CardBody, CardFooter, CardHeader, Container, Flex, Grid, Heading, List, ListIcon, ListItem, Progress, Spinner, Text, useColorModeValue } from "@chakra-ui/react"
-import { Award, Book, ChevronRight, Clock, Target, TrendingUp } from "lucide-react"
+import { Award, Book, ChevronRight, Clock, Target } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 // Mock data - In a real application, this would come from a backend API
 const userData = {
@@ -38,15 +40,18 @@ export default function CareerPathProgressPage() {
   const { data: session } = useSession();
   const { profile, isLoading: isLoadingProfile } = useProfile();
   const { data: skillsProgress, mutate: getSkillsProgress, isPending: isLoadingSkillsProgress } = useSkillsProgressByUserId();
+  const { mutate: getSkills, data: skills, isPending: isLoadingSkills } = useSkills();
   const bgColor = useColorModeValue("white", "white");
   const textColor = useColorModeValue("gray.800", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.200");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // console.log(session, profile);
+  console.log("skills =>", skills);
 
   useEffect(() => {
     if (profile) {
       getSkillsProgress(profile._id);
+      getSkills(profile._id);
     }
   }, [profile?._id]);
 
@@ -62,6 +67,11 @@ export default function CareerPathProgressPage() {
     if (!skillsProgress || skillsProgress.length === 0) return 0;
     return skillsProgress?.reduce((acc, skill) => acc + skill.timeSpent, 0);
   }, [skillsProgress]);
+
+  const careerPath = profile?.careerPath || "";
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
     <Container maxW="container.xl" py={8}>
@@ -87,7 +97,7 @@ export default function CareerPathProgressPage() {
             title: "Skills Progress", content: (
               <>
                 <Progress value={computeSkillsProgress} size="lg" colorScheme="blue" bg="gray.100" />
-                <Text mt={2} textAlign="center">{computeSkillsProgress}% Complete</Text>
+                <Text mt={2} textAlign="center">{Math.round(computeSkillsProgress)}% Complete</Text>
               </>
             )
           },
@@ -106,31 +116,31 @@ export default function CareerPathProgressPage() {
             title: "Things to Improve", content: (
               <>
                 <List spacing={2}>
-                  {userData.improvementAreas.map((area, index) => (
-                    <ListItem key={index}>{area}</ListItem>
+                  {skillsProgress?.filter(skill => !skill.completed).filter((_, i) => i < 4).map((skill, index) => (
+                    <ListItem key={index}>{typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}</ListItem>
                   ))}
                 </List>
-                <Button rightIcon={<ChevronRight />} variant="outline" width="full" mt={4}>
+                <Button rightIcon={<ChevronRight />} onClick={openModal} variant="outline" width="full" mt={4}>
                   View Detailed Plan
                 </Button>
               </>
             )
           },
-          {
-            title: "What's Next", content: (
-              <>
-                <List spacing={2}>
-                  {userData.nextSteps.map((step, index) => (
-                    <ListItem key={index} display="flex" alignItems="flex-start">
-                      <ListIcon as={TrendingUp} color="blue.500" mt={1} />
-                      <Text>{step}</Text>
-                    </ListItem>
-                  ))}
-                </List>
-                <Button colorScheme="blue" width="full" mt={4}>Start Next Task</Button>
-              </>
-            )
-          },
+          // {
+          //   title: "What's Next", content: (
+          //     <>
+          //       <List spacing={2}>
+          //         {userData.nextSteps.map((step, index) => (
+          //           <ListItem key={index} display="flex" alignItems="flex-start">
+          //             <ListIcon as={TrendingUp} color="blue.500" mt={1} />
+          //             <Text>{step}</Text>
+          //           </ListItem>
+          //         ))}
+          //       </List>
+          //       <Button colorScheme="blue" width="full" mt={4}>Start Next Task</Button>
+          //     </>
+          //   )
+          // },
           {
             title: "Recent Achievements", content: (
               <List spacing={2}>
@@ -183,11 +193,18 @@ export default function CareerPathProgressPage() {
       <Box mt={8} bg={bgColor} color={textColor} borderColor={borderColor} borderWidth={1} p={4} borderRadius="md">
         <Heading as="h2" size="lg" mb={4}>Your Skill Set</Heading>
         <Flex flexWrap="wrap" gap={2}>
-          {["JavaScript", "React", "Node.js", "Git", "Agile", "RESTful APIs", "SQL", "Problem Solving"].map((skill) => (
-            <Badge key={skill} bg="gray.100" color="gray.800">{skill}</Badge>
+          {skills?.map((skill) => (
+            <Badge key={skill.id} bg="gray.100" color="gray.800">{skill.name}</Badge>
           ))}
         </Flex>
       </Box>
+
+      <ViewDetailedPlan
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        careerPath={careerPath}
+        skillsProgress={skillsProgress || []}
+      />
     </Container>
   )
 }

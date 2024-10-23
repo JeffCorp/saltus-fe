@@ -38,7 +38,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md flex-1">
+      <aside className="min-w-64 bg-white shadow-md flex-1">
         <div className="p-4">
           <Link href="/" className="text-2xl font-bold text-gray-800 flex items-center">
             <Rocket className="h-6 w-6 mr-2" />
@@ -50,9 +50,8 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             <Link
               key={item.name}
               href={item.link}
-              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${
-                activeTab === item.name ? "bg-gray-100 text-gray-800" : ""
-              }`}
+              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${activeTab === item.name ? "bg-gray-100 text-gray-800" : ""
+                }`}
               onClick={() => setActiveTab(item.name)}
             >
               <item.icon className="h-5 w-5 mr-3" />

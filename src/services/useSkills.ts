@@ -9,10 +9,9 @@ interface Skill {
 }
 
 export function useSkills() {
-  return useQuery<Skill[], Error>({
-    queryKey: ["skills"],
-    queryFn: async () => {
-      const { data } = await apiClient.get<Skill[]>("/skills");
+  return useMutation<Skill[], Error, string>({
+    mutationFn: async (userId: string) => {
+      const { data } = await apiClient.get<Skill[]>(`/skills/user/${userId}`);
       return data;
     },
   });

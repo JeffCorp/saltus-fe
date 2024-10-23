@@ -79,7 +79,6 @@ const Dashboard = () => {
     }
   }, [profile])
 
-
   useEffect(() => {
     if (latestUpdates) {
       // setNewsTrendsData({
