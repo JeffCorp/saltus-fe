@@ -23,7 +23,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md flex-1">
+      <aside className="min-w-64 bg-white shadow-md flex-1">
         <div className="p-4">
           <h1 className="text-2xl font-bold text-gray-800 flex items-center">
             <Rocket className="h-6 w-6 mr-2" />
@@ -43,7 +43,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center justify-center ml-3">
+        <div className="flex items-center justify-center mx-4">
           <Button variant="outline" className="w-full flex items-center justify-center" onClick={() => signOut()}>
             <LogOut className="mr-2 h-4 w-4" />
             Logout

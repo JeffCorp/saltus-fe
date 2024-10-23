@@ -4,9 +4,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Book, CheckCircle, Clock, Star, Target, TrendingUp } from "lucide-react"
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { useProfile } from "@/services/useProfile"
+import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
+import { Box, Text } from "@chakra-ui/react"
+import { Book, Star, Target, TrendingUp } from "lucide-react"
+import { useSession } from "next-auth/react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 // Mock data - In a real application, this would come from a backend API
 const skillsData = {
@@ -45,6 +50,26 @@ const skillsData = {
 }
 
 export default function SkillsPage() {
+  const { data: session } = useSession();
+  const { mutate: getSkillsProgress, data: skillsProgress } = useSkillsProgressByUserId();
+  const { profile, isLoading, isError } = useProfile()
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      getSkillsProgress(session.user.id);
+    }
+  }, [session?.user?.id]);
+
+  const masteredSkills = skillsProgress?.filter((skill) => skill.progress === 100 && skill.proficiency >= 70).length;
+  const inProgressSkills = skillsProgress?.filter((skill) => skill.progress < 100);
+  const skillsToLearn = skillsProgress?.filter((skill) => skill.progress === 0);
+
+  const topSkills = skillsProgress?.filter((skill) => skill.progress > 0).sort((a, b) => b.proficiency - a.proficiency).slice(0, 5);
+
+  console.log(topSkills);
+
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Your Skills Dashboard</h1>
@@ -56,7 +81,7 @@ export default function SkillsPage() {
             <Book className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{skillsData.totalSkills}</div>
+            <div className="text-2xl font-bold">{skillsProgress?.length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -65,7 +90,7 @@ export default function SkillsPage() {
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{skillsData.masteredSkills}</div>
+            <div className="text-2xl font-bold">{masteredSkills}</div>
           </CardContent>
         </Card>
         <Card>
@@ -74,7 +99,7 @@ export default function SkillsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{skillsData.inProgressSkills}</div>
+            <div className="text-2xl font-bold">{inProgressSkills?.length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -83,12 +108,12 @@ export default function SkillsPage() {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{skillsData.skillsToLearn}</div>
+            <div className="text-2xl font-bold">{skillsToLearn?.length}</div>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="mb-8">
+      {/* <Card className="mb-8">
         <CardHeader>
           <CardTitle>Skill Growth Over Time</CardTitle>
           <CardDescription>Your skill acquisition progress</CardDescription>
@@ -104,7 +129,7 @@ export default function SkillsPage() {
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
-      </Card>
+      </Card> */}
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
@@ -114,10 +139,10 @@ export default function SkillsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {skillsData.topSkills.map((skill, index) => (
+              {topSkills?.map((skill, index) => (
                 <div key={index}>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">{skill.name}</span>
+                    <span className="text-sm font-medium">{typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}</span>
                     <span className="text-sm font-medium">{skill.proficiency}%</span>
                   </div>
                   <Progress value={skill.proficiency} className="w-full" />
@@ -134,15 +159,24 @@ export default function SkillsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {skillsData.skillsInProgress.map((skill, index) => (
-                <div key={index}>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">{skill.name}</span>
-                    <span className="text-sm font-medium">{skill.progress}%</span>
-                  </div>
-                  <Progress value={skill.progress} className="w-full" />
-                </div>
-              ))}
+              {
+                inProgressSkills && inProgressSkills.length > 0 ? (
+                  inProgressSkills?.map((skill, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm font-medium">{typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}</span>
+                        <span className="text-sm font-medium">{skill.progress}%</span>
+                      </div>
+                      <Progress value={skill.progress} className="w-full" />
+                    </div>
+                  ))
+                ) : (
+                  <Box>
+                    <Text>No skills in progress</Text>
+                    {/* <Button>Start Learning a New Skill</Button> */}
+                  </Box>
+                )
+              }
             </div>
           </CardContent>
         </Card>
@@ -151,23 +185,40 @@ export default function SkillsPage() {
       <Card className="mt-8">
         <CardHeader>
           <CardTitle>Skills to Acquire</CardTitle>
-          <CardDescription>Based on your career goal: {skillsData.careerGoal}</CardDescription>
+          <CardDescription>Based on your career goal: {profile?.careerPath}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {skillsData.skillsToAcquire.map((skill, index) => (
-              <Badge key={index} variant="secondary">
-                {skill}
-              </Badge>
-            ))}
+            {skillsToLearn && skillsToLearn.length > 0 ? (
+              skillsToLearn?.map((skill, index) => (
+                typeof skill.skillModuleId === 'string' ?
+                  skill.skillModuleId :
+                  skill.skillModuleId.skillsTargeted.map((subSkill) =>
+                    <Badge
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => router.push(`/dashboard/skills/workshop?skillId=${skill.skillModuleId._id}`)}
+                      key={index} variant="secondary">{subSkill}
+                    </Badge>
+                  )
+              ))
+            ) : (
+              <Box>
+                <Text>No skills to learn</Text>
+                {/* <Button>Start Learning a New Skill</Button> */}
+              </Box>
+            )}
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full">Start Learning a New Skill</Button>
+          <Box>
+            <Link href="/dashboard/skills/workshop">
+              <Button className="w-full" variant="outline">Start Learning a New Skill</Button>
+            </Link>
+          </Box>
         </CardFooter>
       </Card>
 
-      <Card className="mt-8">
+      {/* <Card className="mt-8">
         <CardHeader>
           <CardTitle>Skill Development Plan</CardTitle>
         </CardHeader>
@@ -228,7 +279,7 @@ export default function SkillsPage() {
             </TabsContent>
           </Tabs>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   )
 }

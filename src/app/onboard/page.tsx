@@ -1,9 +1,10 @@
 'use client'
 
+import { Textarea } from "@/components/ui/textarea"
 import { useCareerPath, useSuggestedOccupations, useSuggestedOccupationsByPersonality } from "@/services/useCareerPath"
 import { useProfile } from "@/services/useProfile"
 import { Box, Button, Card, CardBody, CardHeader, Container, Flex, Heading, Progress, Radio, RadioGroup, Stack, Text, VStack } from "@chakra-ui/react"
-import { Brain, Briefcase, ChevronLeft, ChevronRight, Lightbulb } from "lucide-react"
+import { Brain, Briefcase, BriefcaseConveyorBelt, ChevronLeft, ChevronRight, Lightbulb } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from 'react'
 
@@ -26,8 +27,18 @@ const personalityQuestions = [
   }
 ]
 
+const staticCareerRoles = [
+  "Software Developer",
+  "Data Scientist",
+  "UX Designer",
+  "Project Manager",
+  "Marketing Specialist",
+  "Financial Analyst",
+  "Other"
+]
+
 export default function OnboardingPage() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(0)
   const [selectedCareerPath, setSelectedCareerPath] = useState<string | null>(null)
   const [personalityAnswers, setPersonalityAnswers] = useState<string[]>([])
   const [selectedOccupation, setSelectedOccupation] = useState<string | null>(null)
@@ -41,9 +52,17 @@ export default function OnboardingPage() {
   const handleCareerPathSelect = (path: string) => {
     setSelectedCareerPath(path)
     if (path === "Other") {
-      setStep(2)
+      setStep(1)
     } else {
       setStep(3)
+    }
+  }
+
+  const handleCustomCareerPath = () => {
+    if (selectedCareerPath) {
+      setStep(3)
+    } else {
+      setStep(2)
     }
   }
 
@@ -75,25 +94,53 @@ export default function OnboardingPage() {
 
   const renderStep = () => {
     switch (step) {
-      case 1:
+      case 0:
         return (
           <Card bg="white" color="text.primary" borderColor="outline.dark" variant="outline">
             <CardHeader>
               <Heading size="md">Choose Your Career Path</Heading>
-              <Text>Select a career path that interests you, or choose "Other" if you're unsure.</Text>
+              <Text>Select a career path that interests you, or choose "Other" for more options.</Text>
+            </CardHeader>
+            <CardBody>
+              <RadioGroup onChange={handleCareerPathSelect}>
+                <VStack align="start" spacing={2}>
+                  {staticCareerRoles.map((role) => (
+                    <Radio key={role} value={role}>{role}</Radio>
+                  ))}
+                </VStack>
+              </RadioGroup>
+            </CardBody>
+          </Card>
+        )
+      case 1:
+        return (
+          <Card bg="white" color="text.primary" borderColor="outline.dark" variant="outline">
+            <CardHeader>
+              <Heading size="md">Specify Your Career Path</Heading>
+              <Text>Choose from our list or describe your desired career path.</Text>
             </CardHeader>
             <CardBody>
               {isLoadingCareerPaths ? (
                 <Text>Loading career paths...</Text>
               ) : (
-                <RadioGroup onChange={handleCareerPathSelect}>
-                  <VStack align="start" spacing={2}>
-                    {careerPaths?.map((path: any) => (
-                      <Radio key={path.careerPath} value={path.careerPath}>{path.careerPath}</Radio>
-                    ))}
-                    <Radio colorScheme="blue" value="Other">Other</Radio>
-                  </VStack>
-                </RadioGroup>
+                <>
+                  <RadioGroup onChange={setSelectedCareerPath} mb={4}>
+                    <VStack align="start" spacing={2}>
+                      {careerPaths?.map((path: any) => (
+                        <Radio key={path.careerPath} value={path.careerPath}>{path.careerPath}</Radio>
+                      ))}
+                    </VStack>
+                  </RadioGroup>
+                  <Box>
+                    <Text mb={2}>Or describe your desired career path:</Text>
+                    <Textarea
+                      value={selectedCareerPath || ''}
+                      onChange={(e) => setSelectedCareerPath(e.target.value)}
+                      placeholder="Describe your career path here..."
+                    />
+                  </Box>
+                  <Button mt={4} onClick={handleCustomCareerPath}>Continue</Button>
+                </>
               )}
             </CardBody>
           </Card>
@@ -150,25 +197,27 @@ export default function OnboardingPage() {
         <Progress value={(step / 3) * 100} size="sm" colorScheme="blue" />
       </Box>
       <Flex align="center" mb={6}>
+        {step === 0 && <BriefcaseConveyorBelt size={32} />}
         {step === 1 && <Briefcase size={32} />}
         {step === 2 && <Brain size={32} />}
         {step === 3 && <Lightbulb size={32} />}
         <Heading as="h2" size="lg" ml={4}>
-          {step === 1 && "Choose Your Path"}
+          {step === 0 && "Choose Your Path"}
+          {step === 1 && "Choose Other Path"}
           {step === 2 && "Discover Your Interests"}
           {step === 3 && "Explore Occupations"}
         </Heading>
       </Flex>
       {renderStep()}
       <Stack direction="row" justifyContent="space-between" mt={6}>
-        {step > 1 && (
+        {step > 0 && (
           <Button leftIcon={<ChevronLeft />} onClick={() => setStep(step - 1)} variant="outline">
             Back
           </Button>
         )}
-        {step < 3 && step !== 2 && (
+        {step < 3 && step !== 1 && (
           <Button rightIcon={<ChevronRight />} onClick={() => setStep(step + 1)} variant="outline" ml="auto">
-            Skip
+            {step === 0 ? "Skip" : "Next"}
           </Button>
         )}
         {step === 3 && (
