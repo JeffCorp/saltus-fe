@@ -7,6 +7,11 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import image1 from "@/assets/images/image1.jpg";
+import image2 from "@/assets/images/image2.jpg";
+import image3 from "@/assets/images/image3.jpg";
+import Image from "next/image";
+import { Rocket } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -41,32 +46,62 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-[90vh]">
+    <div className="flex max-h-[90vh]">
       {/* Left side - Carousel */}
-      <div className="w-1/2 bg-gray-200">
+      <div className="w-1/2 bg-gray-200 h-[100%]">
         <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false}>
-          <div>
-            <img src="/carousel-image-1.jpg" alt="CarLeap Feature 1" />
+          <div className="w-[100%] h-[calc(100vh-3.5rem)]">
+            <Image
+              src={image1}
+              alt="Login Image 1"
+              layout="fill"
+              objectFit="cover"
+              width={0}
+              height={0}
+            />
             <p className="legend">Accelerate Your Career with AI</p>
           </div>
-          <div>
-            <img src="/carousel-image-2.jpg" alt="CarLeap Feature 2" />
+          <div className="w-[100%] h-[calc(100vh-3.5rem)]">
+            <Image
+              src={image2}
+              alt="Login Image 2"
+              layout="fill"
+              objectFit="cover"
+              width={0}
+              height={0}
+            />
             <p className="legend">Connect with Industry Mentors</p>
           </div>
-          <div>
-            <img src="/carousel-image-3.jpg" alt="CarLeap Feature 3" />
+          <div className="w-[100%] h-[calc(100vh-3.5rem)]">
+            <Image
+              src={image3}
+              alt="Login Image 3"
+              layout="fill"
+              objectFit="cover"
+              width={0}
+              height={0}
+            />
             <p className="legend">Personalized Career Paths</p>
           </div>
         </Carousel>
       </div>
 
       {/* Right side - Login Form */}
-      <div className="w-1/2 flex items-center justify-center bg-gray-50">
+      <div className="w-1/2 flex items-center justify-center bg-white">
         <div className="max-w-md w-full space-y-8 p-8">
-          <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Sign in to {process.env.NEXT_PUBLIC_APP_NAME}
-            </h2>
+          <div className="flex flex-col items-center">
+            <div className="flex gap-2 items-center">
+              <Rocket className="text-indigo-600" />
+              <h2 className="text-xl font-extrabold text-indigo-600">
+                {process.env.NEXT_PUBLIC_APP_NAME}
+              </h2>
+            </div>
+            <p className="mt-10 text-3xl font-extrabold text-gray-900">
+              Welcome Back!
+            </p>
+            <h3 className="text-sm text-gray-600 mt-2">
+              Please enter your details
+            </h3>
           </div>
           {error && (
             <div
@@ -78,9 +113,12 @@ const Login = () => {
           )}
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <input type="hidden" name="remember" value="true" />
-            <div className="rounded-md shadow-sm -space-y-px">
+            <div className="rounded-md space-y-2">
               <div>
-                <label htmlFor="email-address" className="sr-only">
+                <label
+                  htmlFor="email-address"
+                  className="sr-only focus:not-sr-only"
+                >
                   Email address
                 </label>
                 <input
@@ -89,7 +127,7 @@ const Login = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none bg-white rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none relative block w-full px-3 py-4 border-b-2 border-gray-400 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -105,7 +143,7 @@ const Login = () => {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className="appearance-none bg-white rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none relative block w-full px-3 py-4 border-b-2 border-gray-400 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -116,7 +154,7 @@ const Login = () => {
             <Box>
               <button
                 type="submit"
-                className="group flex items-center gap-2 relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="group flex mt-12 items-center gap-2 relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Sign in
                 {isLoading && <Spinner size="sm" />}
