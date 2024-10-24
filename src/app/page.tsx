@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 
 export default function CareerLeapLanding() {
   const router = useRouter();
-  const { data: session } = useSession();
 
 
 
