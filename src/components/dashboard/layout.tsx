@@ -40,7 +40,10 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside className="min-w-64 bg-white shadow-md flex-1">
         <div className="p-4">
-          <Link href="/" className="text-2xl font-bold text-gray-800 flex items-center">
+          <Link
+            href="/"
+            className="text-2xl font-bold text-gray-800 flex items-center"
+          >
             <Rocket className="h-6 w-6 mr-2" />
             {process.env.NEXT_PUBLIC_APP_NAME}
           </Link>
@@ -50,8 +53,9 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             <Link
               key={item.name}
               href={item.link}
-              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${activeTab === item.name ? "bg-gray-100 text-gray-800" : ""
-                }`}
+              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${
+                activeTab === item.name ? "bg-indigo-600 text-white hover:bg-indigo-600 hover:text-white" : ""
+              }`}
               onClick={() => setActiveTab(item.name)}
             >
               <item.icon className="h-5 w-5 mr-3" />
@@ -62,7 +66,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
         <div className="flex items-center justify-center ml-3">
           <Button
             variant="outline"
-            className="w-full flex items-center justify-center"
+            className="w-full flex items-center justify-center text-indigo-600 border-indigo-600"
             onClick={() => signOut()}
           >
             <LogOut className="mr-2 h-4 w-4" />
