@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/ui/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -93,7 +92,6 @@ export default function RootLayout({
         <ChakraProvider theme={theme}>
           <SessionProvider>
             <QueryClientProvider client={queryClient}>
-              <Navbar />
               {children}
             </QueryClientProvider>
           </SessionProvider>
