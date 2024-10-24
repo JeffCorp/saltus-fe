@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
               name: response.data.name,
               isOnboarded: response.data.isOnboarded,
               accessToken: response.data.access_token,
-              refreshToken: response.data.refreshToken,
+              refreshToken: response.data.refresh_token,
             };
           } else {
             return null;
