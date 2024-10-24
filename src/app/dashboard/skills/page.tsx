@@ -196,7 +196,7 @@ export default function SkillsPage() {
                   skill.skillModuleId.skillsTargeted.map((subSkill) =>
                     <Badge
                       style={{ cursor: 'pointer' }}
-                      onClick={() => router.push(`/dashboard/skills/workshop?skillId=${skill.skillModuleId._id}`)}
+                      onClick={() => router.push(`/dashboard/skills/workshop?skillId=${typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}`)}
                       key={index} variant="secondary">{subSkill}
                     </Badge>
                   )

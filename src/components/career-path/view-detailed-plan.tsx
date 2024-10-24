@@ -40,7 +40,7 @@ const ViewDetailedPlan: React.FC<ViewDetailedPlanProps> = ({ isOpen, onClose, sk
             <Flex gap={4}>
               <Flex gap={4} flexDirection="column" flex={1}>
                 {skillsProgress.map((skill) => (
-                  <Box key={skill.id} borderWidth={1} borderRadius="md" p={4} onClick={() => setSelectedSkill(skill)}>
+                  <Box key={skill._id} borderWidth={1} borderRadius="md" p={4} onClick={() => setSelectedSkill(skill)}>
                     <HStack justifyContent="space-between" mb={2}>
                       <Text fontWeight="bold">{typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}</Text>
                       <Text>{skill.progress}%</Text>

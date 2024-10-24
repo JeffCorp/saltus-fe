@@ -34,7 +34,7 @@ const Workshop = () => {
     const skillId = searchParams.get('skillId');
 
     if (skillsProgress && skillId) {
-      const skill = skillsProgress.find(s => s.skillModuleId._id === skillId);
+      const skill = skillsProgress.find(s => typeof s.skillModuleId === 'string' ? s.skillModuleId === skillId : s.skillModuleId._id === skillId);
 
       console.log(skill);
 
@@ -46,7 +46,7 @@ const Workshop = () => {
 
   useEffect(() => {
     if (currentSkill) {
-      fetchQuestions(currentSkill?.skillModuleId._id);
+      fetchQuestions(typeof currentSkill.skillModuleId === 'string' ? currentSkill.skillModuleId : currentSkill.skillModuleId._id);
     }
   }, [currentSkill]);
 
@@ -58,7 +58,7 @@ const Workshop = () => {
     submitAnswer(
       {
         qnaId: qnaData._id,
-        skillId: currentSkill.id,
+        skillId: currentSkill._id,
         questionId: String(currentQuestionIndex + 1),
         selectedAnswer: selectedIndex,
       },

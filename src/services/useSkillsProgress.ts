@@ -2,10 +2,15 @@ import apiClient from "@/lib/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export interface SkillProgress {
-  id: string;
+  _id: string;
   skillModuleId:
     | string
-    | { name: string; description: string; skillsTargeted: string[] };
+    | {
+        _id: string;
+        name: string;
+        description: string;
+        skillsTargeted: string[];
+      };
   userId: string;
   progress: number;
   lastUpdated: Date;
@@ -41,7 +46,7 @@ export function useUpdateSkillProgress() {
   return useMutation<SkillProgress, Error, Partial<SkillProgress>>({
     mutationFn: async (updatedProgress) => {
       const { data } = await apiClient.patch<SkillProgress>(
-        `/skills-progress/${updatedProgress.id}`,
+        `/skills-progress/${updatedProgress._id}`,
         updatedProgress
       );
       return data;
