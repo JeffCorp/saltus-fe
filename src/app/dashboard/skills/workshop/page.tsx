@@ -6,12 +6,14 @@ import { SkillProgress, useSkillsProgressByUserId } from '@/services/useSkillsPr
 import { Box, Button, Container, Flex, Heading, Progress, Spinner, Text, useToast, VStack } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 const Workshop = () => {
   const router = useRouter();
   const toast = useToast();
   const { profile } = useProfile();
   const { data: skillsProgress, mutate: refreshSkillsProgress } = useSkillsProgressByUserId();
+  const session = uuidv4();
 
   const [currentSkill, setCurrentSkill] = useState<SkillProgress | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -61,6 +63,7 @@ const Workshop = () => {
         skillId: currentSkill._id,
         questionId: String(currentQuestionIndex + 1),
         selectedAnswer: selectedIndex,
+        sessionId: session,
       },
       {
         onSuccess: (data) => {
@@ -104,6 +107,8 @@ const Workshop = () => {
             duration: 5000,
             isClosable: true,
           });
+
+          router.push(`/dashboard/skills/results?sessionId=${session}`);
         },
         onError: () => {
           toast({

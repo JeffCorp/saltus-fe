@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { ConnectionStatus, useGetConnections } from "@/services/useConnections"
-import { Box, Flex, Link, Spinner, Text } from "@chakra-ui/react"
-import { Search, UserPlus, Users } from "lucide-react"
+import { Flex, Spinner, Text } from "@chakra-ui/react"
+import { Users } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useEffect } from "react"
 
@@ -100,32 +100,20 @@ export default function NetworkPage() {
                   </CardContent>
                 </Card>
 
-                {/* Top Connections */}
+                {/* Network Insights */}
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-md font-semibold">Top Connections</CardTitle>
+                    <CardTitle className="text-lg font-semibold">Network Insights</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {networkData.topConnections.map((connection, index) => (
-                        <div key={index} className="flex items-center space-x-4">
-                          <Avatar>
-                            <AvatarImage src={connection.image} alt={connection.name} />
-                            <AvatarFallback>{connection.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <Text className="font-semibold text-sm">{connection.name}</Text>
-                            <Text className="text-sm text-gray-600">{connection.role} at {connection.company}</Text>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <div className="text-3xl font-bold text-blue-600">+24%</div>
+                    <p className="text-sm text-gray-600">+20 connections this month</p>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Center Column */}
-              <div className="space-y-6 flex-[2.5]">
+              <div className="space-y-6 flex-[3]">
                 {/* Start a post */}
                 <Card>
                   <CardContent className="pt-4">
@@ -160,21 +148,13 @@ export default function NetworkPage() {
               </div>
 
               {/* Right Column */}
-              <div className="space-y-6 flex-[1.2]">
+              <div className="space-y-6 flex-[1.1] w-[300px]">
                 {/* Grow Your Network */}
                 <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold">Grow Your Network</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex space-x-2 mb-4">
-                      <Input placeholder="Search for professionals" className="flex-grow" />
-                      <Button variant="outline">
-                        <Search className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <div className="space-y-4">
-                      {networkData.recommendedConnections.map((connection, index) => (
+                  <CardContent className="p-2 ">
+                    <div>
+                      <NewConnections />
+                      {/* {networkData.recommendedConnections.map((connection, index) => (
                         <Flex key={index} className="items-center justify-between flex-col">
                           <Box className="flex items-start space-x-4">
                             <Avatar>
@@ -182,15 +162,39 @@ export default function NetworkPage() {
                               <AvatarFallback>{connection.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                             </Avatar>
                             <Box>
-                              <p className="font-semibold">{connection.name}</p>
-                              <p className="text-sm text-gray-600">{connection.role} at {connection.company}</p>
-                              <Link className="flex items-center pt-2">
+                              <Text className="font-semibold text-sm">{connection.name}</Text>
+                              <Text className="text-sm text-gray-600">{connection.role} at {connection.company}</Text>
+                              <Link className="flex items-center text-sm pt-2">
                                 <UserPlus className="h-4 mr-2" />
                                 Network
                               </Link>
                             </Box>
                           </Box>
                         </Flex>
+                      ))} */}
+                    </div>
+                  </CardContent>
+                </Card>
+
+
+                {/* Top Connections */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-md font-semibold">Top Connections</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {networkData.topConnections.map((connection, index) => (
+                        <div key={index} className="flex items-center space-x-4">
+                          <Avatar>
+                            <AvatarImage src={connection.image} alt={connection.name} />
+                            <AvatarFallback>{connection.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <Text className="font-semibold text-sm">{connection.name}</Text>
+                            <Text className="text-sm text-gray-600">{connection.role} at {connection.company}</Text>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </CardContent>
@@ -251,17 +255,6 @@ export default function NetworkPage() {
                         <Badge variant="outline">1d ago</Badge>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-
-                {/* Network Insights */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold">Network Insights</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-blue-600">+24%</div>
-                    <p className="text-sm text-gray-600">+20 connections this month</p>
                   </CardContent>
                 </Card>
               </div>

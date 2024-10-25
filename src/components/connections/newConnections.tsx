@@ -1,6 +1,7 @@
 "use client"
 
 import StatusIcon from '@/components/connections/StatusIcon'
+import { Input } from "@/components/ui/input"
 import { useAcceptConnection, useAddConnection, useGetConnections } from '@/services/useConnections'
 import useUsers from '@/services/useUsers'
 import {
@@ -10,7 +11,6 @@ import {
   Divider,
   Flex,
   HStack,
-  Input,
   Text,
   useToast,
   VStack,
@@ -35,7 +35,7 @@ const suggestedConnections = [
 export default function NewConnections() {
   const { data: session } = useSession()
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<typeof mockUsers>([])
+  const [searchResults, setSearchResults] = useState<{ _id: string, name: string, email: string, avatar: string }[]>([])
   const toast = useToast()
   const { mutate: getUsers, data: users } = useUsers()
   const { mutate: addConnection } = useAddConnection();
@@ -52,11 +52,11 @@ export default function NewConnections() {
   console.log(users);
   const handleSearch = () => {
     // In a real application, this would be an API call
-    const results = mockUsers.filter(
-      user => user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    setSearchResults(results)
+    // const results = mockUsers.filter(
+    //   user => user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //     user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    // )
+    // setSearchResults(results)
   }
 
   const sendConnectionRequest = (userId: string) => {
@@ -92,18 +92,17 @@ export default function NewConnections() {
   }
 
   return (
-    <Box className="max-w-2xl mx-auto p-4 min-h-[100vh]">
+    <Box className="max-w-2xl mx-auto">
       <VStack spacing={4} align="stretch">
         <HStack>
           <Input
             placeholder="Search by username or email"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-grow"
+            className="flex-grow text-sm"
           />
-          <Button onClick={handleSearch} colorScheme="blue">
-            <Search className="w-5 h-5 mr-2" />
-            Search
+          <Button variant="outline" onClick={handleSearch}>
+            <Search className="w-4 h-4" />
           </Button>
         </HStack>
 
@@ -111,7 +110,7 @@ export default function NewConnections() {
           <VStack align="stretch" spacing={2}>
             <Text fontWeight="bold" className="text-lg">Search Results</Text>
             {searchResults.map((user) => (
-              <HStack key={user.id} className="bg-white p-3 rounded-lg shadow-sm">
+              <HStack key={user._id} className="bg-white p-3 rounded-lg shadow-sm">
                 <Avatar src={user.avatar} name={user.name} size="sm" />
                 <VStack align="start" spacing={0} className="flex-grow">
                   <Text fontWeight="semibold">{user.name}</Text>
@@ -134,36 +133,40 @@ export default function NewConnections() {
         <Divider />
 
         <VStack align="stretch" spacing={2}>
-          <Text fontWeight="bold" className="text-lg">Suggested Connections</Text>
+          {/* <Text fontWeight="bold" className="text-lg">Suggested Connections</Text> */}
           {users?.map((user: any) => (
             <HStack key={user._id} className="bg-white p-3 rounded-lg shadow-sm">
-              <Avatar src={user.avatar} name={user.name} size="sm" />
-              <VStack align="start" spacing={0} className="flex-grow">
-                <Text fontWeight="semibold">{user.name}</Text>
-                <Text fontSize="sm" color="gray.600">{user.email}</Text>
-              </VStack>
-              {
-                connections?.find((connection: any) => connection.recipient == session?.user.id && connection.requester == user._id && connection.status.toLowerCase() === "pending") ?
-                  <Flex gap={2}>
-                    <Button size="sm" colorScheme="blue" variant="outline" onClick={() => acceptConnectionRequest(user._id)}>
-                      <Check className="w-4 h-4 mr-2" />
-                      Accept
-                    </Button>
-                    <Button size="sm" colorScheme="red" variant="outline" onClick={() => rejectConnectionRequest(user._id)}>
-                      <X className="w-4 h-4 mr-2" />
-                      Reject
-                    </Button>
-                  </Flex>
-                  :
-                  <Button
-                    size="sm"
-                    colorScheme="blue"
-                    variant="outline"
-                    onClick={() => sendConnectionRequest(user._id)}
-                  >
-                    <StatusIcon status={connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status} />
-                    {connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status ?? "Connect"}
-                  </Button>}
+              <Flex gap={2} flexDirection="column">
+                <Flex gap={2}>
+                  <Avatar src={user.avatar} name={user.name} size="sm" />
+                  <VStack align="start" spacing={0} className="flex-grow">
+                    <Text fontWeight="semibold">{user.name}</Text>
+                    <Text fontSize="sm" color="gray.600">{user.email}</Text>
+                  </VStack>
+                </Flex>
+                {
+                  connections?.find((connection: any) => connection.recipient == session?.user.id && connection.requester == user._id && connection.status.toLowerCase() === "pending") ?
+                    <Flex gap={2}>
+                      <Button size="sm" colorScheme="blue" variant="outline" onClick={() => acceptConnectionRequest(user._id)}>
+                        <Check className="w-4 h-4 mr-2" />
+                        Accept
+                      </Button>
+                      <Button size="sm" colorScheme="red" variant="outline" onClick={() => rejectConnectionRequest(user._id)}>
+                        <X className="w-4 h-4 mr-2" />
+                        Reject
+                      </Button>
+                    </Flex>
+                    :
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      variant="outline"
+                      onClick={() => sendConnectionRequest(user._id)}
+                    >
+                      <StatusIcon status={connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status} />
+                      {connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status ?? "Connect"}
+                    </Button>}
+              </Flex>
             </HStack>
           ))}
         </VStack>

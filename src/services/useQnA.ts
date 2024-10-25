@@ -19,6 +19,7 @@ export interface SubmitAnswerPayload {
   skillId: string;
   questionId: string;
   selectedAnswer: number;
+  sessionId: string;
 }
 
 export interface SubmitAnswerResponse {
