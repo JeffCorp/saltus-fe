@@ -11,19 +11,22 @@ const AuthPage = () => {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      if (session?.user.isOnboarded) {
-        router.push('/dashboard')
-      } else {
-        router.push('/onboard')
-      }
+      router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
+    } else if (status === 'unauthenticated') {
+      router.push('/login');
     }
   }, [status, session, router]);
 
-  console.log(session, status);
+  // Remove console.log in production
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Session:', session, 'Status:', status);
+  }
 
-  return <Flex height="100vh" bg="gray.100" alignItems="center" justifyContent="center">
-    <Spinner color="blue.500" />
-  </Flex>
+  return (
+    <Flex height="100vh" bg="gray.100" alignItems="center" justifyContent="center">
+      <Spinner color="blue.500" size="xl" thickness="4px" />
+    </Flex>
+  );
 }
 
 export default AuthPage;
