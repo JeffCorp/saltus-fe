@@ -142,10 +142,11 @@ export default function SkillsPage() {
               {topSkills?.map((skill, index) => (
                 <div key={index}>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">{typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}</span>
+                    <Link href={`/dashboard/skills/workshop?skillId=${typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}`}>
+                      <span className="text-sm font-medium">{typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}</span>
+                    </Link>
                     <span className="text-sm font-medium">{skill.proficiency}%</span>
                   </div>
-                  <Progress value={skill.proficiency} className="w-full" />
                 </div>
               ))}
             </div>
@@ -193,13 +194,12 @@ export default function SkillsPage() {
               skillsToLearn?.map((skill, index) => (
                 typeof skill.skillModuleId === 'string' ?
                   skill.skillModuleId :
-                  skill.skillModuleId.skillsTargeted.map((subSkill) =>
-                    <Badge
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => router.push(`/dashboard/skills/workshop?skillId=${typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}`)}
-                      key={index} variant="secondary">{subSkill}
-                    </Badge>
-                  )
+                  // skill.skillModuleId.map((subSkill) =>
+                  <Badge
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => router.push(`/dashboard/skills/workshop?skillId=${typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}`)}
+                    variant="secondary">{skill.skillModuleId.name}
+                  </Badge>
               ))
             ) : (
               <Box>

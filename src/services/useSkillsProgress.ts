@@ -17,6 +17,7 @@ export interface SkillProgress {
   timeSpent: number;
   completed: boolean;
   proficiency: number;
+  isRetaking: boolean;
 }
 
 export function useSkillsProgress() {
@@ -34,6 +35,17 @@ export function useSkillsProgressByUserId() {
     mutationFn: async (userId: string) => {
       const { data } = await apiClient.get<SkillProgress[]>(
         `/skills-progress/user/${userId}`
+      );
+      return data;
+    },
+  });
+}
+
+export function useSkillsProgressById() {
+  return useMutation({
+    mutationFn: async (skillProgressId: string) => {
+      const { data } = await apiClient.get<SkillProgress>(
+        `/skills-progress/${skillProgressId}`
       );
       return data;
     },

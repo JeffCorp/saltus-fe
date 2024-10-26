@@ -1,43 +1,73 @@
 "use client"
 
+import { useGetResultLogs } from '@/services/useResultLogs'
+import { useUpdateSkillProgress } from '@/services/useSkillsProgress'
 import {
   Badge,
   Box,
+  Button,
   Container,
   Divider,
+  Flex,
   Heading,
   HStack,
   Progress,
   SimpleGrid,
+  Spinner,
   Text,
   useColorModeValue,
   VStack,
 } from '@chakra-ui/react'
 import { CheckCircle, XCircle } from 'lucide-react'
-
-// Mock data for test results
-const testResults = {
-  totalQuestions: 10,
-  correctAnswers: 7,
-  questions: [
-    { id: 1, question: "What is the capital of France?", userAnswer: "Paris", correctAnswer: "Paris", isCorrect: true },
-    { id: 2, question: "Who painted the Mona Lisa?", userAnswer: "Van Gogh", correctAnswer: "Leonardo da Vinci", isCorrect: false },
-    { id: 3, question: "What is the largest planet in our solar system?", userAnswer: "Jupiter", correctAnswer: "Jupiter", isCorrect: true },
-    { id: 4, question: "In which year did World War II end?", userAnswer: "1945", correctAnswer: "1945", isCorrect: true },
-    { id: 5, question: "What is the chemical symbol for gold?", userAnswer: "Au", correctAnswer: "Au", isCorrect: true },
-    { id: 6, question: "Who wrote 'Romeo and Juliet'?", userAnswer: "Charles Dickens", correctAnswer: "William Shakespeare", isCorrect: false },
-    { id: 7, question: "What is the largest ocean on Earth?", userAnswer: "Pacific Ocean", correctAnswer: "Pacific Ocean", isCorrect: true },
-    { id: 8, question: "How many continents are there?", userAnswer: "7", correctAnswer: "7", isCorrect: true },
-    { id: 9, question: "What is the capital of Japan?", userAnswer: "Seoul", correctAnswer: "Tokyo", isCorrect: false },
-    { id: 10, question: "Who invented the telephone?", userAnswer: "Alexander Graham Bell", correctAnswer: "Alexander Graham Bell", isCorrect: true },
-  ],
-}
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo } from 'react'
 
 export default function TestSummary() {
   const bgColor = useColorModeValue('gray.50', 'gray.800')
   const cardBgColor = useColorModeValue('white', 'gray.700')
+  const { data: resultLogs, isPending: isLoadingResultLogs, mutate: getResultLogs } = useGetResultLogs()
+  const { data: skillProgress, status: statusUpdateSkillProgress, isPending: isLoadingSkillProgress, mutate: updateSkillProgress } = useUpdateSkillProgress()
+  const params = useSearchParams()
+  const sessionId = params.get('sessionId')
+  const skillProgressId = params.get('skillProgressId');
+  const router = useRouter()
 
-  const score = (testResults.correctAnswers / testResults.totalQuestions) * 100
+  useEffect(() => {
+    getResultLogs(sessionId || '')
+  }, [sessionId])
+
+  const score = useMemo(() => {
+    return (resultLogs?.filter((q) => q.isCorrect).length || 0) / (resultLogs?.length || 0) * 100
+  }, [resultLogs])
+
+  const correctAnswers = useMemo(() => {
+    return resultLogs?.filter((q) => q.isCorrect).length || 0
+  }, [resultLogs])
+
+  const totalQuestions = useMemo(() => {
+    return resultLogs?.length || 0
+  }, [resultLogs])
+
+  const handleRetakeTest = useCallback(() => {
+    updateSkillProgress({
+      _id: skillProgressId || '',
+      completed: false,
+      isRetaking: true,
+    },
+      {
+        onSuccess: (data) => {
+          const skillId = typeof data?.skillModuleId === 'string'
+            ? data.skillModuleId
+            : data?.skillModuleId?._id;
+          router.push(`/dashboard/skills/workshop?skillId=${skillId}`);
+        }
+      }
+    )
+  }, [])
+
+  if (isLoadingResultLogs) {
+    return <Spinner />
+  }
 
   return (
     <Box bg={bgColor} minHeight="100vh" py={8}>
@@ -53,8 +83,8 @@ export default function TestSummary() {
                 Your Score: {score.toFixed(1)}%
               </Heading>
               <HStack justify="space-between">
-                <Text>Correct Answers: {testResults.correctAnswers}</Text>
-                <Text>Total Questions: {testResults.totalQuestions}</Text>
+                <Text>Correct Answers: {correctAnswers}</Text>
+                <Text>Total Questions: {totalQuestions}</Text>
               </HStack>
               <Progress value={score} colorScheme={score >= 70 ? 'green' : score >= 50 ? 'yellow' : 'red'} size="lg" borderRadius="full" />
             </VStack>
@@ -67,12 +97,12 @@ export default function TestSummary() {
           </Heading>
 
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-            {testResults.questions.map((q) => (
-              <Box key={q.id} bg={cardBgColor} p={6} borderRadius="lg" boxShadow="md">
+            {resultLogs?.map((q, index) => (
+              <Box key={q._id} bg={cardBgColor} p={6} borderRadius="lg" boxShadow="md">
                 <VStack align="stretch" spacing={3}>
                   <HStack>
                     <Badge colorScheme={q.isCorrect ? 'green' : 'red'} fontSize="sm">
-                      Question {q.id}
+                      Question {index + 1}
                     </Badge>
                     {q.isCorrect ? (
                       <CheckCircle size={20} color="green" />
@@ -90,6 +120,9 @@ export default function TestSummary() {
             ))}
           </SimpleGrid>
         </VStack>
+        <Flex justify="center" mt={8}>
+          <Button onClick={handleRetakeTest}>Retake test</Button>
+        </Flex>
       </Container>
     </Box>
   )

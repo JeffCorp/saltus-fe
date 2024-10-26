@@ -5,7 +5,7 @@ import { useCompleteWorkshop, useGetQuestions, useSubmitAnswer } from '@/service
 import { SkillProgress, useSkillsProgressByUserId } from '@/services/useSkillsProgress';
 import { Box, Button, Container, Flex, Heading, Progress, Spinner, Text, useToast, VStack } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 const Workshop = () => {
@@ -13,7 +13,7 @@ const Workshop = () => {
   const toast = useToast();
   const { profile } = useProfile();
   const { data: skillsProgress, mutate: refreshSkillsProgress } = useSkillsProgressByUserId();
-  const session = uuidv4();
+  const session = useMemo(() => uuidv4(), []);
 
   const [currentSkill, setCurrentSkill] = useState<SkillProgress | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -37,8 +37,6 @@ const Workshop = () => {
 
     if (skillsProgress && skillId) {
       const skill = skillsProgress.find(s => typeof s.skillModuleId === 'string' ? s.skillModuleId === skillId : s.skillModuleId._id === skillId);
-
-      console.log(skill);
 
       if (skill) {
         setCurrentSkill(skill);
@@ -108,7 +106,7 @@ const Workshop = () => {
             isClosable: true,
           });
 
-          router.push(`/dashboard/skills/results?sessionId=${session}`);
+          router.push(`/dashboard/skills/results?sessionId=${session}&skillProgressId=${currentSkill._id}`);
         },
         onError: () => {
           toast({
