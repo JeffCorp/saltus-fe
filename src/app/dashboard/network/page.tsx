@@ -73,8 +73,8 @@ export default function NetworkPage() {
                       <div className="flex items-center">
                         <Users className="w-6 h-6 mr-2 text-blue-600" />
                         <Flex gap={1}>
-                          <Text className="text-sm font-bold">{networkData.totalConnections}</Text>
-                          <Text className="text-sm text-gray-600">Total Connections</Text>
+                          <Text className="text-xs font-bold">{networkData.totalConnections}</Text>
+                          <Text className="text-xs text-gray-600">Total Connections</Text>
                         </Flex>
                       </div>
                       {/* <Badge variant="secondary" className="text-xs">{networkData.newConnectionRequests} New</Badge> */}

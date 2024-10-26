@@ -1,5 +1,6 @@
 'use client'
 
+import { NewProjectSimulation } from "@/components/projects/newProject"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -96,7 +97,7 @@ const aiScenarios = [
   },
 ]
 
-export default function ProjectsPage() {
+export default function Component() {
   const [selectedScenario, setSelectedScenario] = useState<{ title: string; description: string } | null>(null)
 
   return (
@@ -278,7 +279,7 @@ export default function ProjectsPage() {
                       <Bar dataKey="insights" fill="#8884d8" />
                     </BarChart>
                   </ResponsiveContainer>
-                  <p className="mt-2 text-sm text-center">Insights generated per week (last 4 weeks)</p>
+                  <p className="mt-2  text-sm text-center">Insights generated per week (last 4 weeks)</p>
                 </div>
               </TabsContent>
             </Tabs>
@@ -331,9 +332,10 @@ export default function ProjectsPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-8 flex justify-center">
+      <NewProjectSimulation />
+      {/* <div className="mt-8 flex justify-center">
         <Button>Start a New Project Simulation</Button>
-      </div>
+      </div> */}
     </div>
   )
 }

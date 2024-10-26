@@ -140,27 +140,28 @@ export default function NewConnections() {
                 <Flex gap={2}>
                   <Avatar src={user.avatar} name={user.name} size="sm" />
                   <VStack align="start" spacing={0} className="flex-grow">
-                    <Text fontWeight="semibold">{user.name}</Text>
-                    <Text fontSize="sm" color="gray.600">{user.email}</Text>
+                    <Text fontSize="xs" fontWeight="semibold">{user.name}</Text>
+                    <Text fontSize="xs" color="gray.600">{user.email}</Text>
                   </VStack>
                 </Flex>
                 {
                   connections?.find((connection: any) => connection.recipient == session?.user.id && connection.requester == user._id && connection.status.toLowerCase() === "pending") ?
                     <Flex gap={2}>
-                      <Button size="sm" colorScheme="blue" variant="outline" onClick={() => acceptConnectionRequest(user._id)}>
+                      <Button size="xs" colorScheme="blue" variant="outline" onClick={() => acceptConnectionRequest(user._id)}>
                         <Check className="w-4 h-4 mr-2" />
                         Accept
                       </Button>
-                      <Button size="sm" colorScheme="red" variant="outline" onClick={() => rejectConnectionRequest(user._id)}>
+                      <Button size="xs" colorScheme="red" variant="outline" onClick={() => rejectConnectionRequest(user._id)}>
                         <X className="w-4 h-4 mr-2" />
                         Reject
                       </Button>
                     </Flex>
                     :
                     <Button
-                      size="sm"
+                      size="xs"
                       colorScheme="blue"
                       variant="outline"
+                      w="full"
                       onClick={() => sendConnectionRequest(user._id)}
                     >
                       <StatusIcon status={connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status} />
