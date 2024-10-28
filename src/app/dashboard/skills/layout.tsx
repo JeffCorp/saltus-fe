@@ -1,3 +1,4 @@
+import Dashboard from '@/components/dashboard/layout';
 import { Inter } from 'next/font/google';
 import { Suspense } from 'react';
 
@@ -12,7 +13,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Suspense fallback={<div>Loading...</div>}>
-          {children}
+          <Dashboard>{children}</Dashboard>
         </Suspense>
       </body>
     </html>
