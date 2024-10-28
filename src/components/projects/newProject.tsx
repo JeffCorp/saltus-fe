@@ -21,7 +21,7 @@ export function NewProjectSimulation() {
   const [reportFrequency, setReportFrequency] = useState('')
   const [selectedScenario, setSelectedScenario] = useState('')
   const [collaborators, setCollaborators] = useState([''])
-  const [estimatedTimeFrame, setEstimatedTimeFrame] = useState('2 weeks')
+  const [estimatedTimeFrame, setEstimatedTimeFrame] = useState(2)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   const handleAddCollaborator = () => {
@@ -49,7 +49,7 @@ export function NewProjectSimulation() {
     setReportFrequency('')
     setSelectedScenario('')
     setCollaborators([''])
-    setEstimatedTimeFrame('2 weeks')
+    setEstimatedTimeFrame(2)
     setAcceptedTerms(false)
   }
 
@@ -120,7 +120,7 @@ export function NewProjectSimulation() {
                     id="time-frame"
                     type="number"
                     value={estimatedTimeFrame}
-                    onChange={(e) => setEstimatedTimeFrame(e.target.value)}
+                    onChange={(e) => setEstimatedTimeFrame(Number(e.target.value))}
                   />
                   <InputRightElement>
                     <Box className="flex items-center justify-center mr-[2rem] bg-gray-200 rounded-md py-1 px-2">

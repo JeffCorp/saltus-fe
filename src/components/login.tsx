@@ -1,17 +1,17 @@
 "use client";
 
+import image1 from "@/assets/images/image1.jpg";
+import image2 from "@/assets/images/image2.jpg";
+import image3 from "@/assets/images/image3.jpg";
 import { Box, Spinner, Text } from "@chakra-ui/react";
-import { signIn } from "next-auth/react";
+import { Rocket } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import image1 from "@/assets/images/image1.jpg";
-import image2 from "@/assets/images/image2.jpg";
-import image3 from "@/assets/images/image3.jpg";
-import Image from "next/image";
-import { Rocket } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,6 +19,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { data: session } = useSession();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +38,7 @@ const Login = () => {
         console.log(result);
       } else {
         setIsLoading(false);
-        router.push("/onboard");
+        router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
       }
     } catch (err) {
       console.error("Sign in error:", err);
