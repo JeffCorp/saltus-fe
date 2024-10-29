@@ -53,7 +53,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             <Link
               key={item.name}
               href={item.link}
-              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${
+              className={`flex items-center px-6 py-4 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${
                 activeTab === item.name ? "bg-indigo-600 text-white hover:bg-indigo-600 hover:text-white" : ""
               }`}
               onClick={() => setActiveTab(item.name)}
