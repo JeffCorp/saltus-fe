@@ -1,17 +1,18 @@
 "use client";
 
+import image1 from "@/assets/images/image1.jpg";
+import image2 from "@/assets/images/image2.jpg";
+import image3 from "@/assets/images/image3.jpg";
 import { useRegister } from "@/services/useAuth";
 import { Spinner, Text, useToast } from "@chakra-ui/react";
+import { Rocket } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import image1 from "@/assets/images/image1.jpg";
-import image2 from "@/assets/images/image2.jpg";
-import image3 from "@/assets/images/image3.jpg";
-import Image from "next/image";
-import { Rocket } from "lucide-react";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -19,8 +20,10 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const { mutate: signUp, isPending: isLoading } = useRegister();
+  const { mutate: signUp, isPending: isLoading, data, status: regStatus, isError } = useRegister();
   const toast = useToast();
+  const { data: session } = useSession();
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,26 +31,65 @@ const Register = () => {
 
     try {
       const response = signUp({ name, email, password });
-      console.log(response);
 
-      toast({
-        title: "Account created.",
-        description: "We've created your account for you.",
-        status: "success",
-        duration: 9000,
-        isClosable: true,
-      });
-      router.push("/login");
-    } catch (err) {
-      console.error("Sign up error:", err);
+      console.log("data", data);
+      console.log("regStatus", regStatus);
+
+    } catch (err: any) {
+      console.error("Sign up error:", err?.message);
       setError("An unexpected error occurred. Please try again.");
     }
   };
 
+  const handleLogin = async () => {
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (result?.error) {
+        setError(result.error);
+        console.log(result);
+      } else {
+        router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
+      }
+    } catch (err) {
+      console.error("Sign in error:", err);
+      setError("An unexpected error occurred. Please try again.");
+    }
+  };
+
+  console.log(session);
+
+
+  if (regStatus === "success") {
+    toast({
+      title: "Account created.",
+      description: "We've created your account for you.",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+
+    handleLogin()
+  }
+
+  if (isError) {
+    toast({
+      title: "Error creating account",
+      description: "Error creating account",
+      status: "error",
+      duration: 3000,
+      isClosable: true,
+    });
+  }
+
   return (
     <div className="flex max-h-[90vh]">
       {/* Left side - Carousel */}
-      <div className="w-1/2 bg-gray-200 h-[100%]">
+      <div className="w-1/2 bg-gray-200 h-[100%] hidden md:block">
         <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false}>
           <div className="w-[100%] h-[calc(100vh-3.5rem)]">
             <Image
@@ -86,7 +128,7 @@ const Register = () => {
       </div>
 
       {/* Right side - Login Form */}
-      <div className="w-1/2 flex items-center justify-center bg-white">
+      <div className="w-full md:w-1/2 flex items-center justify-center bg-white">
         <div className="max-w-md w-full space-y-8 p-8">
           <div className="flex flex-col items-center">
             <div className="flex gap-2 items-center">

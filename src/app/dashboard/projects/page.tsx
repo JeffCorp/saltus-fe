@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Box } from "@chakra-ui/react"
 import { AlertCircle, Brain, Briefcase, CheckCircle2, Clock, TrendingUp, Users, Users2 } from "lucide-react"
 import { useState } from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
@@ -99,6 +100,15 @@ const aiScenarios = [
 
 export default function Component() {
   const [selectedScenario, setSelectedScenario] = useState<{ title: string; description: string } | null>(null)
+  const [isDeveloping, setIsDeveloping] = useState(true);
+
+  if (isDeveloping) {
+    return (
+      <Box style={{ padding: "20px" }}>
+        <h3>Coming soon</h3>
+      </Box>
+    )
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

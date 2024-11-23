@@ -28,14 +28,22 @@ const personalityQuestions = [
 ]
 
 const staticCareerRoles = [
-  "Software Developer",
-  "Data Scientist",
-  "UX Designer",
-  "Project Manager",
-  "Marketing Specialist",
-  "Financial Analyst",
-  "Other"
-]
+  "Technology Professional",      // Encompasses developers, analysts, system architects
+  "Healthcare Provider",          // Doctors, nurses, therapists
+  "Business Manager",            // Project managers, operations, administrators
+  "Financial Expert",            // Analysts, accountants, advisors
+  "Creative Professional",       // Designers, artists, content creators
+  "Educator",                    // Teachers, professors, trainers
+  "Engineer",                    // All engineering disciplines
+  "Legal Professional",          // Lawyers, paralegals, compliance officers
+  "Marketing & Communications",  // Marketing, PR, communications
+  "Sales Professional",          // Sales managers, business development
+  "Research Scientist",          // Researchers across all fields
+  "Social Service Provider",     // Social workers, counselors, community workers
+  "Entrepreneur",               // Business owners, freelancers
+  "Trades Professional",        // Skilled trades and technical work
+  "Other"                       // For roles not covered above
+];
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(0)
@@ -45,9 +53,9 @@ export default function OnboardingPage() {
   const { profile, isLoading, isError, error, updateProfile, isUpdating } = useProfile()
   const router = useRouter()
 
-  const { data: careerPaths, isLoading: isLoadingCareerPaths } = useCareerPath()
-  const { data: suggestedOccupations, isLoading: isLoadingSuggestions, refetch } = useSuggestedOccupations(selectedCareerPath)
-  const { data: suggestedOccupationsByPersonality, isLoading: isLoadingSuggestionsByPersonality, refetch: refetchSuggestionsByPersonality } = useSuggestedOccupationsByPersonality(personalityAnswers)
+  const { data: careerPaths, isPending: isLoadingCareerPaths, mutate: fetchCareerPaths } = useCareerPath()
+  const { data: suggestedOccupations, isPending: isLoadingSuggestions, mutate: fetchSuggestedOccupations } = useSuggestedOccupations(selectedCareerPath)
+  const { data: suggestedOccupationsByPersonality, isPending: isLoadingSuggestionsByPersonality, mutate: fetchSuggestionsByPersonality } = useSuggestedOccupationsByPersonality(personalityAnswers)
 
   const handleCareerPathSelect = (path: string) => {
     setSelectedCareerPath(path)
@@ -61,15 +69,23 @@ export default function OnboardingPage() {
   const handleCustomCareerPath = () => {
     if (selectedCareerPath) {
       setStep(3)
+
+      selectedCareerPath.toLowerCase() !== "other" && fetchSuggestedOccupations()
     } else {
       setStep(2)
     }
+  }
+
+  const loadOtherOptions = () => {
+    fetchSuggestedOccupations()
   }
 
   const handlePersonalityAnswer = (answer: string) => {
     setPersonalityAnswers([...personalityAnswers, answer])
     if (personalityAnswers.length === personalityQuestions.length - 1) {
       setStep(3)
+
+      fetchSuggestionsByPersonality()
     }
   }
 
@@ -124,19 +140,19 @@ export default function OnboardingPage() {
                 <Text>Loading career paths...</Text>
               ) : (
                 <>
-                  <RadioGroup onChange={setSelectedCareerPath} mb={4}>
+                  {careerPaths && <RadioGroup onChange={setSelectedCareerPath} mb={4}>
                     <VStack align="start" spacing={2}>
                       {careerPaths?.map((path: any) => (
                         <Radio key={path.careerPath} value={path.careerPath}>{path.careerPath}</Radio>
                       ))}
                     </VStack>
-                  </RadioGroup>
+                  </RadioGroup>}
                   <Box>
-                    <Text mb={2}>Or describe your desired career path:</Text>
+                    <Text mb={2}>Kindly describe your desired career path:</Text>
                     <Textarea
-                      value={selectedCareerPath || ''}
+                      value={(selectedCareerPath?.toLowerCase() === "other" ? '' : selectedCareerPath) ?? ''}
                       onChange={(e) => setSelectedCareerPath(e.target.value)}
-                      placeholder="Describe your career path here..."
+                      placeholder={`Describe your career path here... Your inclinations, Hobbies, or anything you think could help us recommend a path to you`}
                     />
                   </Box>
                   <Button mt={4} onClick={handleCustomCareerPath}>Continue</Button>
@@ -184,6 +200,7 @@ export default function OnboardingPage() {
                   </VStack>
                 </RadioGroup>
               )}
+              <Button mt={3} onClick={loadOtherOptions}>Load other options</Button>
             </CardBody>
           </Card>
         )

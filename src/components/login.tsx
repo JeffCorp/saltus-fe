@@ -50,7 +50,7 @@ const Login = () => {
   return (
     <div className="flex max-h-[90vh]">
       {/* Left side - Carousel */}
-      <div className="w-1/2 bg-gray-200 h-[100%]">
+      <div className="w-1/2 bg-gray-200 h-[100%] hidden md:block">
         <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false}>
           <div className="w-[100%] h-[calc(100vh-3.5rem)]">
             <Image
@@ -90,7 +90,7 @@ const Login = () => {
       </div>
 
       {/* Right side - Login Form */}
-      <div className="w-1/2 flex items-center justify-center bg-white">
+      <div className="w-full md:w-1/2 flex items-center justify-center bg-white">
         <div className="max-w-md w-full space-y-8 p-8">
           <div className="flex flex-col items-center">
             <div className="flex gap-2 items-center">

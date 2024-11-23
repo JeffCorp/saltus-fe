@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Box } from "@chakra-ui/react"
 import { ArrowRight, ExternalLink, Newspaper, TrendingUp, Zap } from 'lucide-react'
+import { useState } from "react"
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 // Mock data - In a real application, this would come from an API
@@ -47,6 +49,16 @@ const industryNews = [
 ]
 
 export default function CareerTrendInsights() {
+  const [isDeveloping, setIsDeveloping] = useState(true);
+
+  if (isDeveloping) {
+    return (
+      <Box style={{ padding: "20px" }}>
+        <h3>Coming soon</h3>
+      </Box>
+    )
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Career Trend Insights</h1>

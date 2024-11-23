@@ -3,6 +3,7 @@
 import { useProfile } from '@/services/useProfile';
 import { useCompleteWorkshop, useGetQuestions, useSubmitAnswer } from '@/services/useQnA';
 import { SkillProgress, useSkillsProgressByUserId } from '@/services/useSkillsProgress';
+import { removeEscapeCharacters } from '@/utils';
 import { Box, Button, Container, Flex, Heading, Progress, Spinner, Text, useToast, VStack } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -133,10 +134,10 @@ const Workshop = () => {
           <>
             <Box>
               <Text fontWeight="bold">Question {currentQuestionIndex + 1} of {qnaData.questions.length}</Text>
-              <Text mt={2}>{qnaData.questions[currentQuestionIndex].text}</Text>
+              <Text mt={2}>{removeEscapeCharacters(qnaData.questions[currentQuestionIndex].text)}</Text>
             </Box>
             <Progress value={(currentQuestionIndex / qnaData.questions.length) * 100} size="sm" colorScheme="blue" />
-            <Flex flexDirection="column" gap={3}>
+            <Flex flexDirection="column" gap={3} alignSelf="start" maxW="100vw">
               {qnaData.questions[currentQuestionIndex].options.map((option, index) => (
                 <Button
                   variant="ghost"
@@ -148,8 +149,11 @@ const Workshop = () => {
                   width="full"
                   isDisabled={answerSubmitted}
                   _focus={{ boxShadow: 'none' }}
+                  p={2}
+                  h={"auto"}
+                  sx={{ justifyContent: 'start', border: "1px solid #67676767", textWrap: "wrap" }}
                 >
-                  {option}
+                  {removeEscapeCharacters(option)}
                 </Button>
               ))}
             </Flex>

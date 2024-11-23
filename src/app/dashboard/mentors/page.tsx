@@ -6,9 +6,21 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
+import { Box } from "@chakra-ui/react"
 import { Briefcase, MessageCircle, Search, Star } from "lucide-react"
+import { useState } from "react"
 
 export default function MentorsPage() {
+  const [isDeveloping, setIsDeveloping] = useState(true);
+
+  if (isDeveloping) {
+    return (
+      <Box style={{ padding: "20px" }}>
+        <h3>Coming soon</h3>
+      </Box>
+    )
+  }
+
   const mentors = [
     {
       name: "Alice Johnson",

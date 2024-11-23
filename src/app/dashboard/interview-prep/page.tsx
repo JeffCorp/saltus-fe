@@ -7,12 +7,22 @@ import { Label } from "@/components/ui/label"
 import { Select } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
+import { Box } from "@chakra-ui/react"
 import { FileText, Mic, Video } from 'lucide-react'
 import { useState } from 'react'
 
 export default function InterviewPreparation() {
   const [selectedRole, setSelectedRole] = useState<string>('')
   const [feedback, setFeedback] = useState<string>('')
+  const [isDeveloping, setIsDeveloping] = useState(true);
+
+  if (isDeveloping) {
+    return (
+      <Box style={{ padding: "20px" }}>
+        <h3>Coming soon</h3>
+      </Box>
+    )
+  }
 
   const handleStartMockInterview = () => {
     // Placeholder for starting mock interview

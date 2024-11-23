@@ -166,7 +166,8 @@ export default function NewConnections() {
                     >
                       <StatusIcon status={connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status} />
                       {connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status ?? "Connect"}
-                    </Button>}
+                    </Button>
+                }
               </Flex>
             </HStack>
           ))}

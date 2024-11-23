@@ -4,8 +4,8 @@ import ViewDetailedPlan from '@/components/career-path/view-detailed-plan'
 import { useProfile } from "@/services/useProfile"
 import { useSkills } from "@/services/useSkills"
 import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
-import { Badge, Box, Button, Card, CardBody, CardFooter, CardHeader, Container, Flex, Grid, Heading, List, ListIcon, ListItem, Progress, Spinner, Text, useColorModeValue } from "@chakra-ui/react"
-import { Award, Book, ChevronRight, Clock, Target } from "lucide-react"
+import { Badge, Box, Button, Card, CardBody, CardFooter, CardHeader, Container, Flex, Grid, Heading, List, ListItem, Progress, Spinner, Text, useColorModeValue } from "@chakra-ui/react"
+import { Book, ChevronRight, Clock, Target } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useEffect, useMemo, useState } from "react"
 
@@ -17,8 +17,8 @@ const userData = {
   currentRole: "Junior Software Developer",
   skillsProgress: 65,
   totalTimeSpent: 120, // hours
-  completedCourses: 4,
-  earnedCertifications: 2,
+  completedCourses: 0,
+  earnedCertifications: 0,
   improvementAreas: [
     "System Design",
     "Leadership Skills",
@@ -65,7 +65,7 @@ export default function CareerPathProgressPage() {
 
   const totalTimeSpent = useMemo(() => {
     if (!skillsProgress || skillsProgress.length === 0) return 0;
-    return skillsProgress?.reduce((acc, skill) => acc + skill.timeSpent, 0);
+    return Math.round(skillsProgress?.reduce((acc, skill) => acc + skill.timeSpent, 0) / skillsProgress.length);
   }, [skillsProgress]);
 
   const careerPath = profile?.careerPath || "";
@@ -87,7 +87,7 @@ export default function CareerPathProgressPage() {
                 <>
                   <Text><strong>Name:</strong> {profile.name}</Text>
                   <Text><strong>Current Role:</strong> {profile.currentRole || "Not Set"}</Text>
-                  <Text><strong>Career Path:</strong> {profile.careerPath}</Text>
+                  <Text><strong>Career Path:</strong> <span style={{ textTransform: 'capitalize' }}>{profile.careerPath}</span></Text>
                   <Text><strong>Target Role:</strong> {profile.projectedRole}</Text>
                 </>
               )
@@ -143,14 +143,15 @@ export default function CareerPathProgressPage() {
           // },
           {
             title: "Recent Achievements", content: (
-              <List spacing={2}>
-                {userData.recentAchievements.map((achievement, index) => (
-                  <ListItem key={index} display="flex" alignItems="flex-start">
-                    <ListIcon as={Award} color="yellow.500" mt={1} />
-                    <Text>{achievement}</Text>
-                  </ListItem>
-                ))}
-              </List>
+              <>Coming Soon</>
+              // <List spacing={2}>
+              //   {userData.recentAchievements.map((achievement, index) => (
+              //     <ListItem key={index} display="flex" alignItems="flex-start">
+              //       <ListIcon as={Award} color="yellow.500" mt={1} />
+              //       <Text>{achievement}</Text>
+              //     </ListItem>
+              //   ))}
+              // </List>
             )
           },
         ].map((card, index) => (
