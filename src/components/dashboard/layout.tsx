@@ -17,11 +17,16 @@ import {
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 export default function Dashboard({ children }: { children: React.ReactNode }) {
   const [activeTab, setActiveTab] = useState("Home");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname()
+
+  console.log("pathname => ", pathname);
+
 
   const navItems = [
     { name: "Home", icon: Home, link: "/dashboard" },
@@ -64,7 +69,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             <Link
               key={item.name}
               href={item.link}
-              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${(window.location.pathname === item.link) ? "bg-indigo-600 text-white hover:bg-indigo-600 hover:text-white" : ""}`}
+              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${(pathname === item.link) ? "bg-indigo-600 text-white hover:bg-indigo-600 hover:text-white" : ""}`}
               onClick={() => handleNavigation(item.name)}
             >
               <item.icon className="h-5 w-5 mr-3" />

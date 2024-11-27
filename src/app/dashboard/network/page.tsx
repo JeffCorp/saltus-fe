@@ -183,7 +183,7 @@ export default function NetworkPage() {
 
                 {/* Recent Posts */}
                 {posts?.length > 0 ?
-                  <Box overflowY="auto" maxHeight="60vh" gap={4} display="flex" flexDirection="column">
+                  <Box overflowY="auto" maxHeight="100vh" gap={4} display="flex" flexDirection="column">
                     {posts.map((post: any, index: number) => (
                       <Card key={index}>
                         <CardContent className="pt-4">
