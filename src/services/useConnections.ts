@@ -15,6 +15,14 @@ async function fetchUserConnections() {
   return response.data;
 }
 
+async function fetchUserTopConnections() {
+  const response = await apiClient.get(`/connections/top`);
+  if (response.status !== 200) {
+    throw new Error("Network response was not ok");
+  }
+  return response.data;
+}
+
 async function addConnection(connectionData: {
   requester: string;
   recipient: string;
@@ -54,6 +62,15 @@ async function rejectConnection(connectionData: { _id: string }) {
 export const useGetConnections = () =>
   useMutation({
     mutationFn: () => fetchUserConnections(),
+    onSuccess: () => {},
+    onError: (error) => {
+      console.error("Error fetching user connections:", error);
+    },
+  });
+
+export const useGetTopConnections = () =>
+  useMutation({
+    mutationFn: () => fetchUserTopConnections(),
     onSuccess: () => {},
     onError: (error) => {
       console.error("Error fetching user connections:", error);

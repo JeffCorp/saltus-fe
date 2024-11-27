@@ -135,7 +135,7 @@ export default function NewConnections() {
         <VStack align="stretch" spacing={2}>
           {/* <Text fontWeight="bold" className="text-lg">Suggested Connections</Text> */}
           {users?.map((user: any) => (
-            <HStack key={user._id} className="bg-white p-3 rounded-lg shadow-sm">
+            <HStack key={user._id} className="bg-white p-3 rounded-lg shadow-sm w-full">
               <Flex gap={2} flexDirection="column">
                 <Flex gap={2}>
                   <Avatar src={user.avatar} name={user.name} size="sm" />
@@ -157,16 +157,17 @@ export default function NewConnections() {
                       </Button>
                     </Flex>
                     :
-                    <Button
-                      size="xs"
-                      colorScheme="blue"
-                      variant="outline"
-                      w="full"
-                      onClick={() => sendConnectionRequest(user._id)}
-                    >
-                      <StatusIcon status={connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status} />
-                      {connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status ?? "Connect"}
-                    </Button>
+                    <Box>
+                      <Button
+                        size="xs"
+                        colorScheme="blue"
+                        variant="outline"
+                        onClick={() => sendConnectionRequest(user._id)}
+                      >
+                        <StatusIcon status={connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status} />
+                        {connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status ?? "Connect"}
+                      </Button>
+                    </Box>
                 }
               </Flex>
             </HStack>

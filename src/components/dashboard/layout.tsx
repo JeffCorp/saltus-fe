@@ -13,7 +13,7 @@ import {
   MessageSquare,
   Rocket,
   Users,
-  X,
+  X
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -64,8 +64,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             <Link
               key={item.name}
               href={item.link}
-              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${activeTab === item.name ? "bg-indigo-600 text-white hover:bg-indigo-600 hover:text-white" : ""
-                }`}
+              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${(window.location.pathname === item.link) ? "bg-indigo-600 text-white hover:bg-indigo-600 hover:text-white" : ""}`}
               onClick={() => handleNavigation(item.name)}
             >
               <item.icon className="h-5 w-5 mr-3" />
@@ -107,6 +106,10 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
         </header>
 
         <div className="pt-[80px] bg-white overflow-y-scroll h-[100vh]">{children}</div>
+        {/* Create a floating button to add new connections */}
+        <Button className="fixed bottom-[50px] flex items-center justify-center right-[50px] bg-indigo-600 rounded-[50%] text-white p-4 rounded-full shadow-lg w-[70px] h-[70px]">
+          <MessageSquare className="h-5 w-5" />
+        </Button>
       </main>
     </div>
   );
