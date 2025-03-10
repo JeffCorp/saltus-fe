@@ -1,32 +1,19 @@
 "use client"
 
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
 import { useGetResultLogs } from '@/services/useResultLogs'
 import { useUpdateSkillProgress } from '@/services/useSkillsProgress'
-import {
-  Badge,
-  Box,
-  Button,
-  Container,
-  Divider,
-  Flex,
-  Heading,
-  HStack,
-  Progress,
-  SimpleGrid,
-  Spinner,
-  Text,
-  useColorModeValue,
-  VStack,
-} from '@chakra-ui/react'
+import { Spinner } from '@chakra-ui/react'
 import { CheckCircle, XCircle } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo } from 'react'
 
 export default function TestSummary() {
-  const bgColor = useColorModeValue('gray.50', 'gray.800')
-  const cardBgColor = useColorModeValue('white', 'gray.700')
   const { data: resultLogs, isPending: isLoadingResultLogs, mutate: getResultLogs } = useGetResultLogs()
-  const { data: skillProgress, status: statusUpdateSkillProgress, isPending: isLoadingSkillProgress, mutate: updateSkillProgress } = useUpdateSkillProgress()
+  const { mutate: updateSkillProgress } = useUpdateSkillProgress()
   const params = useSearchParams()
   const sessionId = params.get('sessionId')
   const skillProgressId = params.get('skillProgressId');
@@ -61,69 +48,87 @@ export default function TestSummary() {
             : data?.skillModuleId?._id;
           router.push(`/dashboard/skills/workshop?skillId=${skillId}`);
         }
-      }
-    )
-  }, [])
+      })
+  }, [skillProgressId])
 
   if (isLoadingResultLogs) {
-    return <Spinner />
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-[#111111]">
+        <Spinner color="#8A2EFF" size="xl" />
+      </div>
+    )
   }
 
   return (
-    <Box bg={bgColor} minHeight="100vh" py={8}>
-      <Container maxW="container.xl">
-        <VStack spacing={8} align="stretch">
-          <Heading as="h1" size="2xl" textAlign="center">
-            Test Summary
-          </Heading>
+    <div className="min-h-screen bg-[#111111] py-8 px-4">
+      <div className="container max-w-6xl mx-auto space-y-8">
+        <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
+          Test Summary
+        </h1>
 
-          <Box bg={cardBgColor} p={6} borderRadius="lg" boxShadow="md">
-            <VStack spacing={4} align="stretch">
-              <Heading as="h2" size="lg">
-                Your Score: {score.toFixed(1)}%
-              </Heading>
-              <HStack justify="space-between">
-                <Text>Correct Answers: {correctAnswers}</Text>
-                <Text>Total Questions: {totalQuestions}</Text>
-              </HStack>
-              <Progress value={score} colorScheme={score >= 70 ? 'green' : score >= 50 ? 'yellow' : 'red'} size="lg" borderRadius="full" />
-            </VStack>
-          </Box>
+        <Card className="bg-[#1A1A1A] border-[#333333]">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-white">
+              Your Score: {score.toFixed(1)}%
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between text-gray-300">
+              <span>Correct Answers: {correctAnswers}</span>
+              <span>Total Questions: {totalQuestions}</span>
+            </div>
+            <Progress
+              value={score}
+              className={`w-full h-3 ${score >= 70
+                  ? '[&>div]:bg-[#58CC02]'
+                  : score >= 50
+                    ? '[&>div]:bg-[#FF9600]'
+                    : '[&>div]:bg-[#FF4B4B]'
+                } bg-[#222222]`}
+            />
+          </CardContent>
+        </Card>
 
-          <Divider />
+        <h2 className="text-2xl font-bold text-white mt-8 mb-4">Question Review</h2>
 
-          <Heading as="h2" size="xl">
-            Question Review
-          </Heading>
-
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-            {resultLogs?.map((q, index) => (
-              <Box key={q._id} bg={cardBgColor} p={6} borderRadius="lg" boxShadow="md">
-                <VStack align="stretch" spacing={3}>
-                  <HStack>
-                    <Badge colorScheme={q.isCorrect ? 'green' : 'red'} fontSize="sm">
-                      Question {index + 1}
-                    </Badge>
-                    {q.isCorrect ? (
-                      <CheckCircle size={20} color="green" />
-                    ) : (
-                      <XCircle size={20} color="red" />
-                    )}
-                  </HStack>
-                  <Text fontWeight="bold">{q.question}</Text>
-                  <Text>Your Answer: {q.userAnswer}</Text>
-                  {!q.isCorrect && (
-                    <Text color="green.500">Correct Answer: {q.correctAnswer}</Text>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {resultLogs?.map((q, index) => (
+            <Card key={q._id} className="bg-[#1A1A1A] border-[#333333]">
+              <CardContent className="p-6 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge
+                    className={`${q.isCorrect
+                        ? 'bg-[#58CC02] hover:bg-[#58CC02]'
+                        : 'bg-[#FF4B4B] hover:bg-[#FF4B4B]'
+                      } text-white border-none`}
+                  >
+                    Question {index + 1}
+                  </Badge>
+                  {q.isCorrect ? (
+                    <CheckCircle className="w-5 h-5 text-[#58CC02]" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-[#FF4B4B]" />
                   )}
-                </VStack>
-              </Box>
-            ))}
-          </SimpleGrid>
-        </VStack>
-        <Flex justify="center" mt={8}>
-          <Button onClick={handleRetakeTest}>Retake test</Button>
-        </Flex>
-      </Container>
-    </Box>
+                </div>
+                <p className="text-white font-medium">{q.question}</p>
+                <p className="text-gray-400">Your Answer: {q.userAnswer}</p>
+                {!q.isCorrect && (
+                  <p className="text-[#58CC02]">Correct Answer: {q.correctAnswer}</p>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="flex justify-center mt-8">
+          <Button
+            onClick={handleRetakeTest}
+            className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white px-8 py-2"
+          >
+            Retake test
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }

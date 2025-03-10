@@ -1,68 +1,112 @@
-import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import React from "react";
-import { HeroShapes } from "./HeroShapes";
+"use client"
 
-const Hero: React.FC = () => {
-  const router = useRouter();
+import { Button } from "@/components/ui/button"
+import { motion } from "framer-motion"
+import { useSession } from "next-auth/react"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
 
-  const { data: session } = useSession();
+export default function Hero() {
+  const router = useRouter()
+  const { data: session } = useSession()
 
   const handleGetStarted = () => {
     if (session) {
-      router.push("/onboard");
+      router.push("/onboard")
     } else {
-      router.push("/login");
+      router.push("/login")
     }
-  };
-  return (
-    <div className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
-      <HeroShapes />
-      <div className="relative container px-4 md:px-6 flex flex-col items-center text-center space-y-8">
-        <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl text-white">
-          Your AI-Powered
-          <span className="bg-gradient-to-r from-[#8A2EFF] via-[#9F54FF] to-white text-transparent bg-clip-text">
-            {" "}Career Guide
-          </span>
-        </h1>
-        <p className="mx-auto max-w-[700px] text-gray-300 md:text-xl">
-          Navigate your career path with confidence using AI-driven insights,
-          personalized recommendations, and real-time industry trends.
-        </p>
-        <div className="space-x-4">
-          <Button
-            variant="default"
-            className="bg-[#8A2EFF] hover:bg-[#7325D4] shadow-lg"
-            onClick={handleGetStarted}
-          >
-            Get Started
-          </Button>
-          <Button
-            variant="outline"
-            className="text-[#8A2EFF] border-2 border-[#8A2EFF] hover:bg-[#8A2EFF]/10 dark:text-white dark:border-white dark:hover:bg-white/10"
-            onClick={() => router.push("/about")}
-          >
-            Learn More
-          </Button>
-        </div>
+  }
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-16">
-          {[
-            { number: "10k+", label: "Active Users" },
-            { number: "95%", label: "Success Rate" },
-            { number: "24/7", label: "AI Support" },
-          ].map((stat, i) => (
-            <div key={i} className="flex flex-col items-center space-y-2">
-              <span className="text-3xl font-bold text-[#8A2EFF]">{stat.number}</span>
-              <span className="text-sm text-gray-300">{stat.label}</span>
+  return (
+    <div className="relative min-h-[100vh] flex items-center bg-[#111111] py-16">
+      {/* Background effects can be removed or simplified */}
+
+      <div className="container px-4 md:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Column */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="space-y-8"
+          >
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight">
+              Unlock Your Potential With{" "}
+              <span className="bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
+                Saltus
+              </span>
+              <br />
+              Navigate Your Career Path
+            </h1>
+
+            <p className="text-gray-400 text-lg">
+              Our AI driven platform assesses your inclinations and personality traits to
+              suggest career paths tailored to your unique strengths.
+            </p>
+
+            <div className="flex flex-wrap gap-4">
+              <Button
+                className="bg-[#1CB0F6] hover:bg-[#1890d0] text-white px-6 py-2"
+                onClick={handleGetStarted}
+              >
+                Join Us Now
+              </Button>
+              <Button
+                variant="outline"
+                className="border-[#444444] text-white hover:bg-[#333333]"
+                onClick={() => router.push("/about")}
+              >
+                Discover More →
+              </Button>
             </div>
-          ))}
+
+            {/* Testimonials */}
+            <div className="space-y-4 mt-8">
+              <div className="flex items-center gap-4 bg-[#1A1A1A] p-4 rounded-lg border border-[#333333]">
+                <div className="w-12 h-12 rounded-full bg-gray-600" /> {/* Placeholder for avatar */}
+                <div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-white font-semibold">Emily Smith</span>
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className="text-[#FFD700]">★</span>
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-400">
+                    "Saltus has transformed my career journey. The tailored suggestions based on my
+                    personality have been incredibly insightful."
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right Column - Images */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative"
+          >
+            {/* Add your dashboard/UI images here */}
+            <div className="relative">
+              <Image
+                src="/assets/images/dashboard-preview.png"
+                alt="Saltus Dashboard"
+                className="rounded-lg shadow-2xl object-cover w-full h-full"
+                width={500}
+                height={500}
+              />
+              <div className="absolute -top-4 -left-4 bg-[#FF4B4B] text-white px-4 py-1 rounded-full">
+                Track
+              </div>
+              <div className="absolute -bottom-4 -right-4 bg-[#FFD700] text-white px-4 py-1 rounded-full">
+                Empower
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>
-  );
-};
-
-export default Hero;
+  )
+} 

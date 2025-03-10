@@ -5,12 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
 import { useGetProject } from "@/services/useProjects"
 import { useDisclosure } from "@chakra-ui/react"
-import { Briefcase, Clock, TrendingUp, Users, Users2 } from "lucide-react"
-import moment from 'moment'
+import { Briefcase, Clock, TrendingUp, Users2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from 'react'
 
@@ -99,264 +97,124 @@ const aiScenarios = [
   },
 ]
 
-export default function Component() {
+export default function ProjectsPage() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedScenario, setSelectedScenario] = useState<{ title: string; description: string } | null>(null)
   const { data: projects, isPending, mutate: getProjects } = useGetProject()
-  // const [isDeveloping, setIsDeveloping] = useState(true);
   const router = useRouter()
-
-  // if (isDeveloping) {
-  //   return (
-  //     <Box style={{ padding: "20px" }}>
-  //       <h3>Coming soon</h3>
-  //     </Box>
-  //   )
-  // }
 
   useEffect(() => {
     getProjects()
   }, [])
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Your Real-World Project Simulations</h1>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-            <Briefcase className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{projects?.count}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Team Collaborations</CardTitle>
-            <Users2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{projectsData.reduce((acc, curr) => acc + curr.collaborations, 0)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Experience Gained</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{projectsData.reduce((acc, curr) => acc + curr.timeSpent, 0)} hours</div>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-[#111111] py-8">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
+            Your Real-World Project Simulations
+          </h1>
+          <Button
+            onClick={onOpen}
+            className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white"
+          >
+            New Project
+          </Button>
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          {[
+            { title: "Active Projects", icon: Briefcase, value: projects?.count || 0, color: "#58CC02" },
+            { title: "Team Collaborations", icon: Users2, value: projects?.collaborations || 0, color: "#1CB0F6" },
+            { title: "Time Invested", icon: Clock, value: `${projects?.timeSpent || 0}h`, color: "#8A2EFF" },
+            { title: "Growth Rate", icon: TrendingUp, value: "+23%", color: "#FF9600" },
+          ].map((stat, index) => (
+            <Card key={index} className="bg-[#1A1A1A] border-[#333333]">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">{stat.title}</CardTitle>
+                <stat.icon className="h-4 w-4" style={{ color: stat.color }} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{stat.value}</div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Projects Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {projects?.data?.map((project: any) => (
+            <Card
+              key={project._id}
+              className="bg-[#1A1A1A] border-[#333333] hover:border-[#444444] transition-all cursor-pointer"
+              onClick={() => router.push(`/dashboard/projects/${project._id}`)}
+            >
+              <CardHeader>
+                <div className="flex justify-between items-start mb-2">
+                  <CardTitle className="text-lg font-bold text-white">{project.title}</CardTitle>
+                  <Badge className={`
+                    ${project.status === 'In Progress' ? 'bg-[#1CB0F6]' :
+                      project.status === 'Completed' ? 'bg-[#58CC02]' :
+                        'bg-[#FF9600]'} 
+                    text-white border-none`}
+                  >
+                    {project.status}
+                  </Badge>
+                </div>
+                <CardDescription className="text-gray-400 line-clamp-2">
+                  {project.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-400">Progress</span>
+                      <span className="text-white">{project.progress}%</span>
+                    </div>
+                    <Progress
+                      value={project.progress}
+                      className="w-full bg-[#222222] [&>div]:bg-gradient-to-r [&>div]:from-[#58CC02] [&>div]:to-[#1CB0F6]"
+                    />
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <div className="flex -space-x-2">
+                      {project.team?.slice(0, 3).map((member: any, index: number) => (
+                        <Avatar key={index} className="border-2 border-[#1A1A1A]">
+                          <AvatarImage src={member.avatar} alt={member.name} />
+                          <AvatarFallback className="bg-[#8A2EFF] text-white">
+                            {member.name.split(' ').map((n: string) => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                      ))}
+                      {project.team?.length > 3 && (
+                        <div className="w-8 h-8 rounded-full bg-[#222222] border-2 border-[#1A1A1A] flex items-center justify-center text-sm text-white">
+                          +{project.team.length - 3}
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-sm text-gray-400">
+                      Due {new Date(project.dueDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* New Project Dialog */}
+        <NewProjectSimulation
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onClose={() => {
+            onClose()
+            getProjects()
+          }}
+        />
       </div>
-
-      {projects?.data?.map((project: any) => (
-        <Card key={project.id} className="mb-6 clickable" onClick={() => router.push(`/dashboard/projects/${project._id}`)}>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>{project.name}</CardTitle>
-              <Badge variant={project.status === "In Progress" ? "default" : "secondary"}>{project.status}</Badge>
-            </div>
-            <CardDescription>{project.description}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-1 text-sm">
-                  <span>Project Progress</span>
-                  <span>{project.progress}%</span>
-                </div>
-                <Progress value={project.progress} className="w-full" />
-              </div>
-              <div className="flex items-center space-x-4 text-sm">
-                <div className="flex items-center">
-                  <Clock className="mr-1 h-4 w-4" />
-                  <span>Deadline: {moment(project.createdAt).add(project.duration, 'days').format('MMM D, YYYY')}</span>
-                </div>
-                <div className="flex items-center">
-                  <Users className="mr-1 h-4 w-4" />
-                  <span>{project.collaborators.length} team members</span>
-                </div>
-              </div>
-              <div className="flex -space-x-2">
-                {project.collaborators.map((member: any, index: number) => (
-                  <Avatar key={index} className="border-2 border-background !bg-gray-200">
-                    <AvatarImage src={member.avatar} alt={member.name} />
-                    <AvatarFallback className="!bg-gray-200">{member.name.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-          {/* <CardFooter>
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="tasks">Tasks</TabsTrigger>
-                <TabsTrigger value="collaboration">Collaboration</TabsTrigger>
-                <TabsTrigger value="insights">Insights</TabsTrigger>
-              </TabsList>
-              <TabsContent value="overview">
-                <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-                    <span>{project.tasks.completed} tasks completed</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Users2 className="h-4 w-4 text-muted-foreground" />
-                    <span>{project.collaborations} collaborations</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Brain className="h-4 w-4 text-muted-foreground" />
-                    <span>{project.insights} insights generated</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span>{project.timeSpent} hours of experience</span>
-                  </div>
-                </div>
-              </TabsContent>
-              <TabsContent value="tasks">
-                <div className="mt-4">
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={[project.tasks]}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="completed" stackId="a" fill="#4ade80" />
-                      <Bar dataKey="inProgress" stackId="a" fill="#facc15" />
-                      <Bar dataKey="notStarted" stackId="a" fill="#f87171" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                  <div className="mt-2 flex justify-between text-sm">
-                    <div className="flex items-center">
-                      <CheckCircle2 className="mr-1 h-4 w-4 text-green-500" />
-                      <span>Completed: {project.tasks.completed}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <AlertCircle className="mr-1 h-4 w-4 text-yellow-500" />
-                      <span>In Progress: {project.tasks.inProgress}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <AlertCircle className="mr-1 h-4 w-4 text-red-500" />
-                      <span>Not Started: {project.tasks.notStarted}</span>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              <TabsContent value="collaboration">
-                <div className="mt-4 space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={project.team[0].avatar} alt={project.team[0].name} />
-                      <AvatarFallback>{project.team[0].name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{project.team[0].name} shared a new idea</p>
-                      <p className="text-sm text-muted-foreground">2 hours ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={project.team[1].avatar} alt={project.team[1].name} />
-                      <AvatarFallback>{project.team[1].name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{project.team[1].name} started a group discussion</p>
-                      <p className="text-sm text-muted-foreground">5 hours ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={project.team[2].avatar} alt={project.team[2].name} />
-                      <AvatarFallback>{project.team[2].name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{project.team[2].name} provided feedback on a task</p>
-                      <p className="text-sm text-muted-foreground">1 day ago</p>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              <TabsContent value="insights">
-                <div className="mt-4">
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={[
-                      { name: 'Week 1', insights: 2 },
-                      { name: 'Week 2', insights: 3 },
-                      { name: 'Week 3', insights: 1 },
-                      { name: 'Week 4', insights: 2 },
-                    ]}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="insights" fill="#8884d8" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                  <p className="mt-2  text-sm text-center">Insights generated per week (last 4 weeks)</p>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardFooter> */}
-        </Card>
-      ))}
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>AI-Generated Scenarios</CardTitle>
-          <CardDescription>Test your problem-solving skills with real-world challenges</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {aiScenarios.map((scenario, index) => (
-              <Card key={index} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedScenario(scenario)}>
-                <CardHeader>
-                  <CardTitle className="text-lg">{scenario.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">{scenario.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-      <Dialog open={!!selectedScenario} onOpenChange={() => setSelectedScenario(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{selectedScenario?.title}</DialogTitle>
-            <DialogDescription>{selectedScenario?.description}</DialogDescription>
-          </DialogHeader>
-          <div className="mt-4">
-            <h4 className="font-semibold mb-2">Your Response:</h4>
-            <textarea
-              className="w-full h-32 p-2 border rounded-md"
-              placeholder="Type your solution here..."
-            ></textarea>
-          </div>
-          <div className="flex justify-end space-x-2 mt-4">
-            <Button variant="outline" onClick={() => setSelectedScenario(null)}>Cancel</Button>
-            <Button onClick={() => {
-              // Here you would typically send the response to be evaluated
-              alert("Response submitted for evaluation!")
-              setSelectedScenario(null)
-            }}>Submit for Evaluation</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      <NewProjectSimulation
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={() => {
-          onClose()
-          getProjects()
-        }} />
-      {/* <div className="mt-8 flex justify-center">
-        <Button>Start a New Project Simulation</Button>
-      </div> */}
     </div>
   )
 }

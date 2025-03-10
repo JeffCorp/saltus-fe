@@ -22,7 +22,10 @@ async function createProject(data: Project): Promise<any> {
 }
 
 async function updateProject(data: Project): Promise<any> {
-  const response = await apiClient.put(`/projects/${data.id}`, data);
+  const response = await apiClient.put(`/projects/${data.id}`, {
+    ...data,
+    reportFrequency: data.reportFrequency.toString(),
+  });
   return response.data;
 }
 

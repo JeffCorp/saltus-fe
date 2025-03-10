@@ -1,10 +1,13 @@
 'use client'
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { useProfile } from '@/services/useProfile';
 import { useCompleteWorkshop, useGetQuestions, useSubmitAnswer } from '@/services/useQnA';
 import { SkillProgress, useSkillsProgressByUserId } from '@/services/useSkillsProgress';
 import { removeEscapeCharacters } from '@/utils';
-import { Box, Button, Container, Flex, Heading, Progress, Spinner, Text, useToast, VStack } from '@chakra-ui/react';
+import { Spinner, Text, useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -127,50 +130,76 @@ const Workshop = () => {
   };
 
   if (isLoadingQuestions || !currentSkill || !qnaData) {
-    return <Flex justify="center" align="center" height="100vh"><Spinner /></Flex>;
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-[#111111]">
+        <Spinner color="#8A2EFF" size="xl" />
+      </div>
+    );
   }
 
   return (
-    <Container maxW="container.lg" py={8} height="100vh">
-      <VStack spacing={6} align="stretch">
-        <Heading>{typeof currentSkill.skillModuleId === 'string' ? currentSkill.skillModuleId : currentSkill.skillModuleId.name} Workshop</Heading>
-        {!isTestComplete ? (
-          <>
-            <Box>
-              <Text fontWeight="bold">Question {currentQuestionIndex + 1} of {qnaData.questions.length}</Text>
-              <Text mt={2}>{removeEscapeCharacters(qnaData.questions[currentQuestionIndex].text)}</Text>
-            </Box>
-            <Progress value={(currentQuestionIndex / qnaData.questions.length) * 100} size="sm" colorScheme="blue" />
-            <Flex flexDirection="column" gap={3} alignSelf="start" maxW="100vw">
-              {qnaData.questions[currentQuestionIndex].options.map((option, index) => (
+    <div className="min-h-screen bg-[#111111] py-8 px-4">
+      <div className="container max-w-4xl mx-auto">
+        <Card className="bg-[#1A1A1A] border-[#333333]">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-white">
+              {typeof currentSkill.skillModuleId === 'string'
+                ? currentSkill.skillModuleId
+                : currentSkill.skillModuleId.name} Workshop
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!isTestComplete ? (
+              <div className="space-y-6">
+                <div>
+                  <Text className="text-gray-300 font-medium mb-4">
+                    Question {currentQuestionIndex + 1} of {qnaData.questions.length}
+                  </Text>
+                  <Text className="text-white text-lg">
+                    {removeEscapeCharacters(qnaData.questions[currentQuestionIndex]?.text || '')}
+                  </Text>
+                </div>
+
+                <Progress
+                  value={(currentQuestionIndex / qnaData.questions.length) * 100}
+                  className="w-full bg-[#222222] [&>div]:bg-gradient-to-r [&>div]:from-[#58CC02] [&>div]:to-[#1CB0F6]"
+                />
+
+                <div className="space-y-3">
+                  {qnaData.questions[currentQuestionIndex]?.options?.map((option, index) => (
+                    <Button
+                      key={index}
+                      onClick={() => handleAnswer(index)}
+                      disabled={answerSubmitted}
+                      className={`w-full justify-start p-4 h-auto text-left whitespace-normal
+                        ${answerSubmitted
+                          ? 'bg-[#222222] text-gray-400'
+                          : 'bg-[#222222] hover:bg-[#2A2A2A] text-white'
+                        } border border-[#444444]`}
+                    >
+                      {removeEscapeCharacters(option)}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 space-y-4">
+                <Text className="text-2xl font-bold text-white">Workshop Complete!</Text>
+                <Text className="text-xl text-[#58CC02]">
+                  Your score: {score}/{qnaData.questions.length}
+                </Text>
                 <Button
-                  variant="ghost"
-                  bg="whiteAlpha.100"
-                  textAlign="start"
-                  color="black"
-                  key={index}
-                  onClick={() => handleAnswer(index)}
-                  width="full"
-                  isDisabled={answerSubmitted}
-                  _focus={{ boxShadow: 'none' }}
-                  p={2}
-                  h={"auto"}
-                  sx={{ justifyContent: 'start', border: "1px solid #67676767", textWrap: "wrap" }}
+                  onClick={() => router.push('/dashboard/skills')}
+                  className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white"
                 >
-                  {removeEscapeCharacters(option)}
+                  Back to Skills
                 </Button>
-              ))}
-            </Flex>
-          </>
-        ) : (
-          <VStack spacing={4}>
-            <Heading size="md">Workshop Complete!</Heading>
-            <Text>Your score: {score}/{qnaData.questions.length}</Text>
-            <Button onClick={() => router.push('/dashboard/skills')}>Back to Skills</Button>
-          </VStack>
-        )}
-      </VStack>
-    </Container>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 

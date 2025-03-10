@@ -26,22 +26,17 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname()
   const { data: session } = useSession();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const navItems = [
-    { name: "Home", icon: Home, link: "/dashboard" },
-    { name: "Career Path", icon: LineChart, link: "/dashboard/career-path" },
-    { name: "Mentors", icon: Users, link: "/dashboard/mentors" },
-    { name: "Network", icon: MessageSquare, link: "/dashboard/network" },
-    { name: "Skills", icon: BookOpen, link: "/dashboard/skills" },
-    { name: "Projects", icon: BriefcaseIcon, link: "/dashboard/projects" },
-    { name: "Trends", icon: LineChart, link: "/dashboard/trends" },
-    {
-      name: "Interview Prep",
-      icon: GraduationCap,
-      link: "/dashboard/interview-prep",
-    },
-    { name: "Settings", icon: Settings, link: "/dashboard/settings" },
+    { name: "Home", icon: Home, link: "/dashboard", color: "#58CC02" },
+    { name: "Career Path", icon: LineChart, link: "/dashboard/career-path", color: "#FF9600" },
+    { name: "Mentors", icon: Users, link: "/dashboard/mentors", color: "#8A2EFF" },
+    { name: "Network", icon: MessageSquare, link: "/dashboard/network", color: "#FF4B4B" },
+    { name: "Skills", icon: BookOpen, link: "/dashboard/skills", color: "#1CB0F6" },
+    { name: "Projects", icon: BriefcaseIcon, link: "/dashboard/projects", color: "#B35AF4" },
+    { name: "Trends", icon: LineChart, link: "/dashboard/trends", color: "#FF9600" },
+    { name: "Interview Prep", icon: GraduationCap, link: "/dashboard/interview-prep", color: "#FF4B4B" },
+    { name: "Settings", icon: Settings, link: "/dashboard/settings", color: "#777777" },
   ];
 
   const handleNavigation = (name: string) => {
@@ -50,15 +45,15 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen bg-white flex-col md:flex-row">
+    <div className="flex h-screen bg-[#111111] flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className={`min-w-64 bg-[#f8f9fa] shadow-md flex-1 md:flex-none md:w-64 h-full z-10 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
+      <aside className={`min-w-64 bg-[#1A1A1A] shadow-lg flex-1 md:flex-none md:w-64 h-full z-10 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
         <div className="p-4 flex items-center justify-between">
           <Link
             href="/"
-            className="text-2xl font-bold text-gray-800 flex items-center"
+            className="text-2xl font-bold text-white flex items-center"
           >
-            <Rocket className="h-6 w-6 mr-2" />
+            <Rocket className="h-6 w-6 mr-2 text-[#8A2EFF]" />
             {process.env.NEXT_PUBLIC_APP_NAME}
           </Link>
           <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2">
@@ -70,18 +65,26 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             <Link
               key={item.name}
               href={item.link}
-              className={`flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${(pathname === item.link) ? "bg-indigo-600 text-white hover:bg-indigo-600 hover:text-white" : ""}`}
+              className={`flex items-center px-6 py-3 text-gray-300 hover:bg-[#222222] transition-all duration-300 
+                ${pathname === item.link ?
+                  "bg-[#222222] border-l-4 pl-5" : ""}`}
+              style={{
+                borderLeftColor: pathname === item.link ? item.color : 'transparent'
+              }}
               onClick={() => handleNavigation(item.name)}
             >
-              <item.icon className="h-5 w-5 mr-3" />
-              {item.name}
+              <item.icon
+                className="h-5 w-5 mr-3"
+                style={{ color: item.color }}
+              />
+              <span className={pathname === item.link ? "text-white" : ""}>{item.name}</span>
             </Link>
           ))}
         </nav>
-        <div className="flex items-center justify-center mx-3">
+        <div className="p-4">
           <Button
             variant="outline"
-            className="w-full flex items-center justify-center text-indigo-600 border-indigo-600"
+            className="w-full flex items-center justify-center text-[#FF4B4B] border-[#FF4B4B] hover:bg-[#FF4B4B]/10"
             onClick={() => signOut()}
           >
             <LogOut className="mr-2 h-4 w-4" />
@@ -91,51 +94,35 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto flex flex-col md:flex-[5] max-md:fixed max-md:w-full">
+      <main className="flex-1 overflow-y-auto flex flex-col md:flex-[5] max-md:fixed max-md:w-full bg-[#111111]">
         {/* Header */}
-        <header className="bg-[#00000078] text-white fixed top-0 md:right-0 w-[100%] md:w-[calc(100%-16rem)] z-[100] shadow">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center space">
+        <header className="bg-[#1A1A1A] text-white fixed top-0 md:right-0 w-[100%] md:w-[calc(100%-16rem)] z-[100] shadow-lg border-b border-[#333333]">
+          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div className="flex items-center">
-              <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2">
+              <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 hover:bg-[#222222]">
                 {isSidebarOpen ? <X className="h-5 w-5" /> : <IoIosMenu className="h-5 w-5" />}
               </Button>
             </div>
-            <h2 className="text-2xl font-bold lesading-7 text-white sm:truncate w-full">
+            <h2 className="text-2xl font-bold leading-7 text-white sm:truncate w-full ml-4">
               {activeTab}
             </h2>
-            <div className="flex items-center">
-              <Button variant="outline" className="mr-2 bg-white text-black">
+            <div className="flex items-center gap-2">
+              <Button variant="outline" className="bg-[#222222] text-white border-[#333333] hover:bg-[#333333]">
                 <Bell className="h-5 w-5" />
               </Button>
-              {/* <Menu>
-                <MenuButton
-                  as={Button}
-                  variant="outline"
-                  className="items-center border-2 border-white rounded-[5px] p-2 cursor-pointer hover:bg-white/10 transition-colors flex"
-                >
-                  <div className="flex items-center">
-                    <User className="h-5 w-5 mr-3" />
-                    <div className="flex flex-col items-start">
-                      <Text fontSize="sm">{session?.user.name}</Text>
-                      <Text fontSize="xs" color="gray.300">{session?.user.email}</Text>
-                    </div>
-                  </div>
-                </MenuButton>
-                <MenuList>
-                  <MenuItem onClick={() => signOut()}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign out
-                  </MenuItem>
-                </MenuList>
-              </Menu> */}
             </div>
           </div>
         </header>
 
-        <div className="pt-[80px] bg-white overflow-y-scroll h-[100vh]">{children}</div>
-        {/* Create a floating button to add new connections */}
-        <Button className="fixed bottom-[50px] flex items-center justify-center right-[50px] bg-indigo-600 rounded-[50%] text-white p-4 rounded-full shadow-lg w-[70px] h-[70px]">
-          <MessageSquare className="h-5 w-5" />
+        <div className="pt-[80px] bg-[#111111] overflow-y-scroll h-[100vh] text-white">
+          {children}
+        </div>
+
+        {/* Floating Action Button */}
+        <Button
+          className="fixed bottom-[50px] right-[50px] rounded-full shadow-lg w-[60px] h-[60px] bg-[#8A2EFF] hover:bg-[#7325D4] transition-all duration-300 hover:scale-110"
+        >
+          <MessageSquare className="h-6 w-6" />
         </Button>
       </main>
     </div>

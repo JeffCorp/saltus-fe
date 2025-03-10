@@ -4,14 +4,14 @@ import LoadingSpinner from "@/components/loaders/LoadingSpinner"
 import NetworkLayout from "@/components/network/layout"
 import Post from "@/components/network/post"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useCreateComment, useGetComment } from "@/services/useComments"
 import { ConnectionStatus, useGetConnections, useGetTopConnections } from "@/services/useConnections"
 import { useCreatePost, useGetPost, useLikePost } from "@/services/usePosts"
-import { timeAgo } from "@/utils"
-import { Box, Button, Flex, Text } from "@chakra-ui/react"
-import { Heart, MessageCircle, Users } from "lucide-react"
+import { Text } from "@chakra-ui/react"
+import { MessageCircle } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -52,11 +52,10 @@ const recentPosts = [
 
 export default function NetworkPage() {
   const [post, setPost] = useState("");
-  const [postList, setPostList] = useState(recentPosts);
   const { data: session } = useSession();
   const { data: connections, isPending, mutate: getConnections } = useGetConnections();
-  const { data: topConnections, isPending: isTopConnectionsPending, mutate: getTopConnections } = useGetTopConnections();
-  const { mutate: createPost, data: newPost } = useCreatePost();
+  const { data: topConnections, mutate: getTopConnections } = useGetTopConnections();
+  const { mutate: createPost } = useCreatePost();
   const { data: posts, isLoading: isPostsPending } = useGetPost();
   const { mutate: createComment, data: newComment } = useCreateComment();
   const { data: comments, isPending: isCommentsPending, mutate: getComments } = useGetComment();
@@ -69,14 +68,14 @@ export default function NetworkPage() {
   useEffect(() => {
     getConnections();
     getTopConnections();
-    setPostList(posts);
   }, []);
 
-  const handlePost = (e: any) => {
+  const handlePost = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!post.trim()) return;
+
     createPost({ title: "New Post", content: post });
     setPost("");
-    setPostList([...postList, { authorName: session?.user?.name, authorImage: session?.user?.image, timeAgo: "just now", content: post }]);
   }
 
   const handleLike = (postId: string) => {
@@ -102,181 +101,81 @@ export default function NetworkPage() {
     }
   }
 
+  if (isPending) {
+    return <LoadingSpinner />;
+  }
+
+  const approvedConnections = connections?.filter(
+    (connection: any) => connection.status === ConnectionStatus.APPROVED
+  );
+
+  if (!approvedConnections || approvedConnections.length === 0) {
+    return null;
+  }
+
   return (
     <NetworkLayout>
-      {isPending ?
-        <LoadingSpinner /> :
-        connections && connections.filter((connection: any) => connection.status === ConnectionStatus.APPROVED).length > 0 ? (
-          selectedPost ?
-            <Post post={selectedPost} />
-            :
-            <Flex className="gap-6 w-full">
-              <div className="space-y-6 flex-1">
-                {/* Network Overview */}
-                <Card className="">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-md font-semibold">Network Overview</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center">
-                        <Users className="w-6 h-6 mr-2 text-blue-600" />
-                        <Flex gap={1}>
-                          <Text className="text-xs font-bold">{connections?.length}</Text>
-                          <Text className="text-xs text-gray-600">Total Connections</Text>
-                        </Flex>
-                      </div>
-                      {/* <Badge variant="secondary" className="text-xs">{networkData.newConnectionRequests} New</Badge> */}
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Mentors:</span>
-                        <span className="font-semibold">0</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Mentees:</span>
-                        <span className="font-semibold">0</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Upcoming Events:</span>
-                        <span className="font-semibold">0</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Recent Messages:</span>
-                        <span className="font-semibold">0</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+      {selectedPost ? (
+        <Post post={selectedPost} />
+      ) : (
+        <div className="flex gap-6 w-full">
+          {/* Right Column - Posts */}
+          <div className="flex-1 space-y-6 min-w-0">
+            {/* Create Post */}
+            <Card className="bg-[#1A1A1A] border-[#333333]">
+              <CardContent className="p-4">
+                <form onSubmit={handlePost} className="flex items-center gap-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={session?.user?.image || ""} />
+                    <AvatarFallback className="bg-[#8A2EFF] text-white uppercase text-lg">
+                      {session?.user?.name?.split(" ").map((n: any) => n[0]).join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Input
+                    placeholder="Share your thoughts..."
+                    className="flex-1 bg-[#222222] border-[#444444] text-white placeholder:text-gray-400 h-12 text-lg"
+                    value={post}
+                    onChange={(e) => setPost(e.target.value)}
+                  />
+                  <Button
+                    type="submit"
+                    className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white h-12 px-6 text-lg"
+                    disabled={!post.trim()}
+                  >
+                    Post
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
 
-                {/* Network Insights */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold">Network Insights</CardTitle>
-                  </CardHeader>
-                  {/* <CardContent>
-                    <div className="text-3xl font-bold text-blue-600">N/A %</div>
-                    <p className="text-sm text-gray-600">N/A connections this month</p>
-                  </CardContent> */}
-                </Card>
+            {/* Posts Feed */}
+            {isPostsPending ? (
+              <LoadingSpinner />
+            ) : posts?.length ? (
+              <div className="space-y-6">
+                {posts.map((post: any) => (
+                  <div
+                    key={post._id}
+                    className="cursor-pointer transition-transform hover:scale-[1.02]"
+                    onClick={() => router.push(`/dashboard/network/posts/${post._id}`)}
+                  >
+                    <Post post={post} />
+                  </div>
+                ))}
               </div>
-              <div className="space-y-6 flex-[3]">
-                {/* Start a post */}
-                <Card>
-                  <CardContent className="pt-4">
-                    <div>
-                      {/* <Avatar>
-                          <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Your profile" />
-                          <AvatarFallback>YO</AvatarFallback>
-                        </Avatar> */}
-                      <form onSubmit={handlePost} className="flex items-center space-x-4">
-                        <Input
-                          placeholder="Start a post"
-                          className="bg-gray-100 border-gray-300"
-                          value={post}
-                          onChange={(e) => setPost(e.target.value)}
-                        />
-                        <Button type="submit">Post</Button>
-                      </form>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Recent Posts */}
-                {posts?.length > 0 ?
-                  <Box overflowY="auto" maxHeight="100vh" gap={4} display="flex" flexDirection="column">
-                    {posts.map((post: any, index: number) => (
-                      <Card key={index}>
-                        <CardContent className="pt-4">
-                          <div className="flex items-center space-x-4 mb-4">
-                            <Avatar>
-                              <AvatarImage src={post.authorImage} alt={post.authorName} />
-                              <AvatarFallback style={{ background: '#999' }}>{post.user?.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-semibold">{post.user.name}</p>
-                              <p className="text-xs text-gray-500">{timeAgo(post.createdAt)}</p>
-                            </div>
-                          </div>
-                          <p className="text-sm " style={{ cursor: 'pointer' }} onClick={() => router.push(`/dashboard/network/posts/${post._id}`)}>{post.content}</p>
-
-                          {/* Post interactions */}
-                          <div className="mt-4 pt-3 border-t">
-                            <div className="flex items-center gap-6">
-                              <button
-                                className="flex items-center gap-2 text-gray-600 hover:text-blue-600"
-                                onClick={() => handleLike(post._id)}
-                              >
-                                {post.likes.includes(session?.user?.id) ? (
-                                  <Heart className="w-5 h-5 fill-red-500 stroke-red-500" />
-                                ) : (
-                                  <Heart className="w-5 h-5" />
-                                )}
-                                <span className="text-sm">{post.likes?.length || 0}</span>
-                              </button>
-
-                              <button
-                                className="flex items-center gap-2 text-gray-600 hover:text-blue-600"
-                                onClick={() => handleShowComment(post._id)}
-                              >
-                                <MessageCircle className="w-5 h-5" />
-                                <span className="text-sm">{post.commentCount || 0}</span>
-                              </button>
-                            </div>
-
-                            {/* Comments section */}
-                            {showComments === post._id && (
-                              <div className="mt-4 space-y-4">
-                                {/* Comment input */}
-                                <form onSubmit={(e) => handleAddComment(e, post._id)}>
-                                  <div className="flex gap-2">
-                                    <Input
-                                      placeholder="Add a comment..."
-                                      value={commentText}
-                                      onChange={(e) => setCommentText(e.target.value)}
-                                      className="flex-1"
-                                    />
-                                    <Button
-                                      size="sm"
-                                      type="submit"
-                                    >
-                                      Comment
-                                    </Button>
-                                  </div>
-                                </form>
-
-                                {/* Comments list */}
-                                <div className="space-y-3">
-                                  {comments?.map((comment: any, idx: number) => (
-                                    <div key={idx} className="flex gap-3">
-                                      <Avatar className="w-8 h-8">
-                                        <AvatarImage src={comment.user.image} />
-                                        <AvatarFallback>{comment?.user?.name.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
-                                      </Avatar>
-                                      <div className="flex-1 bg-gray-50 rounded-lg p-3">
-                                        <p className="text-sm font-semibold">{comment.user.name}</p>
-                                        <p className="text-sm">{comment.content}</p>
-                                        <p className="text-xs text-gray-500 mt-1">{timeAgo(comment.createdAt)}</p>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </Box>
-                  :
-                  <Text className="text-sm text-gray-600">No posts found</Text>
-                }
-              </div>
-            </Flex>
-        ) : (
-          <></>
-        )
-      }
+            ) : (
+              <Card className="bg-[#1A1A1A] border-[#333333] p-8">
+                <div className="text-center">
+                  <MessageCircle className="mx-auto h-12 w-12 text-[#8A2EFF] opacity-50" />
+                  <Text className="mt-4 text-lg font-medium text-gray-300">
+                    No posts yet. Be the first to share!
+                  </Text>
+                </div>
+              </Card>
+            )}
+          </div>
+        </div>
+      )}
     </NetworkLayout>
-  )
+  );
 }

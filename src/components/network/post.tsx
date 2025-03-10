@@ -1,8 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useCreateComment, useGetComment, useLikePost } from "@/services/useComments";
 import { timeAgo } from "@/utils";
-import { Button, Flex, Input, Text } from "@chakra-ui/react";
+import { Spinner, Text } from "@chakra-ui/react";
 import { Heart, MessageCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -10,13 +12,12 @@ import { useEffect, useState } from "react";
 const Post = ({ post }: { post: any }) => {
   const { data: comments, isPending: isCommentsPending, mutate: getComments } = useGetComment();
   const { mutate: likePost } = useLikePost()
-  const { mutate: createComment, data: newComment } = useCreateComment();
+  const { mutate: createComment } = useCreateComment();
   const [commentText, setCommentText] = useState("");
   const { data: session } = useSession();
 
   const handleAddComment = (e: any, postId: string) => {
     e.preventDefault();
-    // Implement add comment functionality
     createComment({ content: commentText, postId })
     getComments(postId)
     setCommentText("")
@@ -35,26 +36,32 @@ const Post = ({ post }: { post: any }) => {
     getComments(post._id)
   }, [post._id])
 
-  console.log(post)
-
   return (
-    <Card className="mb-8 p-4 w-full h-full">
+    <Card className="bg-[#1A1A1A] border-[#333333] mb-8 p-4 w-full h-full">
       <CardContent>
-        <Flex gap={4} className="h-full" alignItems="center">
+        <div className="flex gap-4 items-center">
           <Avatar>
             <AvatarImage src={post.authorImage} alt={post.authorName} />
-            <AvatarFallback style={{ background: '#999', color: '#fff' }}>{post.user?.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
+            <AvatarFallback className="bg-[#8A2EFF] text-white uppercase">
+              {post.user?.name?.split(' ').map((n: string) => n[0]).join('')}
+            </AvatarFallback>
           </Avatar>
-          <Text className="text-xl font-bold">{post.content}</Text>
-        </Flex>
-        <div className="mt-4 pt-3 border-t">
+          <div className="flex-1">
+            <Text className="font-semibold text-white">{post.user?.name}</Text>
+            <Text className="text-sm text-gray-400">{timeAgo(post.createdAt)}</Text>
+          </div>
+        </div>
+
+        <Text className="text-white mt-4">{post.content}</Text>
+
+        <div className="mt-4 pt-3 border-t border-[#333333]">
           <div className="flex items-center gap-6">
             <button
-              className="flex items-center gap-2 text-gray-600 hover:text-blue-600"
+              className="flex items-center gap-2 text-gray-400 hover:text-[#FF4B4B] transition-colors"
               onClick={() => handleLike(post._id)}
             >
               {post.likes.includes(session?.user?.id) ? (
-                <Heart className="w-5 h-5 fill-red-500 stroke-red-500" />
+                <Heart className="w-5 h-5 fill-[#FF4B4B] stroke-[#FF4B4B]" />
               ) : (
                 <Heart className="w-5 h-5" />
               )}
@@ -62,7 +69,7 @@ const Post = ({ post }: { post: any }) => {
             </button>
 
             <button
-              className="flex items-center gap-2 text-gray-600 hover:text-blue-600"
+              className="flex items-center gap-2 text-gray-400 hover:text-[#1CB0F6] transition-colors"
               onClick={() => handleShowComment(post._id)}
             >
               <MessageCircle className="w-5 h-5" />
@@ -79,11 +86,11 @@ const Post = ({ post }: { post: any }) => {
                 placeholder="Add a comment..."
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                className="flex-1"
+                className="flex-1 bg-[#222222] border-[#333333] text-white placeholder:text-gray-500"
               />
               <Button
-                size="sm"
                 type="submit"
+                className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white"
               >
                 Comment
               </Button>
@@ -91,21 +98,29 @@ const Post = ({ post }: { post: any }) => {
           </form>
 
           {/* Comments list */}
-          <div className="space-y-3">
-            {comments?.map((comment: any, idx: number) => (
-              <div key={idx} className="flex gap-3">
-                <Avatar>
-                  <AvatarImage src={comment.authorImage} alt={comment.authorName} />
-                  <AvatarFallback style={{ background: '#999' }}>{comment.user?.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 bg-gray-50 rounded-lg p-3">
-                  <p className="text-sm font-semibold">{comment.user.name}</p>
-                  <p className="text-sm">{comment.content}</p>
-                  <p className="text-xs text-gray-500 mt-1">{timeAgo(comment.createdAt)}</p>
+          {isCommentsPending ? (
+            <div className="flex justify-center p-4">
+              <Spinner color="#8A2EFF" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {comments?.map((comment: any, idx: number) => (
+                <div key={idx} className="flex gap-3">
+                  <Avatar>
+                    <AvatarImage src={comment.authorImage} alt={comment.authorName} />
+                    <AvatarFallback className="bg-[#8A2EFF] text-white uppercase">
+                      {comment.user?.name?.split(' ').map((n: string) => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 bg-[#222222] rounded-lg p-3">
+                    <p className="text-sm font-semibold text-white">{comment.user.name}</p>
+                    <p className="text-sm text-gray-300">{comment.content}</p>
+                    <p className="text-xs text-gray-500 mt-1">{timeAgo(comment.createdAt)}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

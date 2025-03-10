@@ -7,7 +7,8 @@ import { useCreateComment, useGetComment } from "@/services/useComments"
 import { useGetConnections, useGetTopConnections } from "@/services/useConnections"
 import { useCreatePost, useGetPost, useLikePost } from "@/services/usePosts"
 import { otherUser } from "@/utils"
-import { Flex, Spinner, Text } from "@chakra-ui/react"
+import { Spinner, Text } from "@chakra-ui/react"
+import { Users } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 
@@ -47,12 +48,12 @@ const recentPosts = [
 
 export default function NetworkLayout({ children }: { children: React.ReactNode }) {
   const [post, setPost] = useState("");
-  const [postList, setPostList] = useState(recentPosts);
+  const [postList, setPostList] = useState<any[]>([]);
   const { data: session } = useSession();
   const { data: connections, isPending, mutate: getConnections } = useGetConnections();
   const { data: topConnections, isPending: isTopConnectionsPending, mutate: getTopConnections } = useGetTopConnections();
-  const { mutate: createPost, data: newPost } = useCreatePost();
-  const { data: posts, isLoading: isPostsPending } = useGetPost();
+  const { mutate: createPost } = useCreatePost();
+  const { data: posts } = useGetPost();
   const { mutate: createComment, data: newComment } = useCreateComment();
   const { data: comments, isPending: isCommentsPending, mutate: getComments } = useGetComment();
   const { mutate: likePost } = useLikePost()
@@ -97,122 +98,119 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
   }
 
   return (
-    <div className="bg-white min-h-[100vh] overflow-hidden">
+    <div className="bg-[#111111] min-h-[100vh] overflow-hidden">
       <div className="container mx-auto py-6 px-4 overflow-hidden">
-        <Flex className="gap-6">
-          {/* Other Column */}
-          {/* Add the other column here */}
-          {
-            topConnections?.length > 0 ?
-              <Flex className="flex-[3]">
-                {children}
-              </Flex>
-              :
-              <Flex className="flex-[3]" flexDirection="column" justifyContent="center" alignItems="center">
-                <Text>Kindly make a connection to view network posts</Text>
-              </Flex>
-          }
+        <div className="flex gap-6">
+          {/* Main Content */}
+          <div className="flex-[3]">
+            {topConnections?.length > 0 ? (
+              children
+            ) : (
+              <div className="flex flex-col items-center justify-center h-[60vh] bg-[#1A1A1A] rounded-2xl border border-[#333333] p-8">
+                <Text className="text-gray-400 text-center">
+                  Make your first connection to view network posts
+                </Text>
+              </div>
+            )}
+          </div>
 
-          {/* Right Column */}
+          {/* Right Sidebar */}
           <div className="space-y-6 flex-[1.1] w-[300px]">
+            <div className="w-[300px] space-y-6">
+              <Card className="bg-[#1A1A1A] border-[#333333] sticky top-[100px]">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xl font-bold text-white">Network Overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {/* Connection Stats */}
+                  <div className="p-4 rounded-xl bg-[#222222] border border-[#444444]">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-xl bg-[#8A2EFF]/20">
+                        <Users className="w-7 h-7 text-[#8A2EFF]" />
+                      </div>
+                      <div>
+                        <Text className="text-3xl font-bold text-white">{connections?.length || 0}</Text>
+                        <Text className="text-sm font-medium text-gray-300">Total Connections</Text>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Other Stats */}
+                  <div className="space-y-3 mt-6">
+                    {[
+                      { label: "Mentors", value: "0", color: "#58CC02" },
+                      { label: "Mentees", value: "0", color: "#1CB0F6" },
+                      { label: "Upcoming Events", value: "0", color: "#FF9600" },
+                      { label: "Recent Messages", value: "0", color: "#FF4B4B" },
+                    ].map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center p-3 rounded-lg hover:bg-[#222222] transition-colors border border-transparent hover:border-[#444444]"
+                      >
+                        <span className="text-gray-300 font-medium">{item.label}</span>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: item.color }}
+                        >
+                          {item.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
             {/* Top Connections */}
-            <Card>
+            <Card className="bg-[#1A1A1A] border-[#333333]">
               <CardHeader className="pb-2">
-                <CardTitle className="text-md font-semibold">Top Connections</CardTitle>
+                <CardTitle className="text-md font-semibold text-white">Top Connections</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {
-                    isTopConnectionsPending ? <Spinner /> :
-                      topConnections?.length > 0 ?
-                        topConnections?.map((connection: any, index: number) => (
-                          <div key={index} className="flex items-center space-x-4">
-                            <Avatar>
-                              <AvatarImage src={connection.image} alt={connection.name} />
-                              <AvatarFallback style={{ textTransform: 'uppercase', backgroundColor: '#456', color: '#fff' }}>{otherUser(session, connection?.requester?._id) ? connection?.requester?.name?.split(' ').map((n: string) => n[0]).join('') : connection?.recipient?.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <Text className="font-semibold text-sm">{otherUser(session, connection?.requester?._id) ? connection?.requester?.name : connection?.recipient?.name}</Text>
-                              {/* <Text className="text-sm text-gray-600">{connection.role} at {connection.company}</Text> */}
-                            </div>
-                          </div>
-                        ))
-                        :
-                        <Text className="text-sm text-gray-600">No top connections found</Text>
-                  }
+                  {isTopConnectionsPending ? (
+                    <div className="flex justify-center">
+                      <Spinner color="#8A2EFF" />
+                    </div>
+                  ) : topConnections?.length > 0 ? (
+                    topConnections?.map((connection: any, index: number) => (
+                      <div key={index} className="flex items-center space-x-4 group hover:bg-[#222222] p-2 rounded-lg transition-colors">
+                        <Avatar>
+                          <AvatarImage src={connection.image} alt={connection.name} />
+                          <AvatarFallback
+                            className="bg-[#8A2EFF] text-white uppercase"
+                          >
+                            {otherUser(session, connection?.requester?._id)
+                              ? connection?.requester?.name?.split(' ').map((n: string) => n[0]).join('')
+                              : connection?.recipient?.name?.split(' ').map((n: string) => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <Text className="font-semibold text-sm text-white">
+                            {otherUser(session, connection?.requester?._id)
+                              ? connection?.requester?.name
+                              : connection?.recipient?.name}
+                          </Text>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <Text className="text-sm text-gray-400">No top connections found</Text>
+                  )}
                 </div>
               </CardContent>
             </Card>
+
             {/* Grow Your Network */}
-            {!isPending && <Card>
-              <CardContent className="p-2 ">
-                <div>
+            {!isPending && (
+              <Card className="bg-[#1A1A1A] border-[#333333]">
+                <CardContent className="p-4">
                   <MyConnections />
-                </div>
-              </CardContent>
-            </Card>}
-
-            {/* Upcoming Events */}
-            {/* <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold">Upcoming Events</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="font-semibold">Tech Meetup 2024</p>
-                        <p className="text-sm text-gray-600">July 15, 2024 • Virtual</p>
-                        <Badge variant="outline" className="mt-2">Attending</Badge>
-                      </div>
-                      <div>
-                        <p className="font-semibold">Women in Tech Conference</p>
-                        <p className="text-sm text-gray-600">August 3-5, 2024 • New York</p>
-                        <Button variant="outline" className="mt-2">RSVP</Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card> */}
-
-            {/* Recent Messages */}
-            {/* <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold">Recent Messages</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <Avatar>
-                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Jane Smith" />
-                            <AvatarFallback>JS</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold">Jane Smith</p>
-                            <p className="text-sm text-gray-600">Thanks for your advice on...</p>
-                          </div>
-                        </div>
-                        <Badge variant="outline">2h ago</Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <Avatar>
-                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Alex Johnson" />
-                            <AvatarFallback>AJ</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold">Alex Johnson</p>
-                            <p className="text-sm text-gray-600">Are you attending the upcoming...</p>
-                          </div>
-                        </div>
-                        <Badge variant="outline">1d ago</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card> */}
+                </CardContent>
+              </Card>
+            )}
           </div>
-        </Flex>
+        </div>
       </div>
     </div>
   )
-
 }

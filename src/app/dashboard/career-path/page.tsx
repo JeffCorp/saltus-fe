@@ -1,220 +1,207 @@
-'use client'
+"use client"
 
-import ViewDetailedPlan from '@/components/career-path/view-detailed-plan'
-import { useGetCertificatesByUserId } from "@/services/useCertificates"
-import { useProfile } from "@/services/useProfile"
-import { useSkills } from "@/services/useSkills"
-import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
-import { Badge, Box, Button, Card, CardBody, CardFooter, CardHeader, Container, Flex, Grid, Heading, List, ListItem, Progress, Spinner, Text, useColorModeValue } from "@chakra-ui/react"
-import { Book, ChevronRight, Clock, Target } from "lucide-react"
-import { useSession } from "next-auth/react"
-import { useEffect, useMemo, useState } from "react"
+import ViewDetailedPlan from '@/components/career-path/view-detailed-plan';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGetCertificatesByUserId } from "@/services/useCertificates";
+import { useProfile } from "@/services/useProfile";
+import { useSkills } from "@/services/useSkills";
+import { useSkillsProgressByUserId } from "@/services/useSkillsProgress";
+import { Spinner } from "@chakra-ui/react";
+import { Briefcase, GraduationCap, LineChart, Star, Trophy } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useEffect, useMemo, useState } from "react";
 
-// Mock data - In a real application, this would come from a backend API
-const userData = {
-  name: "Alex Johnson",
-  careerPath: "Software Development",
-  targetRole: "Senior Software Engineer",
-  currentRole: "Junior Software Developer",
-  skillsProgress: 65,
-  totalTimeSpent: 120, // hours
-  completedCourses: 0,
-  earnedCertifications: 0,
-  improvementAreas: [
-    "System Design",
-    "Leadership Skills",
-    "Advanced Algorithms"
-  ],
-  nextSteps: [
-    "Complete Advanced React Course",
-    "Contribute to Open Source Project",
-    "Prepare for System Design Interview"
-  ],
-  recentAchievements: [
-    "Completed AWS Certification",
-    "Led team project to successful deployment",
-    "Improved app performance by 30%"
-  ]
-}
-
-export default function CareerPathProgressPage() {
-  const { data: session } = useSession();
-  const { profile, isLoading: isLoadingProfile } = useProfile();
-  const { data: skillsProgress, mutate: getSkillsProgress, isPending: isLoadingSkillsProgress } = useSkillsProgressByUserId();
-  const { mutate: getSkills, data: skills, isPending: isLoadingSkills } = useSkills();
-  const { data: certificates, isLoading: isLoadingCertificates } = useGetCertificatesByUserId(profile?._id);
-  const bgColor = useColorModeValue("white", "white");
-  const textColor = useColorModeValue("gray.800", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.200");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  console.log("certificates =>", certificates);
-
-  console.log("skills =>", skills);
+export default function CareerPath() {
+  const { data: session } = useSession()
+  const { profile, isLoading: isLoadingProfile } = useProfile()
+  const { data: skillsProgress, mutate: getSkillsProgress, isPending: isLoadingSkillsProgress } = useSkillsProgressByUserId()
+  const { mutate: getSkills, data: skills, isPending: isLoadingSkills } = useSkills()
+  const { data: certificates, isLoading: isLoadingCertificates } = useGetCertificatesByUserId(profile?._id)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     if (profile) {
-      getSkillsProgress(profile._id);
-      getSkills(profile._id);
+      getSkillsProgress(profile._id)
+      getSkills(profile._id)
     }
-  }, [profile?._id]);
-
-  console.log(skillsProgress);
+  }, [profile?._id])
 
   const computeSkillsProgress = useMemo(() => {
-    if (!skillsProgress || skillsProgress.length === 0) return 0;
-    const totalSkills = skillsProgress?.length;
-    return (skillsProgress?.reduce((acc, skill) => acc + skill.progress, 0) / totalSkills);
-  }, [skillsProgress]);
+    if (!skillsProgress || skillsProgress.length === 0) return 0
+    const totalSkills = skillsProgress?.length
+    return (skillsProgress?.reduce((acc, skill) => acc + skill.progress, 0) / totalSkills)
+  }, [skillsProgress])
 
-  const totalTimeSpent = useMemo(() => {
-    if (!skillsProgress || skillsProgress.length === 0) return 0;
-    return Math.round(skillsProgress?.reduce((acc, skill) => acc + skill.timeSpent, 0) / skillsProgress.length);
-  }, [skillsProgress]);
+  const milestones = [
+    {
+      title: "Entry Level",
+      description: "0-2 years experience",
+      icon: GraduationCap,
+      color: "#58CC02",
+      skills: ["Basic Programming", "Team Collaboration", "Problem Solving"],
+      completed: computeSkillsProgress >= 25
+    },
+    {
+      title: "Mid Level",
+      description: "2-5 years experience",
+      icon: Briefcase,
+      color: "#1CB0F6",
+      skills: ["System Design", "Project Leadership", "Mentoring"],
+      completed: computeSkillsProgress >= 50
+    },
+    {
+      title: "Senior Level",
+      description: "5-8 years experience",
+      icon: Star,
+      color: "#8A2EFF",
+      skills: ["Architecture Design", "Team Management", "Strategic Planning"],
+      completed: computeSkillsProgress >= 75
+    },
+    {
+      title: "Lead/Principal",
+      description: "8+ years experience",
+      icon: Trophy,
+      color: "#FF9600",
+      skills: ["Technical Vision", "Organization Leadership", "Innovation"],
+      completed: computeSkillsProgress >= 90
+    }
+  ]
 
-  const careerPath = profile?.careerPath || "";
+  const trends = [
+    {
+      title: "Skills Progress",
+      value: `${Math.round(computeSkillsProgress)}%`,
+      description: "Overall completion of required skills",
+      icon: LineChart,
+      color: "#FF4B4B"
+    },
+    {
+      title: "Certifications",
+      value: certificates?.length || 0,
+      description: "Completed certifications",
+      icon: Star,
+      color: "#B35AF4"
+    }
+  ]
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  if (isLoadingProfile || isLoadingSkills || isLoadingSkillsProgress) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Spinner color="#8A2EFF" size="xl" />
+      </div>
+    )
+  }
 
   return (
-    <Container maxW="container.xl" py={8}>
-      <Heading as="h1" size="xl" mb={6} color={textColor}>Your Career Path Progress</Heading>
+    <div className="container p-6 mx-auto space-y-8">
+      {/* Welcome Section */}
+      <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
+          Your Career Journey
+        </h1>
+        <p className="mt-2 text-gray-400">
+          Current Role: {profile?.currentRole || "Not Set"} → Target: {profile?.projectedRole || "Not Set"}
+        </p>
+      </div>
 
-      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap={6}>
-        {[
-          {
-            title: "Career Overview", content: (
-              isLoadingProfile ? (
-                <Spinner />
-              ) : (
-                <>
-                  <Text><strong>Name:</strong> {profile.name}</Text>
-                  <Text><strong>Current Role:</strong> {profile.currentRole || "Not Set"}</Text>
-                  <Text><strong>Career Path:</strong> <span style={{ textTransform: 'capitalize' }}>{profile.careerPath}</span></Text>
-                  <Text><strong>Target Role:</strong> {profile.projectedRole}</Text>
-                </>
-              )
-            )
-          },
-          {
-            title: "Skills Progress", content: (
-              <>
-                <Progress value={computeSkillsProgress} size="lg" colorScheme="blue" bg="gray.100" />
-                <Text mt={2} textAlign="center">{Math.round(computeSkillsProgress)}% Complete</Text>
-              </>
-            )
-          },
-          {
-            title: "Time Investment", content: (
-              <Flex align="center" justify="center">
-                <Clock size={48} color="blue" />
-                <Box ml={4}>
-                  <Text fontSize="3xl" fontWeight="bold">{totalTimeSpent}</Text>
-                  <Text fontSize="sm" color="gray.500">Total Hours Spent</Text>
-                </Box>
-              </Flex>
-            )
-          },
-          {
-            title: "Things to Improve", content: (
-              <>
-                <List spacing={2}>
-                  {skillsProgress?.filter(skill => !skill.completed).filter((_, i) => i < 4).map((skill, index) => (
-                    <ListItem key={index}>{typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}</ListItem>
-                  ))}
-                </List>
-                <Button rightIcon={<ChevronRight />} onClick={openModal} variant="outline" width="full" mt={4}>
-                  View Detailed Plan
-                </Button>
-              </>
-            )
-          },
-          // {
-          //   title: "What's Next", content: (
-          //     <>
-          //       <List spacing={2}>
-          //         {userData.nextSteps.map((step, index) => (
-          //           <ListItem key={index} display="flex" alignItems="flex-start">
-          //             <ListIcon as={TrendingUp} color="blue.500" mt={1} />
-          //             <Text>{step}</Text>
-          //           </ListItem>
-          //         ))}
-          //       </List>
-          //       <Button colorScheme="blue" width="full" mt={4}>Start Next Task</Button>
-          //     </>
-          //   )
-          // },
-          {
-            title: "Recent Achievements", content: (
-              <>Coming Soon</>
-              // <List spacing={2}>
-              //   {userData.recentAchievements.map((achievement, index) => (
-              //     <ListItem key={index} display="flex" alignItems="flex-start">
-              //       <ListIcon as={Award} color="yellow.500" mt={1} />
-              //       <Text>{achievement}</Text>
-              //     </ListItem>
-              //   ))}
-              // </List>
-            )
-          },
-        ].map((card, index) => (
-          <Card key={index} bg={bgColor} color={textColor} borderColor={borderColor} borderWidth={1}>
-            <CardHeader>
-              <Heading size="md">{card.title}</Heading>
+      {/* Career Timeline */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {milestones.map((milestone, index) => (
+          <Card
+            key={index}
+            className={`bg-[#1A1A1A] border-[#333333] transform hover:scale-105 transition-all duration-300
+              ${milestone.completed ? 'border-l-4' : 'opacity-70'}`}
+            style={{ borderLeftColor: milestone.completed ? milestone.color : 'transparent' }}
+          >
+            <CardHeader className="flex flex-row items-center gap-4">
+              <div className="p-2 rounded-xl" style={{ backgroundColor: `${milestone.color}20` }}>
+                <milestone.icon className="w-8 h-8" style={{ color: milestone.color }} />
+              </div>
+              <div>
+                <CardTitle className="text-lg font-bold text-white">{milestone.title}</CardTitle>
+                <p className="text-sm text-gray-400">{milestone.description}</p>
+              </div>
             </CardHeader>
-            <CardBody>
-              {card.content}
-            </CardBody>
+            <CardContent>
+              <div className="space-y-2">
+                {milestone.skills.map((skill, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 text-sm text-gray-300"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: milestone.color }} />
+                    {skill}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
           </Card>
         ))}
-      </Grid>
+      </div>
 
-      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mt={8}>
-        {[
-          { title: "Completed Courses", icon: Book, count: userData.completedCourses, label: "Courses Finished" },
-          {
-            title: "Certifications",
-            icon: Target,
-            count: isLoadingCertificates ? <Spinner size="sm" /> : certificates?.length || 0,
-            label: "Certifications Earned"
-          },
-        ].map((card, index) => (
-          <Card key={index} bg={bgColor} color={textColor} borderColor={borderColor} borderWidth={1}>
-            <CardHeader>
-              <Heading size="md">{card.title}</Heading>
+      {/* Market Trends */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {trends.map((trend, index) => (
+          <Card
+            key={index}
+            className="bg-[#1A1A1A] border-[#333333] transform hover:scale-105 transition-all duration-300"
+          >
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-2 rounded-xl" style={{ backgroundColor: `${trend.color}20` }}>
+                  <trend.icon className="w-6 h-6" style={{ color: trend.color }} />
+                </div>
+                <div>
+                  <CardTitle className="text-lg font-bold text-white">{trend.title}</CardTitle>
+                  <p className="text-sm text-gray-400">{trend.description}</p>
+                </div>
+              </div>
+              <span
+                className="text-2xl font-bold"
+                style={{ color: trend.color }}
+              >
+                {trend.value}
+              </span>
             </CardHeader>
-            <CardBody>
-              <Flex align="center" justify="center">
-                <card.icon size={48} color="blue" />
-                <Box ml={4}>
-                  <Text fontSize="3xl" fontWeight="bold">{card.count}</Text>
-                  <Text fontSize="sm" color="gray.500">{card.label}</Text>
-                </Box>
-              </Flex>
-            </CardBody>
-            <CardFooter>
-              <Button variant="outline" width="full">View {card.title}</Button>
-            </CardFooter>
           </Card>
         ))}
-      </Grid>
+      </div>
 
-      <Box mt={8} bg={bgColor} color={textColor} borderColor={borderColor} borderWidth={1} p={4} borderRadius="md">
-        <Heading as="h2" size="lg" mb={4}>Your Skill Set</Heading>
-        <Flex flexWrap="wrap" gap={2}>
-          {skills?.map((skill) => (
-            <Badge key={skill.id} bg="gray.100" color="gray.800">{skill.name}</Badge>
+      {/* Skills Progress */}
+      <Card className="bg-[#1A1A1A] border-[#333333]">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-white">Your Skills Progress</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {skillsProgress?.filter(skill => !skill.completed).slice(0, 3).map((skill, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 p-4 rounded-xl bg-[#222222] hover:bg-[#2A2A2A] transition-colors"
+            >
+              <div className="w-2 h-2 rounded-full bg-[#8A2EFF]" />
+              <span className="text-gray-300">
+                {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}
+              </span>
+              <div className="ml-auto text-sm text-gray-400">
+                {skill.progress}% Complete
+              </div>
+            </div>
           ))}
-        </Flex>
-      </Box>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="w-full mt-4 p-3 rounded-xl bg-[#8A2EFF]/10 text-[#8A2EFF] hover:bg-[#8A2EFF]/20 transition-colors"
+          >
+            View Detailed Plan
+          </button>
+        </CardContent>
+      </Card>
 
       <ViewDetailedPlan
         isOpen={isModalOpen}
-        onClose={closeModal}
-        careerPath={careerPath}
+        onClose={() => setIsModalOpen(false)}
+        careerPath={profile?.careerPath || ""}
         skillsProgress={skillsProgress || []}
       />
-    </Container>
+    </div>
   )
 }

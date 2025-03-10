@@ -15,55 +15,34 @@ import { useEffect, useState } from 'react'
 
 export default function ProjectPage() {
   const { id } = useParams()
-  const [project, setProject] = useState<ProjectSimulation | null>({
-    _id: "1",
-    title: "Sustainable Urban Planning Initiative",
-    description: "Develop innovative solutions for sustainable urban development, addressing challenges in transportation, energy efficiency, and green spaces.",
-    industry: "Urban Planning",
-    skills: ["Urban Planning", "Sustainable Development", "Transportation", "Energy Efficiency", "Green Spaces"],
-    sprints: [
-      { id: 1, name: "Sprint 1", description: "Define the project scope and objectives" },
-      { id: 2, name: "Sprint 2", description: "Conduct market research and stakeholder analysis" },
-      { id: 3, name: "Sprint 3", description: "Develop initial project plan and timeline" },
-    ],
-    collaborators: [
-      { _id: "1", name: "Emma Green" },
-      { _id: "2", name: "Liam Chen" },
-      { _id: "3", name: "Sophia Patel" },
-    ],
-    selectedScenario: "Scenario 1",
-    feedback: "Initial feedback from stakeholders",
-    difficulty: Difficulty.Intermediate,
-    duration: 12,
-    reportFrequency: 4,
+  const [project, setProject] = useState<ProjectSimulation | null>(null)
+  const [logs, setLogs] = useState<DailyLog[]>([])
+  const [newLog, setNewLog] = useState('')
+  const { data: projectData, mutate: fetchProject } = useGetProjectById()
+  const { mutate: updateProject } = useUpdateProject({
+    onSuccess: () => { },
+    onError: () => { }
   })
-  const [logs, setLogs] = useState<DailyLog[]>([
-    { date: '2023-06-01', content: 'Kickoff meeting held. Team roles assigned.' },
-    { date: '2023-06-02', content: 'Started research on sustainable urban planning best practices.' },
-    { date: '2023-06-03', content: 'Identified key stakeholders for the project.' },
-  ])
-  const [newLog, setNewLog] = useState('');
-  const [isStarted, setIsStarted] = useState<Boolean>(false);
-  const { data: projectData, mutate: fetchProject, isPending: isProjectPending } = useGetProjectById()
-  const { data: updatedProject, mutate: updateProject } = useUpdateProject({ onSuccess: () => { }, onError: () => { } });
 
   useEffect(() => {
-    // Fetch project data
-    // This is a placeholder. In a real application, you'd fetch from your API
-    fetchProject(id as string);
+    fetchProject(id as string)
   }, [id])
 
   useEffect(() => {
-    setProject({
-      ...projectData
-    })
-  }, [isProjectPending])
+    if (projectData) {
+      setProject(projectData)
+    }
+  }, [projectData])
 
   const handleUpdateProject = async (e: React.FormEvent) => {
     e.preventDefault()
-    updateProject({...project, id: id as string})
-    // Update project logic here
-    console.log('Updating project:', project)
+    if (!project) return
+    updateProject({
+      ...project,
+      id: id as string,
+      reportFrequency: project.reportFrequency.toString(),
+      collaborators: project.collaborators.map((collaborator: Collaborator) => collaborator._id)
+    })
   }
 
   const handleAddLog = () => {
@@ -73,148 +52,170 @@ export default function ProjectPage() {
     }
   }
 
-  if (!project) return <div>Loading...</div>
+  if (!project) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-[#111111]">
+        <div className="w-8 h-8 border-4 border-[#8A2EFF] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   return (
-    <div className="container mx-auto p-4 space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">{project.title}</h1>
-        <Badge variant="outline" className="text-lg py-1">
-          {project.industry}
-        </Badge>
-      </div>
+    <div className="min-h-screen bg-[#111111] py-8">
+      <div className="container mx-auto px-4 space-y-8">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-white">{project.title}</h1>
+          <Badge className="bg-[#1CB0F6] text-white border-none text-lg py-1">
+            {project.industry}
+          </Badge>
+        </div>
 
-      <Tabs defaultValue="details" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="details">Project Details</TabsTrigger>
-          <TabsTrigger value="sprints">Sprints</TabsTrigger>
-          <TabsTrigger value="collaborators">Collaborators</TabsTrigger>
-          <TabsTrigger value="logs">Daily Logs</TabsTrigger>
-        </TabsList>
-        <TabsContent value="details">
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleUpdateProject} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Description</label>
-                  <Textarea
-                    value={project.description || ''}
-                    onChange={(e) => setProject({ ...project, description: e.target.value })}
-                    className="min-h-[100px]"
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="bg-[#1A1A1A] border-[#333333]">
+            <TabsTrigger value="details" className="data-[state=active]:bg-[#222222] text-white">Project Details</TabsTrigger>
+            <TabsTrigger value="sprints" className="data-[state=active]:bg-[#222222] text-white">Sprints</TabsTrigger>
+            <TabsTrigger value="collaborators" className="data-[state=active]:bg-[#222222] text-white">Collaborators</TabsTrigger>
+            <TabsTrigger value="logs" className="data-[state=active]:bg-[#222222] text-white">Daily Logs</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details">
+            <Card className="bg-[#1A1A1A] border-[#333333]">
+              <CardHeader>
+                <CardTitle className="text-white">Project Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleUpdateProject} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Difficulty</label>
-                    <Select>
-                      {Object.values(Difficulty)?.map((diff) => (
-                        <option key={diff} value={diff}>{diff}</option>
-                      ))}
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Duration (weeks)</label>
-                    <Input
-                      type="number"
-                      value={project.duration}
-                      onChange={(e) => setProject({ ...project, duration: parseInt(e.target.value) })}
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
+                    <Textarea
+                      value={project.description}
+                      onChange={(e) => setProject({ ...project, description: e.target.value })}
+                      className="min-h-[100px] bg-[#222222] border-[#444444] text-white placeholder:text-gray-500"
                     />
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Skills</label>
-                  <div className="flex flex-wrap gap-2">
-                    {project?.skills?.map((skill, index) => (
-                      <Badge key={index} variant="secondary">{skill}</Badge>
-                    ))}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Difficulty</label>
+                      <Select
+                        value={project.difficulty}
+                        onChange={(e) => setProject({ ...project, difficulty: e.target.value as Difficulty })}
+                        className="bg-[#222222] border-[#444444] text-white"
+                      >
+                        {Object.values(Difficulty)?.map((diff) => (
+                          <option key={diff} value={diff}>{diff}</option>
+                        ))}
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Duration (weeks)</label>
+                      <Input
+                        type="number"
+                        value={project.duration}
+                        onChange={(e) => setProject({ ...project, duration: parseInt(e.target.value) })}
+                        className="bg-[#222222] border-[#444444] text-white"
+                      />
+                    </div>
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Skills</label>
+                    <div className="flex flex-wrap gap-2">
+                      {project.skills?.map((skill, index) => (
+                        <Badge key={index} className="bg-[#8A2EFF] text-white border-none">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white w-full md:w-auto"
+                  >
+                    Update Project
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="sprints">
+            <Card className="bg-[#1A1A1A] border-[#333333]">
+              <CardHeader>
+                <CardTitle className="text-white">Sprints</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {project.sprints?.map((sprint: Sprint) => (
+                    <Card key={sprint.id} className="bg-[#222222] border-[#444444]">
+                      <CardHeader>
+                        <CardTitle className="text-white text-lg">{sprint.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-gray-300">{sprint.description}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Report Frequency (days)</label>
-                  <Input
-                    type="number"
-                    value={project.reportFrequency}
-                    onChange={(e) => setProject({ ...project, reportFrequency: parseInt(e.target.value) })}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="collaborators">
+            <Card className="bg-[#1A1A1A] border-[#333333]">
+              <CardHeader>
+                <CardTitle className="text-white">Collaborators</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {project.collaborators?.map((collaborator: Collaborator) => (
+                    <Card key={collaborator._id} className="bg-[#222222] border-[#444444]">
+                      <CardContent className="flex items-center justify-center h-20">
+                        <span className="text-lg font-medium text-white">{collaborator.name}</span>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="logs">
+            <Card className="bg-[#1A1A1A] border-[#333333]">
+              <CardHeader>
+                <CardTitle className="text-white">Daily Logs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4 space-y-2">
+                  <Textarea
+                    value={newLog}
+                    onChange={(e) => setNewLog(e.target.value)}
+                    placeholder="Enter new log..."
+                    className="min-h-[100px] bg-[#222222] border-[#444444] text-white placeholder:text-gray-500"
                   />
-                </div>
-                <div className='w-1/3'>
-                  <Button type="submit" className="group flex mt-12 items-center gap-2 relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Start Project
+                  <Button
+                    onClick={handleAddLog}
+                    className="w-full bg-[#8A2EFF] hover:bg-[#7325D4] text-white"
+                  >
+                    Add Log
                   </Button>
                 </div>
-              </form>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="sprints">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sprints</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {project?.sprints?.map((sprint: Sprint) => (
-                  <Card key={sprint.id}>
-                    <CardHeader>
-                      <CardTitle>{sprint.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{sprint.description}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="collaborators">
-          <Card>
-            <CardHeader>
-              <CardTitle>Collaborators</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {project?.collaborators?.map((collaborator: Collaborator) => (
-                  <Card key={collaborator._id}>
-                    <CardContent className="flex items-center justify-center h-20">
-                      <span className="text-lg font-medium">{collaborator.name}</span>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="logs">
-          <Card>
-            <CardHeader>
-              <CardTitle>Daily Logs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4 space-y-2">
-                <Textarea
-                  value={newLog}
-                  onChange={(e) => setNewLog(e.target.value)}
-                  placeholder="Enter new log..."
-                  className="min-h-[100px]"
-                />
-                <Button onClick={handleAddLog} className="w-full">Add Log</Button>
-              </div>
-              <ScrollArea className="h-[400px] w-full rounded-md border p-4">
-                {logs.map((log, index) => (
-                  <div key={index} className="mb-4 last:mb-0">
-                    <div className="font-semibold">{new Date(log.date).toLocaleDateString()}</div>
-                    <p className="mt-1">{log.content}</p>
-                  </div>
-                ))}
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                <ScrollArea className="h-[400px] rounded-md border border-[#444444] bg-[#222222] p-4">
+                  {logs.map((log, index) => (
+                    <div key={index} className="mb-4 last:mb-0">
+                      <div className="font-semibold text-white">
+                        {new Date(log.date).toLocaleDateString()}
+                      </div>
+                      <p className="mt-1 text-gray-300">{log.content}</p>
+                    </div>
+                  ))}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   )
 }

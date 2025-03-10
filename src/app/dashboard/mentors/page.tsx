@@ -1,15 +1,12 @@
-'use client'
+"use client"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select } from "@/components/ui/select"
-import { useCreateMentorRelationship, useGetMentorsByMenteeId } from "@/services/useMentor"
+import { useCreateMentorRelationship, useGetMentorsByMentorId } from "@/services/useMentor"
 import { useProfile } from "@/services/useProfile"
-import { useToast } from "@chakra-ui/react"
-import { Briefcase, MessageCircle, Search, Star } from "lucide-react"
+import { Spinner, useToast } from "@chakra-ui/react"
+import { Award, BookOpen, Calendar, MessageSquare, Star, Users } from "lucide-react"
+import { useSession } from "next-auth/react"
 import { useState } from "react"
 
 export default function MentorsPage() {
@@ -17,9 +14,58 @@ export default function MentorsPage() {
   const [expertise, setExpertise] = useState("");
   const { profile } = useProfile();
   const toast = useToast();
+  const { data: session } = useSession();
 
-  const { data: mentorships, isLoading } = useGetMentorsByMenteeId(profile?._id);
+  // Dummy data for mentors
+  const dummyMentors = [
+    {
+      _id: "1",
+      mentorId: {
+        name: "John Doe",
+        currentRole: "Senior Software Engineer",
+        expertise: ["React", "Node.js"]
+      },
+      status: "active"
+    },
+    {
+      _id: "2",
+      mentorId: {
+        name: "Jane Smith",
+        currentRole: "Product Manager",
+        expertise: ["Product Strategy", "Agile"]
+      },
+      status: "pending"
+    },
+    {
+      _id: "3",
+      mentorId: {
+        name: "Mike Johnson",
+        currentRole: "Tech Lead",
+        expertise: ["System Design", "Leadership"]
+      },
+      status: "active"
+    }
+  ];
+
+  // Replace the useGetMentorsByMenteeId hook result with dummy data
+  const { data: mentorships, isLoading: isLoadingMentorships } = {
+    data: dummyMentors,
+    isLoading: false
+  };
   const { mutate: createMentorship } = useCreateMentorRelationship();
+  const { data: mentors, isLoading: isLoadingMentors } = {
+    data: dummyMentors,
+    isLoading: false
+  };
+  const { data: mentees, isLoading: isLoadingMentees } = useGetMentorsByMentorId(profile?._id);
+
+  if (isLoadingMentorships || isLoadingMentors || isLoadingMentees) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Spinner color="#8A2EFF" size="xl" />
+      </div>
+    );
+  }
 
   const handleConnect = async (mentorId: string) => {
     try {
@@ -48,133 +94,166 @@ export default function MentorsPage() {
     }
   };
 
-  const mentors = [
+  const stats = [
     {
-      id: "1",
-      name: "Alice Johnson",
-      role: "Senior Software Engineer",
-      company: "Tech Giants Inc.",
-      expertise: ["React", "Node.js", "Cloud Computing"],
-      rating: 4.9,
-      image: "/placeholder.svg?height=100&width=100",
+      title: "Active Mentors",
+      value: mentors?.filter((m: any) => m.status === 'active').length || 0,
+      icon: Users,
+      color: "#58CC02"
     },
     {
-      id: "2",
-      name: "Bob Smith",
-      role: "Product Manager",
-      company: "Innovative Solutions Ltd.",
-      expertise: ["Agile", "UX Design", "Data Analytics"],
-      rating: 4.7,
-      image: "/placeholder.svg?height=100&width=100",
+      title: "Active Mentees",
+      value: mentees?.filter((m: any) => m.status === 'active').length || 0,
+      icon: Star,
+      color: "#1CB0F6"
     },
     {
-      name: "Carol Williams",
-      role: "Data Scientist",
-      company: "AI Frontiers",
-      expertise: ["Machine Learning", "Python", "Big Data"],
-      rating: 4.8,
-      image: "/placeholder.svg?height=100&width=100",
-    },
-    {
-      name: "David Brown",
-      role: "UX/UI Designer",
-      company: "Creative Designs Co.",
-      expertise: ["User Research", "Figma", "Design Systems"],
-      rating: 4.6,
-      image: "/placeholder.svg?height=100&width=100",
-    },
-  ]
+      title: "Sessions Completed",
+      value: "12",
+      icon: Calendar,
+      color: "#8A2EFF"
+    }
+  ];
 
   // Filter mentors based on search and expertise
-  const filteredMentors = mentors.filter(mentor => {
-    const matchesSearch = mentor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mentor.role.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesExpertise = !expertise || mentor.expertise.includes(expertise);
+  const filteredMentors = mentors.filter((mentor: any) => {
+    const matchesSearch = mentor.mentorId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mentor.mentorId.currentRole.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesExpertise = !expertise || mentor.mentorId.expertise.includes(expertise);
     return matchesSearch && matchesExpertise;
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Find Your Career Mentor</h1>
+    <div className="container p-6 mx-auto space-y-8">
+      {/* Welcome Section */}
+      <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
+          Mentorship Hub
+        </h1>
+        <p className="mt-2 text-gray-400">
+          Connect, learn, and grow with industry professionals
+        </p>
+      </div>
 
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row gap-4">
-          <Input
-            placeholder="Search mentors..."
-            className="flex-grow"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Select value={expertise} onChange={(e) => setExpertise(e.target.value)}>
-            <option value="">All Expertise</option>
-            <option value="React">React</option>
-            <option value="Node.js">Node.js</option>
-            <option value="Python">Python</option>
-            <option value="Machine Learning">Machine Learning</option>
-          </Select>
-          <Button variant="outline" className="flex items-center justify-center">
-            <Search className="mr-2 h-4 w-4" /> Search
+      {/* Stats Grid */}
+      <div className="grid gap-6 md:grid-cols-3">
+        {stats.map((stat, index) => (
+          <Card
+            key={index}
+            className="bg-[#1A1A1A] border-[#333333] transform hover:scale-105 transition-all duration-300"
+          >
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-2 rounded-xl" style={{ backgroundColor: `${stat.color}20` }}>
+                  <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
+                </div>
+                <div>
+                  <CardTitle className="text-lg font-bold text-white">{stat.title}</CardTitle>
+                </div>
+              </div>
+              <span className="text-2xl font-bold" style={{ color: stat.color }}>
+                {stat.value}
+              </span>
+            </CardHeader>
+          </Card>
+        ))}
+      </div>
+
+      {/* Active Mentors */}
+      <Card className="bg-[#1A1A1A] border-[#333333]">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-xl font-bold text-white">Your Mentors</CardTitle>
+          <Button
+            className="bg-[#8A2EFF] hover:bg-[#7325D4]"
+            onClick={() => {/* TODO: Add find mentor functionality */ }}
+          >
+            Find Mentor
           </Button>
-        </div>
-      </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {mentors?.filter((mentor: any) => mentor.status === 'active').map((mentor: any, index: any) => (
+            <div
+              key={index}
+              className="flex items-center gap-4 p-4 rounded-xl bg-[#222222] hover:bg-[#2A2A2A] transition-colors"
+            >
+              <div className="p-2 rounded-xl bg-[#58CC02]/20">
+                <Award className="w-6 h-6 text-[#58CC02]" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-medium">{mentor.mentorId.name}</h3>
+                <p className="text-sm text-gray-400">{mentor.mentorId.currentRole}</p>
+              </div>
+              <Button variant="outline" className="border-[#8A2EFF] text-[#8A2EFF] hover:bg-[#8A2EFF]/10">
+                <MessageSquare className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredMentors.map((mentor, index) => {
-          const hasPendingRequest = mentorships?.some(
-            (m: any) => m.mentorId === mentor.id && m.status === 'pending'
-          );
-          const isActiveMentor = mentorships?.some(
-            (m: any) => m.mentorId === mentor.id && m.status === 'active'
-          );
+      {/* Your Mentees */}
+      <Card className="bg-[#1A1A1A] border-[#333333]">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-white">Your Mentees</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {mentees?.filter((mentee: any) => mentee.status === 'active').map((mentee: any, index: any) => (
+            <div
+              key={index}
+              className="flex items-center gap-4 p-4 rounded-xl bg-[#222222] hover:bg-[#2A2A2A] transition-colors"
+            >
+              <div className="p-2 rounded-xl bg-[#1CB0F6]/20">
+                <BookOpen className="w-6 h-6 text-[#1CB0F6]" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-medium">{mentee.menteeId.name}</h3>
+                <p className="text-sm text-gray-400">{mentee.menteeId.currentRole}</p>
+              </div>
+              <Button variant="outline" className="border-[#8A2EFF] text-[#8A2EFF] hover:bg-[#8A2EFF]/10">
+                <MessageSquare className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
-          return (
-            <Card key={index}>
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={mentor.image} alt={mentor.name} />
-                    <AvatarFallback>{mentor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <CardTitle>{mentor.name}</CardTitle>
-                    <p className="text-sm text-gray-500">{mentor.role}</p>
-                  </div>
+      {/* Pending Requests */}
+      {(mentors?.some((m: any) => m.status === 'pending') || mentees?.some((m: any) => m.status === 'pending')) && (
+        <Card className="bg-[#1A1A1A] border-[#333333]">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-white">Pending Requests</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {[
+              ...mentors?.filter((m: any) => m.status === 'pending').map((m: any) => ({ ...m, type: 'mentor' })) || [],
+              ...mentees?.filter((m: any) => m.status === 'pending').map((m: any) => ({ ...m, type: 'mentee' })) || []
+            ].map((request, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-4 p-4 rounded-xl bg-[#222222] hover:bg-[#2A2A2A] transition-colors"
+              >
+                <div className="p-2 rounded-xl bg-[#FF9600]/20">
+                  <Users className="w-6 h-6 text-[#FF9600]" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <div className="flex items-center text-sm text-gray-500 mb-2">
-                    <Briefcase className="mr-2 h-4 w-4" />
-                    {mentor.company}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Star className="mr-2 h-4 w-4 text-yellow-400" />
-                    {mentor.rating} / 5.0
-                  </div>
+                <div className="flex-1">
+                  <h3 className="text-white font-medium">
+                    {request.type === 'mentor' ? request.mentorId.name : request.menteeId.name}
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    {request.type === 'mentor' ? 'Mentor Request' : 'Mentee Request'}
+                  </p>
                 </div>
-                <div className="mb-4">
-                  <h3 className="font-semibold mb-2">Expertise</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {mentor.expertise.map((skill, skillIndex) => (
-                      <Badge key={skillIndex} variant="secondary">{skill}</Badge>
-                    ))}
-                  </div>
+                <div className="flex gap-2">
+                  <Button className="bg-[#58CC02] hover:bg-[#4CAD02]">Accept</Button>
+                  <Button variant="outline" className="border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10">
+                    Decline
+                  </Button>
                 </div>
-                <Button
-                  className="w-full flex items-center justify-center"
-                  variant="outline"
-                  disabled={hasPendingRequest || isActiveMentor}
-                  onClick={() => handleConnect(mentor.id || '')}
-                >
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  {isActiveMentor ? 'Active Mentor' :
-                    hasPendingRequest ? 'Request Pending' : 'Connect'}
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
