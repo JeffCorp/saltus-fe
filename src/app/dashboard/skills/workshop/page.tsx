@@ -51,6 +51,10 @@ const Workshop = () => {
     }
   }, [currentSkill]);
 
+  if (qnaData) {
+    scrollTo(0, 0)
+  }
+
   const handleAnswer = (selectedIndex: number) => {
     if (!currentSkill || !qnaData || answerSubmitted) return;
 

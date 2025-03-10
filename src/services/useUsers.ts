@@ -9,9 +9,29 @@ async function fetchUsers() {
   return response.data;
 }
 
+async function fetchSuggestedUsers() {
+  const response = await apiClient.get(`/users/suggestions`);
+  if (response.status !== 200) {
+    throw new Error("Network response was not ok");
+  }
+  return response.data;
+}
+
 function useUsers() {
   const getUsers = useMutation({
     mutationFn: () => fetchUsers(),
+    onSuccess: () => {},
+    onError: (error) => {
+      console.error("Error fetching users:", error);
+    },
+  });
+
+  return { ...getUsers };
+}
+
+export function useSuggestedUsers() {
+  const getUsers = useMutation({
+    mutationFn: () => fetchSuggestedUsers(),
     onSuccess: () => {},
     onError: (error) => {
       console.error("Error fetching users:", error);

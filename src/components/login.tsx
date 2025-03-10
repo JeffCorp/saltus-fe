@@ -48,11 +48,11 @@ const Login = () => {
   };
 
   return (
-    <div className="flex max-h-[90vh]">
+    <div className="flex max-h-[100vh]">
       {/* Left side - Carousel */}
       <div className="w-1/2 bg-gray-200 h-[100%] hidden md:block">
         <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false}>
-          <div className="w-[100%] h-[calc(100vh-3.5rem)]">
+          <div className="w-[100%] h-[100vh]">
             <Image
               src={image1}
               alt="Login Image 1"

@@ -1,7 +1,7 @@
 "use client";
 import { useLatestUpdatesMutation } from "@/services/useLatestUpdates";
 import { useProfile } from "@/services/useProfile";
-import { Box, Flex, Link, Spinner, Text } from "@chakra-ui/react";
+import { Box, Flex, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Spinner, Text } from "@chakra-ui/react";
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -35,34 +35,89 @@ const generateRandomData = (count: number) => {
 };
 
 // Mock data for news trends with randomized data
+// const newsTrends = {
+//   labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+//   datasets: [
+//     {
+//       label: "Electric Vehicles",
+//       data: generateRandomData(6),
+// borderColor: "rgb(255, 99, 132)",
+// backgroundColor: "rgba(255, 99, 132, 0.5)",
+//     },
+//     {
+//       label: "Autonomous Driving",
+//       data: generateRandomData(6),
+// borderColor: "rgb(53, 162, 235)",
+// backgroundColor: "rgba(53, 162, 235, 0.5)",
+//     },
+//     {
+//       label: "Hydrogen Fuel Cells",
+//       data: generateRandomData(6),
+// borderColor: "rgb(75, 192, 192)",
+// backgroundColor: "rgba(75, 192, 192, 0.5)",
+//     },
+//     {
+//       label: "Car Sharing Services",
+//       data: generateRandomData(6),
+// borderColor: "rgb(255, 159, 64)",
+// backgroundColor: "rgba(255, 159, 64, 0.5)",
+//     },
+//   ],
+// };
+
+const colors = [
+  {
+    borderColor: "rgb(255, 99, 132)",
+    backgroundColor: "rgba(255, 99, 132, 0.5)",
+  },
+  {
+    borderColor: "rgb(53, 162, 235)",
+    backgroundColor: "rgba(53, 162, 235, 0.5)",
+  },
+  {
+    borderColor: "rgb(75, 192, 192)",
+    backgroundColor: "rgba(75, 192, 192, 0.5)",
+  },
+  {
+    borderColor: "rgb(255, 159, 64)",
+    backgroundColor: "rgba(255, 159, 64, 0.5)",
+  }
+]
+
 const newsTrends = {
   labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
   datasets: [
     {
       label: "Electric Vehicles",
-      data: generateRandomData(6),
+      data: [65, 75, 70, 80, 60, 90],
       borderColor: "rgb(255, 99, 132)",
       backgroundColor: "rgba(255, 99, 132, 0.5)",
+      // Custom data for each point
+      customData: [
+        { title: "hello", sentiment: "positive", topBrands: ["Tesla", "VW"] },
+        { title: "hello", sentiment: "neutral", topBrands: ["Ford", "GM"] },
+        { title: "hello", sentiment: "positive", topBrands: ["BMW", "Tesla"] },
+        { title: "hello", sentiment: "very positive", topBrands: ["Tesla", "Rivian"] },
+        { title: "hello", sentiment: "negative", topBrands: ["Toyota", "Honda"] },
+        { title: "hello", sentiment: "positive", topBrands: ["Tesla", "Lucid"] }
+      ]
     },
     {
       label: "Autonomous Driving",
-      data: generateRandomData(6),
+      data: [40, 45, 55, 65, 70, 80],
       borderColor: "rgb(53, 162, 235)",
       backgroundColor: "rgba(53, 162, 235, 0.5)",
-    },
-    {
-      label: "Hydrogen Fuel Cells",
-      data: generateRandomData(6),
-      borderColor: "rgb(75, 192, 192)",
-      backgroundColor: "rgba(75, 192, 192, 0.5)",
-    },
-    {
-      label: "Car Sharing Services",
-      data: generateRandomData(6),
-      borderColor: "rgb(255, 159, 64)",
-      backgroundColor: "rgba(255, 159, 64, 0.5)",
-    },
-  ],
+      // Different custom data for this dataset
+      customData: [
+        { title: 2, testMiles: "10K", companies: ["Waymo"] },
+        { title: 1, testMiles: "15K", companies: ["Cruise"] },
+        { title: 0, testMiles: "20K", companies: ["Waymo", "Tesla"] },
+        { title: 1, testMiles: "25K", companies: ["Argo AI"] },
+        { title: 0, testMiles: "30K", companies: ["Cruise", "Aurora"] },
+        { title: 0, testMiles: "35K", companies: ["Waymo", "Cruise"] }
+      ]
+    }
+  ]
 };
 
 const Dashboard = () => {
@@ -76,8 +131,47 @@ const Dashboard = () => {
     isPending: isLoadingLatestUpdates,
   } = useLatestUpdatesMutation();
   const [newsTrendsData, setNewsTrendsData] = useState<any>(newsTrends);
+  const [isGraphDataModalOpen, setIsGraphDataModalOpen] = useState(false);
+  const [selectedGraphData, setSelectedGraphData] = useState<{ posts: { title: string; url: string }[] }>();
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      tooltip: {
+        callbacks: {
+          afterBody: (context: any) => {
+            const datasetIndex = context[0].datasetIndex;
+            const pointIndex = context[0].dataIndex;
+            const customData = newsTrendsData.datasets[datasetIndex].customData[pointIndex];
 
-  console.log(profile);
+            // Create different tooltip content based on dataset
+            if (datasetIndex === 0) {
+              return [
+                `Posts: ${customData?.posts?.map((post: any) => post.title)}`,
+              ];
+            }
+          }
+        }
+      }
+    },
+    onClick: (e: any, elem: any) => {
+      if (elem.length > 0) {
+        const { datasetIndex, index } = elem[0];
+
+        console.log(newsTrendsData.datasets[datasetIndex].customData[index]);
+
+        setSelectedGraphData(newsTrendsData.datasets[datasetIndex].customData[index])
+        setIsGraphDataModalOpen(true)
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
 
   useEffect(() => {
     if (profile) {
@@ -87,15 +181,19 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (latestUpdates) {
-      // setNewsTrendsData({
-      //   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-      //   datasets: latestUpdates.map((update: any) => ({
-      //     label: update.title,
-      //     data: generateRandomData(6),
-      //     borderColor: 'rgb(255, 99, 132)',
-      //     backgroundColor: `rgba(255, 99, ${Math.floor(Math.random() * 255)}, 0.5)`,
-      //   }))
-      // })
+      console.log("latestupdates =>", latestUpdates);
+
+      setNewsTrendsData({
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: latestUpdates?.graph_data?.map((update: any, i: number) => ({
+          label: update.topic,
+          data: update.monthly_data.map((d: any) => d.average_ratio),
+          customData: [
+            ...update.monthly_data.map((d: any) => ({ posts: d.posts.filter((post: any, i: number) => i < 5).map((post: any) => ({ title: post.title, url: post.url })) }))
+          ],
+          ...colors[i]
+        }))
+      })
     }
   }, [latestUpdates]);
   // if (session) {
@@ -110,6 +208,9 @@ const Dashboard = () => {
   };
 
   // Mock data for learning progress
+  // Create an endpoint to handle the requests from gsthering all the skills updates from the skills module for the different validations
+  // Also make modifications to the tests to accomodate questions that require writting your answer.
+
   const learningProgressData = {
     labels: [
       "Technical Skills",
@@ -143,19 +244,19 @@ const Dashboard = () => {
     ],
   };
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: `News Trends in ${profile?.topic}`,
-      },
-    },
-  };
+  // const options = {
+  //   responsive: true,
+  //   maintainAspectRatio: false,
+  //   plugins: {
+  //     legend: {
+  //       position: "top" as const,
+  //     },
+  //     title: {
+  //       display: true,
+  //       text: `News Trends in ${profile?.topic}`,
+  //     },
+  //   },
+  // };
 
   const learningProgressOptions = {
     responsive: true,
@@ -256,8 +357,34 @@ const Dashboard = () => {
               News Trends
             </h2>
             <div className="bg-white p-4 rounded-lg shadow h-full">
-              <Line options={options} data={newsTrendsData} />
+              {isLoadingLatestUpdates ?
+                <Flex
+                  justifyContent="center"
+                  alignItems="center"
+                  height="100%"
+                  width="100%"
+                >
+                  <Spinner />
+                </Flex>
+                :
+                <Line options={options} data={newsTrendsData} />}
             </div>
+            <Modal isOpen={isGraphDataModalOpen} onClose={() => setIsGraphDataModalOpen(!isGraphDataModalOpen)} size="md">
+              <ModalOverlay />
+              <ModalContent>
+                <ModalCloseButton />
+                <ModalHeader>News</ModalHeader>
+                <ModalBody bg="white" >
+                  <Flex flexDirection="column" gap={5}>
+                    {
+                      selectedGraphData?.posts?.map((data: { title: string, url: string }, i: number) => (
+                        <Link key={i} href={data?.url} target="_blank">{data?.title}</Link>
+                      ))
+                    }
+                  </Flex>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
           </div>
         </div>
 
@@ -275,8 +402,8 @@ const Dashboard = () => {
               >
                 <Spinner />
               </Flex>
-            ) : latestUpdates && latestUpdates?.length > 0 ? (
-              latestUpdates?.map((update, index) => (
+            ) : latestUpdates && latestUpdates?.data?.length > 0 ? (
+              latestUpdates?.data?.map((update, index) => (
                 <Box
                   key={index}
                   borderWidth="1px"

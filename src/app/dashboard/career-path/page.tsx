@@ -1,6 +1,7 @@
 'use client'
 
 import ViewDetailedPlan from '@/components/career-path/view-detailed-plan'
+import { useGetCertificatesByUserId } from "@/services/useCertificates"
 import { useProfile } from "@/services/useProfile"
 import { useSkills } from "@/services/useSkills"
 import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
@@ -41,10 +42,13 @@ export default function CareerPathProgressPage() {
   const { profile, isLoading: isLoadingProfile } = useProfile();
   const { data: skillsProgress, mutate: getSkillsProgress, isPending: isLoadingSkillsProgress } = useSkillsProgressByUserId();
   const { mutate: getSkills, data: skills, isPending: isLoadingSkills } = useSkills();
+  const { data: certificates, isLoading: isLoadingCertificates } = useGetCertificatesByUserId(profile?._id);
   const bgColor = useColorModeValue("white", "white");
   const textColor = useColorModeValue("gray.800", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.200");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  console.log("certificates =>", certificates);
 
   console.log("skills =>", skills);
 
@@ -169,7 +173,12 @@ export default function CareerPathProgressPage() {
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mt={8}>
         {[
           { title: "Completed Courses", icon: Book, count: userData.completedCourses, label: "Courses Finished" },
-          { title: "Certifications", icon: Target, count: userData.earnedCertifications, label: "Certifications Earned" },
+          {
+            title: "Certifications",
+            icon: Target,
+            count: isLoadingCertificates ? <Spinner size="sm" /> : certificates?.length || 0,
+            label: "Certifications Earned"
+          },
         ].map((card, index) => (
           <Card key={index} bg={bgColor} color={textColor} borderColor={borderColor} borderWidth={1}>
             <CardHeader>

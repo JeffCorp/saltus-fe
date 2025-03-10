@@ -4,7 +4,7 @@ import PendingConnections from '@/components/connections/pendingConnections'
 import StatusIcon from '@/components/connections/StatusIcon'
 import { Input } from "@/components/ui/input"
 import { useAcceptConnection, useAddConnection, useGetConnections } from '@/services/useConnections'
-import useUsers from '@/services/useUsers'
+import { useSuggestedUsers } from '@/services/useUsers'
 import {
   Avatar,
   Box,
@@ -33,21 +33,19 @@ const suggestedConnections = [
   { id: 6, name: 'Sarah Lee', email: 'sarah@example.com', avatar: '/placeholder.svg?height=40&width=40' },
 ]
 
-export default function NewConnections() {
+export default function MyConnections() {
   const { data: session } = useSession()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<{ _id: string, name: string, email: string, avatar: string }[]>([])
   const toast = useToast()
-  const { mutate: getUsers, data: users } = useUsers()
+  const { mutate: getUsers, data: users } = useSuggestedUsers()
   const { mutate: addConnection } = useAddConnection();
   const { data: connections, isPending, mutate: getConnections } = useGetConnections();
-  const { data: pendingConnections, isPending: isLoadingPendingConnections, mutate: getPendingConnections } = useGetConnections();
   const { mutate: acceptConnection } = useAcceptConnection();
 
   useEffect(() => {
     getUsers()
     getConnections()
-    getPendingConnections()
   }, [])
 
   console.log("connections =>", connections);
@@ -70,7 +68,6 @@ export default function NewConnections() {
     })
 
     getConnections()
-    getPendingConnections()
 
     toast({
       title: 'Connection request sent',
@@ -97,7 +94,6 @@ export default function NewConnections() {
 
   return (
     <Box className="max-w-2xl mx-auto">
-
       <VStack spacing={4} align="stretch">
         <HStack>
           <Input
@@ -139,6 +135,9 @@ export default function NewConnections() {
         <PendingConnections />
         <Divider />
 
+        <div>
+          <Text>Suggestions</Text>
+        </div>
         <VStack align="stretch" spacing={2}>
           {/* <Text fontWeight="bold" className="text-lg">Suggested Connections</Text> */}
           {users?.map((user: any) => (

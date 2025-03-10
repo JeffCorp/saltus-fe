@@ -4,13 +4,15 @@ import { NewProjectSimulation } from "@/components/projects/newProject"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertCircle, Brain, Briefcase, CheckCircle2, Clock, TrendingUp, Users, Users2 } from "lucide-react"
-import { useState } from 'react'
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { useGetProject } from "@/services/useProjects"
+import { useDisclosure } from "@chakra-ui/react"
+import { Briefcase, Clock, TrendingUp, Users, Users2 } from "lucide-react"
+import moment from 'moment'
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from 'react'
 
 // Mock data - In a real application, this would come from a backend API
 const projectsData = [
@@ -98,8 +100,11 @@ const aiScenarios = [
 ]
 
 export default function Component() {
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedScenario, setSelectedScenario] = useState<{ title: string; description: string } | null>(null)
+  const { data: projects, isPending, mutate: getProjects } = useGetProject()
   // const [isDeveloping, setIsDeveloping] = useState(true);
+  const router = useRouter()
 
   // if (isDeveloping) {
   //   return (
@@ -109,10 +114,13 @@ export default function Component() {
   //   )
   // }
 
+  useEffect(() => {
+    getProjects()
+  }, [])
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Your Real-World Project Simulations</h1>
-
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -120,7 +128,7 @@ export default function Component() {
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{projectsData.length}</div>
+            <div className="text-2xl font-bold">{projects?.count}</div>
           </CardContent>
         </Card>
         <Card>
@@ -143,8 +151,8 @@ export default function Component() {
         </Card>
       </div>
 
-      {projectsData.map((project) => (
-        <Card key={project.id} className="mb-6">
+      {projects?.data?.map((project: any) => (
+        <Card key={project.id} className="mb-6 clickable" onClick={() => router.push(`/dashboard/projects/${project._id}`)}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>{project.name}</CardTitle>
@@ -164,24 +172,24 @@ export default function Component() {
               <div className="flex items-center space-x-4 text-sm">
                 <div className="flex items-center">
                   <Clock className="mr-1 h-4 w-4" />
-                  <span>Deadline: {new Date(project.dueDate).toLocaleDateString()}</span>
+                  <span>Deadline: {moment(project.createdAt).add(project.duration, 'days').format('MMM D, YYYY')}</span>
                 </div>
                 <div className="flex items-center">
                   <Users className="mr-1 h-4 w-4" />
-                  <span>{project.team.length} team members</span>
+                  <span>{project.collaborators.length} team members</span>
                 </div>
               </div>
               <div className="flex -space-x-2">
-                {project.team.map((member, index) => (
-                  <Avatar key={index} className="border-2 border-background">
+                {project.collaborators.map((member: any, index: number) => (
+                  <Avatar key={index} className="border-2 border-background !bg-gray-200">
                     <AvatarImage src={member.avatar} alt={member.name} />
-                    <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    <AvatarFallback className="!bg-gray-200">{member.name.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
                   </Avatar>
                 ))}
               </div>
             </div>
           </CardContent>
-          <CardFooter>
+          {/* <CardFooter>
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -292,7 +300,7 @@ export default function Component() {
                 </div>
               </TabsContent>
             </Tabs>
-          </CardFooter>
+          </CardFooter> */}
         </Card>
       ))}
 
@@ -316,7 +324,6 @@ export default function Component() {
           </div>
         </CardContent>
       </Card>
-
       <Dialog open={!!selectedScenario} onOpenChange={() => setSelectedScenario(null)}>
         <DialogContent>
           <DialogHeader>
@@ -340,8 +347,13 @@ export default function Component() {
           </div>
         </DialogContent>
       </Dialog>
-
-      <NewProjectSimulation />
+      <NewProjectSimulation
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onClose={() => {
+          onClose()
+          getProjects()
+        }} />
       {/* <div className="mt-8 flex justify-center">
         <Button>Start a New Project Simulation</Button>
       </div> */}

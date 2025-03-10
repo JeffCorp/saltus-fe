@@ -1,16 +1,19 @@
 'use client'
 
-import NewConnections from "@/components/connections/newConnections"
+import LoadingSpinner from "@/components/loaders/LoadingSpinner"
+import NetworkLayout from "@/components/network/layout"
+import Post from "@/components/network/post"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useCreateComment, useGetComment } from "@/services/useComments"
 import { ConnectionStatus, useGetConnections, useGetTopConnections } from "@/services/useConnections"
 import { useCreatePost, useGetPost, useLikePost } from "@/services/usePosts"
-import { otherUser, timeAgo } from "@/utils"
-import { Box, Button, Flex, Spinner, Text } from "@chakra-ui/react"
+import { timeAgo } from "@/utils"
+import { Box, Button, Flex, Text } from "@chakra-ui/react"
 import { Heart, MessageCircle, Users } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 // Mock data (unchanged)
@@ -60,8 +63,8 @@ export default function NetworkPage() {
   const { mutate: likePost } = useLikePost()
   const [showComments, setShowComments] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
-
-  console.log(session?.user);
+  const [selectedPost, setSelectedPost] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     getConnections();
@@ -69,20 +72,14 @@ export default function NetworkPage() {
     setPostList(posts);
   }, []);
 
-  console.log({ posts });
   const handlePost = (e: any) => {
     e.preventDefault();
     createPost({ title: "New Post", content: post });
-    setPostList([...postList, { authorName: session?.user?.name, authorImage: session?.user?.image, timeAgo: "just now", content: post }]);
     setPost("");
+    setPostList([...postList, { authorName: session?.user?.name, authorImage: session?.user?.image, timeAgo: "just now", content: post }]);
   }
 
   const handleLike = (postId: string) => {
-    console.log({ posts: posts.find((post: any) => post._id === postId) });
-    console.log(postId);
-
-    console.log(session?.user);
-
     posts.find((post: any) => post._id === postId).likes.push(session?.user?.id)
     likePost(postId);
     // Implement like functionality
@@ -97,17 +94,23 @@ export default function NetworkPage() {
   }
 
   const handleShowComment = (postId: string) => {
-    getComments(postId)
-    setShowComments(postId);
+    if (postId) {
+      setShowComments(null);
+    } else {
+      getComments(postId)
+      setShowComments(postId);
+    }
   }
 
   return (
-    isPending ? <Spinner /> :
-      connections && connections.filter((connection: any) => connection.status === ConnectionStatus.APPROVED).length > 0 ? (
-        <div className="bg-white min-h-[100vh]">
-          <div className="container mx-auto py-6 px-4">
-            <Flex className="gap-6">
-              {/* Left Column */}
+    <NetworkLayout>
+      {isPending ?
+        <LoadingSpinner /> :
+        connections && connections.filter((connection: any) => connection.status === ConnectionStatus.APPROVED).length > 0 ? (
+          selectedPost ?
+            <Post post={selectedPost} />
+            :
+            <Flex className="gap-6 w-full">
               <div className="space-y-6 flex-1">
                 {/* Network Overview */}
                 <Card className="">
@@ -151,23 +154,21 @@ export default function NetworkPage() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-semibold">Network Insights</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-blue-600">+24%</div>
-                    <p className="text-sm text-gray-600">+20 connections this month</p>
-                  </CardContent>
+                  {/* <CardContent>
+                    <div className="text-3xl font-bold text-blue-600">N/A %</div>
+                    <p className="text-sm text-gray-600">N/A connections this month</p>
+                  </CardContent> */}
                 </Card>
               </div>
-
-              {/* Center Column */}
               <div className="space-y-6 flex-[3]">
                 {/* Start a post */}
                 <Card>
                   <CardContent className="pt-4">
                     <div>
                       {/* <Avatar>
-                        <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Your profile" />
-                        <AvatarFallback>YO</AvatarFallback>
-                      </Avatar> */}
+                          <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Your profile" />
+                          <AvatarFallback>YO</AvatarFallback>
+                        </Avatar> */}
                       <form onSubmit={handlePost} className="flex items-center space-x-4">
                         <Input
                           placeholder="Start a post"
@@ -197,7 +198,7 @@ export default function NetworkPage() {
                               <p className="text-xs text-gray-500">{timeAgo(post.createdAt)}</p>
                             </div>
                           </div>
-                          <p className="text-sm">{post.content}</p>
+                          <p className="text-sm " style={{ cursor: 'pointer' }} onClick={() => router.push(`/dashboard/network/posts/${post._id}`)}>{post.content}</p>
 
                           {/* Post interactions */}
                           <div className="mt-4 pt-3 border-t">
@@ -271,131 +272,11 @@ export default function NetworkPage() {
                   <Text className="text-sm text-gray-600">No posts found</Text>
                 }
               </div>
-
-              {/* Right Column */}
-              <div className="space-y-6 flex-[1.1] w-[300px]">
-                {/* Grow Your Network */}
-                <Card>
-                  <CardContent className="p-2 ">
-                    <div>
-                      <NewConnections />
-                      {/* {networkData.recommendedConnections.map((connection, index) => (
-                        <Flex key={index} className="items-center justify-between flex-col">
-                          <Box className="flex items-start space-x-4">
-                            <Avatar>
-                              <AvatarImage src={connection.image} alt={connection.name} />
-                              <AvatarFallback>{connection.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                            </Avatar>
-                            <Box>
-                              <Text className="font-semibold text-sm">{connection.name}</Text>
-                              <Text className="text-sm text-gray-600">{connection.role} at {connection.company}</Text>
-                              <Link className="flex items-center text-sm pt-2">
-                                <UserPlus className="h-4 mr-2" />
-                                Network
-                              </Link>
-                            </Box>
-                          </Box>
-                        </Flex>
-                      ))} */}
-                    </div>
-                  </CardContent>
-                </Card>
-
-
-                {/* Top Connections */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-md font-semibold">Top Connections</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {
-                        isTopConnectionsPending ? <Spinner /> :
-                          topConnections?.length > 0 ?
-                            topConnections?.map((connection: any, index: number) => (
-                              <div key={index} className="flex items-center space-x-4">
-                                <Avatar>
-                                  <AvatarImage src={connection.image} alt={connection.name} />
-                                  <AvatarFallback style={{ textTransform: 'uppercase', backgroundColor: '#456', color: '#fff' }}>{otherUser(session, connection?.requester?._id) ? connection?.requester?.name?.split(' ').map((n: string) => n[0]).join('') : connection?.recipient?.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <Text className="font-semibold text-sm">{otherUser(session, connection?.requester?._id) ? connection?.requester?.name : connection?.recipient?.name}</Text>
-                                  {/* <Text className="text-sm text-gray-600">{connection.role} at {connection.company}</Text> */}
-                                </div>
-                              </div>
-                            ))
-                            :
-                            <Text className="text-sm text-gray-600">No top connections found</Text>
-                      }
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Upcoming Events */}
-                {/* <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold">Upcoming Events</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="font-semibold">Tech Meetup 2024</p>
-                        <p className="text-sm text-gray-600">July 15, 2024 • Virtual</p>
-                        <Badge variant="outline" className="mt-2">Attending</Badge>
-                      </div>
-                      <div>
-                        <p className="font-semibold">Women in Tech Conference</p>
-                        <p className="text-sm text-gray-600">August 3-5, 2024 • New York</p>
-                        <Button variant="outline" className="mt-2">RSVP</Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card> */}
-
-                {/* Recent Messages */}
-                {/* <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold">Recent Messages</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <Avatar>
-                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Jane Smith" />
-                            <AvatarFallback>JS</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold">Jane Smith</p>
-                            <p className="text-sm text-gray-600">Thanks for your advice on...</p>
-                          </div>
-                        </div>
-                        <Badge variant="outline">2h ago</Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <Avatar>
-                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Alex Johnson" />
-                            <AvatarFallback>AJ</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold">Alex Johnson</p>
-                            <p className="text-sm text-gray-600">Are you attending the upcoming...</p>
-                          </div>
-                        </div>
-                        <Badge variant="outline">1d ago</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card> */}
-              </div>
             </Flex>
-          </div>
-        </div>
-      ) : (
-        <Flex>
-          <NewConnections />
-        </Flex>
-      )
+        ) : (
+          <></>
+        )
+      }
+    </NetworkLayout>
   )
 }

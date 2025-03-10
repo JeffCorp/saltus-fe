@@ -49,7 +49,7 @@ const industryNews = [
 ]
 
 export default function CareerTrendInsights() {
-  const [isDeveloping, setIsDeveloping] = useState(true);
+  const [isDeveloping, setIsDeveloping] = useState(false);
 
   if (isDeveloping) {
     return (

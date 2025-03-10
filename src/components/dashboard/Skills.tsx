@@ -95,6 +95,40 @@ export default function Skills() {
           </ResponsiveContainer>
         </CardContent>
       </Card> */}
+      <Card className="mt-8 mb-8">
+        <CardHeader>
+          <CardTitle>Skills to Acquire</CardTitle>
+          <CardDescription>Based on your career goal: {profile?.careerPath}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {skillsToLearn && skillsToLearn.length > 0 ? (
+              skillsToLearn?.map((skill, index) => (
+                typeof skill.skillModuleId === 'string' ?
+                  skill.skillModuleId :
+                  // skill.skillModuleId.map((subSkill) =>
+                  <Badge
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => router.push(`/dashboard/skills/workshop?skillId=${typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}`)}
+                    variant="secondary">{skill.skillModuleId.name}
+                  </Badge>
+              ))
+            ) : (
+              <Box>
+                <Text>No skills to learn</Text>
+                {/* <Button>Start Learning a New Skill</Button> */}
+              </Box>
+            )}
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Box>
+            <Link href="/dashboard/skills/workshop">
+              <Button className="w-full" variant="outline">Start Learning a New Skill</Button>
+            </Link>
+          </Box>
+        </CardFooter>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
@@ -152,41 +186,6 @@ export default function Skills() {
           </CardContent>
         </Card>
       </div>
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Skills to Acquire</CardTitle>
-          <CardDescription>Based on your career goal: {profile?.careerPath}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {skillsToLearn && skillsToLearn.length > 0 ? (
-              skillsToLearn?.map((skill, index) => (
-                typeof skill.skillModuleId === 'string' ?
-                  skill.skillModuleId :
-                  // skill.skillModuleId.map((subSkill) =>
-                  <Badge
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => router.push(`/dashboard/skills/workshop?skillId=${typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}`)}
-                    variant="secondary">{skill.skillModuleId.name}
-                  </Badge>
-              ))
-            ) : (
-              <Box>
-                <Text>No skills to learn</Text>
-                {/* <Button>Start Learning a New Skill</Button> */}
-              </Box>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Box>
-            <Link href="/dashboard/skills/workshop">
-              <Button className="w-full" variant="outline">Start Learning a New Skill</Button>
-            </Link>
-          </Box>
-        </CardFooter>
-      </Card>
 
       {/* <Card className="mt-8">
         <CardHeader>

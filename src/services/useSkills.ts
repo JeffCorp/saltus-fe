@@ -28,6 +28,15 @@ export function useSkillsByUserId(userId: string) {
   });
 }
 
+export function useGetSkillsByUserId() {
+  return useMutation<Skill[], Error>({
+    mutationFn: async (userId: any) => {
+      const { data } = await apiClient.get<Skill[]>(`/skills/user/${userId}`);
+      return data;
+    },
+  });
+}
+
 export function useAddSkill() {
   const queryClient = useQueryClient();
 

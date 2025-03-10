@@ -9,24 +9,24 @@ import {
   Home,
   LineChart,
   LogOut,
-  Menu,
   MessageSquare,
   Rocket,
+  Settings,
   Users,
   X
 } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { IoIosMenu } from "react-icons/io";
 
 export default function Dashboard({ children }: { children: React.ReactNode }) {
   const [activeTab, setActiveTab] = useState("Home");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname()
-
-  console.log("pathname => ", pathname);
-
+  const { data: session } = useSession();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const navItems = [
     { name: "Home", icon: Home, link: "/dashboard" },
@@ -41,6 +41,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
       icon: GraduationCap,
       link: "/dashboard/interview-prep",
     },
+    { name: "Settings", icon: Settings, link: "/dashboard/settings" },
   ];
 
   const handleNavigation = (name: string) => {
@@ -51,7 +52,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen bg-white flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className={`min-w-64 bg-white shadow-md flex-1 md:flex-none md:w-64 h-full z-10 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
+      <aside className={`min-w-64 bg-[#f8f9fa] shadow-md flex-1 md:flex-none md:w-64 h-full z-10 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
         <div className="p-4 flex items-center justify-between">
           <Link
             href="/"
@@ -92,20 +93,41 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto flex flex-col md:flex-[5] max-md:fixed max-md:w-full">
         {/* Header */}
-        <header className="bg-white fixed top-0 md:right-0 w-[100%] md:w-[calc(100%-16rem)] bg-white">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+        <header className="bg-[#00000078] text-white fixed top-0 md:right-0 w-[100%] md:w-[calc(100%-16rem)] z-[100] shadow">
+          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center space">
             <div className="flex items-center">
               <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2">
-                {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                {isSidebarOpen ? <X className="h-5 w-5" /> : <IoIosMenu className="h-5 w-5" />}
               </Button>
             </div>
-            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate">
+            <h2 className="text-2xl font-bold lesading-7 text-white sm:truncate w-full">
               {activeTab}
             </h2>
             <div className="flex items-center">
-              <Button variant="outline" className="mr-2">
+              <Button variant="outline" className="mr-2 bg-white text-black">
                 <Bell className="h-5 w-5" />
               </Button>
+              {/* <Menu>
+                <MenuButton
+                  as={Button}
+                  variant="outline"
+                  className="items-center border-2 border-white rounded-[5px] p-2 cursor-pointer hover:bg-white/10 transition-colors flex"
+                >
+                  <div className="flex items-center">
+                    <User className="h-5 w-5 mr-3" />
+                    <div className="flex flex-col items-start">
+                      <Text fontSize="sm">{session?.user.name}</Text>
+                      <Text fontSize="xs" color="gray.300">{session?.user.email}</Text>
+                    </div>
+                  </div>
+                </MenuButton>
+                <MenuList>
+                  <MenuItem onClick={() => signOut()}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign out
+                  </MenuItem>
+                </MenuList>
+              </Menu> */}
             </div>
           </div>
         </header>

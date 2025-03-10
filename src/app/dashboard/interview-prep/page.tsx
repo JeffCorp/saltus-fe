@@ -14,7 +14,7 @@ import { useState } from 'react'
 export default function InterviewPreparation() {
   const [selectedRole, setSelectedRole] = useState<string>('')
   const [feedback, setFeedback] = useState<string>('')
-  const [isDeveloping, setIsDeveloping] = useState(true);
+  const [isDeveloping, setIsDeveloping] = useState(false);
 
   if (isDeveloping) {
     return (

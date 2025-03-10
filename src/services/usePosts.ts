@@ -20,6 +20,11 @@ async function getPost(): Promise<any> {
   return response.data;
 }
 
+async function getPostById(id: string): Promise<any> {
+  const response = await apiClient.get(`/posts/${id}`);
+  return response.data;
+}
+
 async function likePost(postId: string): Promise<any> {
   const response = await apiClient.post(`/posts/${postId}/like`);
   return response.data;
@@ -29,6 +34,12 @@ export function useGetPost() {
   return useQuery({
     queryKey: ["posts"],
     queryFn: getPost,
+  });
+}
+
+export function useGetPostById() {
+  return useMutation({
+    mutationFn: getPostById,
   });
 }
 

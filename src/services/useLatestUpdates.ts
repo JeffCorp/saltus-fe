@@ -15,6 +15,11 @@ interface RedditPost {
   selftext: string;
 }
 
+interface FullResponse {
+  data: RedditPost[];
+  graph_data: any;
+}
+
 interface LatestUpdatesResponse {
   data: RedditPost[];
 }
@@ -39,9 +44,9 @@ export function useLatestUpdates(topic: string) {
 
 // Create mutation to get latest updates
 export function useLatestUpdatesMutation() {
-  return useMutation<RedditPost[], Error, string>({
+  return useMutation<FullResponse, Error, string>({
     mutationFn: async (topic) => {
-      const { data } = await apiClient.get<RedditPost[]>(
+      const { data } = await apiClient.get<FullResponse>(
         `/reddit/new?topic=${encodeURIComponent(topic)}`
       );
       return data;
