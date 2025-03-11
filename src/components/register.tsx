@@ -42,7 +42,8 @@ const Register = () => {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
+        console.log("session", session)
+        // router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");

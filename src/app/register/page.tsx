@@ -9,7 +9,7 @@ export default function RegisterPage() {
   const router = useRouter()
 
   if (session) {
-    router.push('/dashboard')
+    router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard')
   }
 
   return <Register />;

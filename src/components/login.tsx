@@ -37,7 +37,8 @@ const Login = () => {
         setError(result.error);
       } else {
         setIsLoading(false);
-        router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
+        console.log("session", session)
+        // router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
       }
     } catch (err) {
       console.error("Sign in error:", err);
