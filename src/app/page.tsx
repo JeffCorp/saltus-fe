@@ -26,14 +26,14 @@ const staggerChildren = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-screen bg-white dark:bg-[#111111]">
       <Navbar />
       <div className="flex flex-col min-h-screen">
         <main className="flex-1" role="main">
           <Hero />
 
           {/* Discover Your Path Section */}
-          <Section className="bg-[#1A1A1A] relative overflow-hidden">
+          <Section className="bg-gray-50 dark:bg-[#1A1A1A] relative overflow-hidden">
             <motion.div
               initial="initial"
               whileInView="animate"
@@ -44,14 +44,14 @@ export default function Home() {
             >
               <div className="grid gap-16 lg:grid-cols-2 items-center">
                 <div>
-                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl mb-6">
+                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl mb-6 text-gray-900 dark:text-white">
                     Discover Your Path{" "}
                     <span className="bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
                       to Success with Saltus
                     </span>
                   </h2>
-                  <p className="text-gray-400 text-lg">
-                    Uncover personalized career recommendations tailored to your unique traits and preferences. Our AI technology empowers you to navigate your career journey effortlessly.
+                  <p className="text-gray-600 dark:text-gray-400 text-lg">
+                    Uncover personalized career recommendations tailored to your unique traits and preferences.
                   </p>
                 </div>
                 <div className="relative">
@@ -69,35 +69,35 @@ export default function Home() {
           </Section>
 
           {/* Features Grid Section */}
-          <Section className="bg-[#111111]">
+          <Section className="bg-white dark:bg-[#111111]">
             <div className="container px-4 md:px-6">
               <div className="grid gap-8 md:grid-cols-3" role="list">
-                <div className="bg-[#1A1A1A] p-8 rounded-xl border border-[#333333]" role="listitem">
-                  <h3 className="text-xl font-bold mb-4">
+                <div className="bg-white dark:bg-[#1A1A1A] p-8 rounded-xl border border-gray-200 dark:border-[#333333] shadow-sm" role="listitem">
+                  <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
                     Personalized career recommendations{" "}
                     <span className="text-[#58CC02]">tailored for you</span>
                   </h3>
-                  <p className="text-gray-400">
-                    Saltus analyzes your inclinations to provide career paths that align with your strengths, helping you decide with confidence.
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Saltus analyzes your inclinations to provide career paths that align with your strengths.
                   </p>
                 </div>
 
-                <div className="bg-[#1A1A1A] p-8 rounded-xl border border-[#333333]" role="listitem">
-                  <h3 className="text-xl font-bold mb-4">
+                <div className="bg-white dark:bg-[#1A1A1A] p-8 rounded-xl border border-gray-200 dark:border-[#333333] shadow-sm" role="listitem">
+                  <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
                     Intuitive dashboard for{" "}
                     <span className="text-[#1CB0F6]">tracking your journey</span>
                   </h3>
-                  <p className="text-gray-400">
+                  <p className="text-gray-600 dark:text-gray-400">
                     Our dashboard integrates tools and insights to help you manage your development and stay on top of your career goals.
                   </p>
                 </div>
 
-                <div className="bg-[#1A1A1A] p-8 rounded-xl border border-[#333333]" role="listitem">
-                  <h3 className="text-xl font-bold mb-4">
+                <div className="bg-white dark:bg-[#1A1A1A] p-8 rounded-xl border border-gray-200 dark:border-[#333333] shadow-sm" role="listitem">
+                  <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
                     Join a supportive community to{" "}
                     <span className="text-[#8A2EFF]">share insights</span>
                   </h3>
-                  <p className="text-gray-400">
+                  <p className="text-gray-600 dark:text-gray-400">
                     Connect with like-minded individuals on similar career paths as you share strategies and support each other's journey.
                   </p>
                 </div>
@@ -106,7 +106,7 @@ export default function Home() {
           </Section>
 
           {/* Statistics Section */}
-          <Section className="bg-[#1A1A1A]">
+          <Section className="bg-gray-50 dark:bg-[#1A1A1A]">
             <div className="container px-4 md:px-6">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-8" role="list" aria-label="Achievement statistics">
                 <div className="bg-[#1CB0F6] p-6 rounded-xl text-center" role="listitem">
@@ -126,27 +126,30 @@ export default function Home() {
           </Section>
 
           {/* Transform Your Career Section */}
-          <Section className="bg-[#111111]">
+          <Section className="bg-white dark:bg-[#111111]">
             <div className="container px-4 md:px-6">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl mb-12">
-                Transform Your Career with Saltus
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl mb-12 text-gray-900 dark:text-white">
+                Transform Your Career with{" "}
+                <span className="bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
+                  Saltus
+                </span>
               </h2>
               <div className="grid md:grid-cols-3 gap-8">
-                <div className="bg-[#1A1A1A] p-6 rounded-xl">
-                  <h3 className="text-xl font-bold mb-4">Stay Organized with Our Dashboard</h3>
-                  <p className="text-gray-400">
+                <div className="bg-white dark:bg-[#1A1A1A] p-6 rounded-xl">
+                  <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Stay Organized with Our Dashboard</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
                     Experience our user-friendly dashboard designed to keep you organized and focused on your career goals.
                   </p>
                 </div>
-                <div className="bg-[#1A1A1A] p-6 rounded-xl">
-                  <h3 className="text-xl font-bold mb-4">Career Insights at Your Fingertips</h3>
-                  <p className="text-gray-400">
+                <div className="bg-white dark:bg-[#1A1A1A] p-6 rounded-xl">
+                  <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Career Insights at Your Fingertips</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
                     With every step monitored, you'll have the tools you need to navigate your professional development effectively.
                   </p>
                 </div>
-                <div className="bg-[#1A1A1A] p-6 rounded-xl">
-                  <h3 className="text-xl font-bold mb-4">Join a Thriving Community</h3>
-                  <p className="text-gray-400">
+                <div className="bg-white dark:bg-[#1A1A1A] p-6 rounded-xl">
+                  <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Join a Thriving Community</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
                     Engage with a vibrant community of driven individuals. Share insights, seek advice, and find motivation.
                   </p>
                 </div>
@@ -155,11 +158,11 @@ export default function Home() {
           </Section>
 
           {/* Contact Form Section */}
-          <Section className="bg-[#1A1A1A]">
+          <Section className="bg-gray-50 dark:bg-[#1A1A1A]">
             <div className="container px-4 md:px-6">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <div>
-                  <h2 className="text-3xl font-bold mb-6" id="contact-form">
+                  <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white" id="contact-form">
                     Unlock Your Career Potential with Saltus
                   </h2>
                   <form className="space-y-4" aria-labelledby="contact-form">
@@ -204,35 +207,35 @@ export default function Home() {
           </Section>
         </main>
 
-        <footer className="py-6 w-full border-t border-[#333333] bg-[#111111]" role="contentinfo">
+        <footer className="py-6 w-full border-t border-gray-200 dark:border-[#333333] bg-white dark:bg-[#111111]" role="contentinfo">
           <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Rocket className="h-8" aria-hidden="true" />
-                <span className="text-white">Saltus</span>
+                <span className="text-gray-900 dark:text-white">Saltus</span>
               </div>
-              <nav aria-label="Footer navigation">
-                <Link href="/about" className="text-gray-400 hover:text-white">About Us</Link>
-                <Link href="/assessment" className="text-gray-400 hover:text-white">Career Assessment</Link>
-                <Link href="/dashboard" className="text-gray-400 hover:text-white">Career Dashboard</Link>
-                <Link href="/contact" className="text-gray-400 hover:text-white">Get in Touch</Link>
-                <Link href="/faq" className="text-gray-400 hover:text-white">FAQ</Link>
-                <Link href="/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link>
+              <nav aria-label="Footer navigation" className="flex flex-col md:flex-row gap-4">
+                <Link href="/about" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">About Us</Link>
+                <Link href="/assessment" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Career Assessment</Link>
+                <Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Career Dashboard</Link>
+                <Link href="/contact" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Get in Touch</Link>
+                <Link href="/faq" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">FAQ</Link>
+                <Link href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Privacy Policy</Link>
               </nav>
               <div className="flex gap-4" aria-label="Social media links">
-                <Link href="#" className="text-gray-400 hover:text-white" aria-label="Follow us on Instagram">
+                <Link href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" aria-label="Follow us on Instagram">
                   <Instagram className="h-5 w-5" aria-hidden="true" />
                 </Link>
-                <Link href="#" className="text-gray-400 hover:text-white" aria-label="Follow us on Facebook">
+                <Link href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" aria-label="Follow us on Facebook">
                   <Facebook className="h-5 w-5" aria-hidden="true" />
                 </Link>
-                <Link href="#" className="text-gray-400 hover:text-white" aria-label="Follow us on Twitter">
+                <Link href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" aria-label="Follow us on Twitter">
                   <Twitter className="h-5 w-5" aria-hidden="true" />
                 </Link>
               </div>
             </div>
-            <div className="mt-6 text-center text-gray-400 text-sm">
-              © copyright saltus.com {new Date().getFullYear()}. All Rights Reserved
+            <div className="mt-6 text-center text-gray-600 dark:text-gray-400 text-sm">
+              © copyright Saltus {new Date().getFullYear()}. All Rights Reserved
             </div>
           </div>
         </footer>

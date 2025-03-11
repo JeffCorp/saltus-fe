@@ -3,14 +3,15 @@
 import image1 from "@/assets/images/image1.jpg";
 import image2 from "@/assets/images/image2.jpg";
 import image3 from "@/assets/images/image3.jpg";
+import { Button } from "@/components/ui/button";
 import { useRegister } from "@/services/useAuth";
-import { Spinner, Text, useToast } from "@chakra-ui/react";
-import { Rocket } from "lucide-react";
+import { useToast } from "@chakra-ui/react";
+import { Loader2, Rocket } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
@@ -20,25 +21,14 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const { mutate: signUp, isPending: isLoading, data, status: regStatus, isError } = useRegister();
-  const toast = useToast();
+  const { mutate: signUp, isPending: isLoading, isError, isSuccess } = useRegister();
   const { data: session } = useSession();
-
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    try {
-      const response = signUp({ name, email, password });
-
-      console.log("data", data);
-      console.log("regStatus", regStatus);
-
-    } catch (err: any) {
-      console.error("Sign up error:", err?.message);
-      setError("An unexpected error occurred. Please try again.");
-    }
+    signUp({ name, email, password });
   };
 
   const handleLogin = async () => {
@@ -51,175 +41,181 @@ const Register = () => {
 
       if (result?.error) {
         setError(result.error);
-        console.log(result);
       } else {
         router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
       }
     } catch (err) {
-      console.error("Sign in error:", err);
       setError("An unexpected error occurred. Please try again.");
     }
   };
 
-  console.log(session);
-
-
-  if (regStatus === "success") {
-    toast({
-      title: "Account created.",
-      description: "We've created your account for you.",
-      status: "success",
-      duration: 9000,
-      isClosable: true,
-    });
-
-    handleLogin()
-  }
-
-  if (isError) {
-    toast({
-      title: "Error creating account",
-      description: "Error creating account",
-      status: "error",
-      duration: 3000,
-      isClosable: true,
-    });
-  }
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        title: "Account created successfully!",
+        description: "You can now login to your account.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      handleLogin();
+    }
+    if (isError) {
+      toast({
+        title: "Error creating account",
+        description: "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [isSuccess, isError]);
 
   return (
-    <div className="flex max-h-[100vh]">
+    <div className="flex min-h-screen">
       {/* Left side - Carousel */}
-      <div className="w-1/2 bg-gray-200 h-[100%] hidden md:block">
-        <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false}>
-          <div className="w-[100%] h-[100vh]">
+      <div className="w-1/2 bg-gray-50 dark:bg-[#1A1A1A] hidden md:block relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#58CC02]/20 via-[#1CB0F6]/20 to-[#8A2EFF]/20 z-10" />
+        <Carousel
+          autoPlay
+          infiniteLoop
+          showThumbs={false}
+          showStatus={false}
+          showArrows={false}
+          interval={5000}
+          className="h-full"
+        >
+          <div className="h-screen relative">
             <Image
               src={image1}
-              alt="Login Image 1"
-              layout="fill"
-              objectFit="cover"
-              width={0}
-              height={0}
+              alt="AI Career Guidance"
+              className="object-cover"
+              fill
+              priority
             />
-            <p className="legend">Accelerate Your Career with AI</p>
+            <div className="absolute bottom-0 left-0 right-0 p-8 text-white bg-gradient-to-t from-black/60 to-transparent">
+              <h3 className="text-2xl font-bold mb-2">Accelerate Your Career with AI</h3>
+              <p>Get personalized career guidance powered by artificial intelligence</p>
+            </div>
           </div>
-          <div className="w-[100%] h-[calc(100vh-3.5rem)]">
+          <div className="h-screen relative">
             <Image
               src={image2}
-              alt="Login Image 2"
-              layout="fill"
-              objectFit="cover"
-              width={0}
-              height={0}
+              alt="Connect with Industry Mentors"
+              className="object-cover"
+              fill
+              priority
             />
-            <p className="legend">Connect with Industry Mentors</p>
+            <div className="absolute bottom-0 left-0 right-0 p-8 text-white bg-gradient-to-t from-black/60 to-transparent">
+              <h3 className="text-2xl font-bold mb-2">Connect with Industry Mentors</h3>
+              <p>Connect with experienced professionals in your field</p>
+            </div>
           </div>
-          <div className="w-[100%] h-[calc(100vh-3.5rem)]">
+          <div className="h-screen relative">
             <Image
               src={image3}
-              alt="Login Image 3"
-              layout="fill"
-              objectFit="cover"
-              width={0}
-              height={0}
+              alt="Personalized Career Paths"
+              className="object-cover"
+              fill
+              priority
             />
-            <p className="legend">Personalized Career Paths</p>
+            <div className="absolute bottom-0 left-0 right-0 p-8 text-white bg-gradient-to-t from-black/60 to-transparent">
+              <h3 className="text-2xl font-bold mb-2">Personalized Career Paths</h3>
+              <p>Create a career path that suits your goals and aspirations</p>
+            </div>
           </div>
         </Carousel>
       </div>
 
-      {/* Right side - Login Form */}
-      <div className="w-full md:w-1/2 flex items-center justify-center bg-white">
-        <div className="max-w-md w-full space-y-8 p-8">
-          <div className="flex flex-col items-center">
-            <div className="flex gap-2 items-center">
-              <Rocket className="text-indigo-600" />
-              <h2 className="text-xl font-extrabold text-indigo-600">
+      {/* Right side - Register Form */}
+      <div className="w-full md:w-1/2 flex items-center justify-center bg-white dark:bg-[#111111] px-4">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <div className="flex justify-center items-center gap-2 mb-8">
+              <Rocket className="h-8 w-8 text-[#1CB0F6]" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
                 {process.env.NEXT_PUBLIC_APP_NAME}
-              </h2>
+              </span>
             </div>
-            <p className="mt-10 text-3xl font-extrabold text-gray-900">
-              Create An Account
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Create Your Account
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Join thousands of professionals accelerating their careers
             </p>
-            <h3 className="text-sm text-gray-600 mt-2">
-              Please enter your details
-            </h3>
           </div>
+
           {error && (
-            <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-              role="alert"
-            >
-              <span className="block sm:inline">{error}</span>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+              {error}
             </div>
           )}
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <input type="hidden" name="remember" value="true" />
-            <div className="rounded-md space-y-2">
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
               <div>
-                <label htmlFor="name" className="sr-only">
-                  Name
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Full Name
                 </label>
                 <input
                   id="name"
-                  name="name"
                   type="text"
-                  autoComplete="name"
                   required
-                  className="appearance-none relative block w-full px-3 py-4 border-b-2 border-gray-400 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Name"
+                  className="w-full px-4 py-2 bg-white dark:bg-[#1A1A1A] border border-gray-300 dark:border-[#333333] rounded-lg focus:ring-2 focus:ring-[#1CB0F6] focus:border-transparent transition-colors text-gray-900 dark:text-white"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div>
-                <label htmlFor="email-address" className="sr-only">
-                  Email address
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Email
                 </label>
                 <input
-                  id="email-address"
-                  name="email"
+                  id="email"
                   type="email"
-                  autoComplete="email"
                   required
-                  className="appearance-none relative block w-full px-3 py-4 border-b-2 border-gray-400 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Email address"
+                  className="w-full px-4 py-2 bg-white dark:bg-[#1A1A1A] border border-gray-300 dark:border-[#333333] rounded-lg focus:ring-2 focus:ring-[#1CB0F6] focus:border-transparent transition-colors text-gray-900 dark:text-white"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
-                <label htmlFor="password" className="sr-only">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Password
                 </label>
                 <input
                   id="password"
-                  name="password"
                   type="password"
-                  autoComplete="current-password"
                   required
-                  className="appearance-none relative block w-full px-3 py-4 border-b-2 border-gray-400 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Password"
+                  className="w-full px-4 py-2 bg-white dark:bg-[#1A1A1A] border border-gray-300 dark:border-[#333333] rounded-lg focus:ring-2 focus:ring-[#1CB0F6] focus:border-transparent transition-colors text-gray-900 dark:text-white"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
 
-            <div>
-              <button
-                type="submit"
-                className="group flex mt-12 items-center gap-2 relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Register {isLoading && <Spinner size="sm" />}
-              </button>
-            </div>
+            <Button
+              type="submit"
+              className="w-full bg-[#1CB0F6] hover:bg-[#1890d0] text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                "Create account"
+              )}
+            </Button>
           </form>
-          <div className="flex justify-center gap-1">
-            <Text color="gray.500">Already have an account?</Text>
-            <Link className="text-blue-500" href="/login">
-              Login
+
+          <p className="text-center text-gray-600 dark:text-gray-400">
+            Already have an account?{" "}
+            <Link href="/login" className="text-[#1CB0F6] hover:text-[#1890d0] font-medium">
+              Sign in
             </Link>
-          </div>
+          </p>
         </div>
       </div>
     </div>

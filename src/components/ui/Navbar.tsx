@@ -48,23 +48,30 @@ const Navbar: React.FC = () => {
         <div className="relative group">
           <Link
             className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
-            href="#"
+            href="/career-tools"
           >
             Career Tools
           </Link>
         </div>
         <Link
           className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
-          href="#"
+          href="/how-it-works"
         >
           How It Works
         </Link>
         <Link
           className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
-          href="#"
+          href="/support"
         >
           Support
         </Link>
+        <Link
+          className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
+          href="/pricing"
+        >
+          Pricing
+        </Link>
+
         {status === "authenticated" ? (
           <div className="ml-8 flex gap-4">
             <Button
@@ -85,11 +92,11 @@ const Navbar: React.FC = () => {
         ) : status === "unauthenticated" && !isAuthPage ? (
           <div className="ml-8">
             <Button
-              onClick={() => router.push("/contact")}
+              onClick={() => router.push("/register")}
               variant="default"
               className="bg-[#1CB0F6] hover:bg-[#1890d0]"
             >
-              Schedule a Meeting
+              Join us
             </Button>
           </div>
         ) : null}
@@ -134,19 +141,19 @@ const Navbar: React.FC = () => {
               >
                 Dashboard
               </button>
-              <button
+              {/* <button
                 onClick={() => signOut()}
                 className="p-8 bg-[#1CB0F6] hover:bg-[#1890d0] w-full text-left transition-colors"
               >
                 Logout
-              </button>
+              </button> */}
             </>
           ) : status === "unauthenticated" && !isAuthPage ? (
             <button
-              onClick={() => handleNav("/contact")}
+              onClick={() => handleNav("/register")}
               className="p-8 bg-[#1CB0F6] hover:bg-[#1890d0] w-full text-left transition-colors"
             >
-              Schedule a Meeting
+              Join us
             </button>
           ) : null}
         </nav>
