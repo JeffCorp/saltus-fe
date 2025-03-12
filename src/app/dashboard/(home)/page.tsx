@@ -1,7 +1,7 @@
 "use client";
 import { useLatestUpdatesMutation } from "@/services/useLatestUpdates";
 import { useProfile } from "@/services/useProfile";
-import { Box, Flex, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Spinner, Text } from "@chakra-ui/react";
+import { Flex, Link, Spinner } from "@chakra-ui/react";
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -13,11 +13,10 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { Rss, UserCheck, Users } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Line, Radar } from "react-chartjs-2";
+import { Radar } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -283,190 +282,95 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 space-y-8">
-      {/* Welcome Section */}
+      {/* Welcome Section with Quick Actions */}
       <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
-          Welcome to your dashboard
+          Welcome back, {session?.user?.name || session?.user?.email}!
         </h1>
-        <p className="mt-2 text-gray-400">
-          Hello, {session?.user?.name || session?.user?.email}! Let's continue your career journey.
-        </p>
-      </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div className="bg-[#1A1A1A] rounded-2xl border border-[#333333] overflow-hidden transform hover:scale-105 transition-transform duration-300">
-          <div className="p-6 flex items-center gap-6">
-            <div className="p-3 rounded-xl" style={{ backgroundColor: '#58CC02' }}>
-              <Rss className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-400">Total Posts</dt>
-              <dd className="mt-1 text-4xl font-bold text-white">{userStats.postsCount}</dd>
-            </div>
-          </div>
-        </div>
-        <div className="bg-[#1A1A1A] rounded-2xl border border-[#333333] overflow-hidden transform hover:scale-105 transition-transform duration-300">
-          <div className="p-6 flex items-center gap-6">
-            <div className="p-3 rounded-xl" style={{ backgroundColor: '#1CB0F6' }}>
-              <Users className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-400">Followers</dt>
-              <dd className="mt-1 text-4xl font-bold text-white">{userStats.followersCount}</dd>
-            </div>
-          </div>
-        </div>
-        <div className="bg-[#1A1A1A] rounded-2xl border border-[#333333] overflow-hidden transform hover:scale-105 transition-transform duration-300">
-          <div className="p-6 flex items-center gap-6">
-            <div className="p-3 rounded-xl" style={{ backgroundColor: '#8A2EFF' }}>
-              <UserCheck className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-400">Following</dt>
-              <dd className="mt-1 text-4xl font-bold text-white">{userStats.followingCount}</dd>
-            </div>
-          </div>
+        {/* Quick Actions Grid */}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link href="/dashboard/learn" className="bg-[#222222] hover:bg-[#2a2a2a] p-4 rounded-xl border border-[#333333] transition-all hover:scale-105">
+            <h3 className="font-semibold text-[#58CC02]">Continue Learning</h3>
+            <p className="text-sm text-gray-400 mt-1">Pick up where you left off</p>
+          </Link>
+
+          <Link href="/dashboard/news" className="bg-[#222222] hover:bg-[#2a2a2a] p-4 rounded-xl border border-[#333333] transition-all hover:scale-105">
+            <h3 className="font-semibold text-[#1CB0F6]">Latest Updates</h3>
+            <p className="text-sm text-gray-400 mt-1">Check industry news</p>
+          </Link>
+
+          <Link href="/dashboard/skills" className="bg-[#222222] hover:bg-[#2a2a2a] p-4 rounded-xl border border-[#333333] transition-all hover:scale-105">
+            <h3 className="font-semibold text-[#8A2EFF]">Skill Assessment</h3>
+            <p className="text-sm text-gray-400 mt-1">Test your knowledge</p>
+          </Link>
+
+          <Link href="/dashboard/network" className="bg-[#222222] hover:bg-[#2a2a2a] p-4 rounded-xl border border-[#333333] transition-all hover:scale-105">
+            <h3 className="font-semibold text-[#FF4B4B]">Join Community</h3>
+            <p className="text-sm text-gray-400 mt-1">Connect with peers</p>
+          </Link>
         </div>
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="h-[400px]">
-          <h2 className="text-2xl font-bold mb-4 text-white">Learning Progress</h2>
-          <div className="bg-[#1A1A1A] p-6 rounded-2xl border border-[#333333] h-full">
-            <Radar
-              data={{
-                ...learningProgressData,
-                datasets: learningProgressData.datasets.map((dataset, index) => ({
-                  ...dataset,
-                  backgroundColor: index === 0 ? 'rgba(88, 204, 2, 0.2)' : 'rgba(138, 46, 255, 0.2)',
-                  borderColor: index === 0 ? '#58CC02' : '#8A2EFF',
-                  pointBackgroundColor: index === 0 ? '#58CC02' : '#8A2EFF',
-                }))
-              }}
-              options={{
-                ...learningProgressOptions,
-                scales: {
-                  r: {
-                    ...learningProgressOptions.scales.r,
-                    grid: { color: '#333333' },
-                    pointLabels: { color: '#FFFFFF' },
-                  }
-                },
-                plugins: {
-                  ...learningProgressOptions.plugins,
-                  legend: {
-                    ...learningProgressOptions.plugins.legend,
-                    labels: { color: '#FFFFFF' }
-                  }
-                }
-              }}
-            />
-          </div>
-        </div>
-        <div className="h-[400px]">
-          <h2 className="text-2xl font-bold mb-4 text-white">News Trends</h2>
-          <div className="bg-[#1A1A1A] p-6 rounded-2xl border border-[#333333] h-full">
-            {isLoadingLatestUpdates ? (
-              <Flex justifyContent="center" alignItems="center" height="100%">
-                <Spinner color="#8A2EFF" />
-              </Flex>
-            ) : (
-              <Line
-                data={newsTrendsData}
-                options={{
-                  ...options,
-                  scales: {
-                    ...options.scales,
-                    y: {
-                      ...options.scales.y,
-                      grid: { color: '#333333' },
-                      ticks: { color: '#FFFFFF' }
-                    },
-                    x: {
-                      grid: { color: '#333333' },
-                      ticks: { color: '#FFFFFF' }
-                    }
-                  },
-                  plugins: {
-                    ...options.plugins,
-                    legend: {
-                      ...options.plugins.legend,
-                      position: 'top' as const,
-                      labels: { color: '#FFFFFF' }
-                    }
-                  }
-                }}
-              />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* News Updates */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-6 text-white">Your News Updates</h2>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {isLoadingLatestUpdates ? (
-            <Flex justifyContent="center" alignItems="center" height="100px">
-              <Spinner color="#8A2EFF" />
-            </Flex>
-          ) : latestUpdates?.data?.length && latestUpdates?.data?.length > 0 ? (
-            latestUpdates.data.map((update, index) => (
-              <Box
-                key={index}
-                className="bg-[#1A1A1A] rounded-2xl border border-[#333333] p-6 transform hover:scale-105 transition-transform duration-300"
-              >
-                <Flex direction="column" gap={3}>
-                  <Text
-                    className="font-bold text-lg text-white line-clamp-1"
-                    style={{ textTransform: 'capitalize' }}
-                  >
-                    {update.title}
-                  </Text>
-                  <Text className="text-sm text-gray-400">
-                    Author: {update.author}
-                  </Text>
-                  <Text className="text-gray-300 line-clamp-2">
-                    {update.description || update.selftext}
-                  </Text>
-                  <Link
-                    href={`https://www.reddit.com${update.permalink}`}
-                    isExternal
-                    className="text-[#1CB0F6] hover:text-[#58CC02] transition-colors"
-                  >
-                    Read more
-                  </Link>
-                </Flex>
-              </Box>
-            ))
-          ) : (
-            <div className="text-center text-gray-400">No news updates found</div>
-          )}
-        </div>
-      </div>
-
-      {/* Modal */}
-      <Modal isOpen={isGraphDataModalOpen} onClose={() => setIsGraphDataModalOpen(false)}>
-        <ModalOverlay />
-        <ModalContent className="bg-[#1A1A1A] text-white border border-[#333333]">
-          <ModalHeader>News</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody className="space-y-4">
-            {selectedGraphData?.posts?.map((data, i) => (
+      {/* Latest News Section - Simplified */}
+      <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
+        <h2 className="text-2xl font-bold text-white mb-4">Latest Updates in {profile?.topic}</h2>
+        {isLoadingLatestUpdates ? (
+          <Flex justifyContent="center" alignItems="center" height="100px">
+            <Spinner color="#8A2EFF" />
+          </Flex>
+        ) : latestUpdates?.data?.length && latestUpdates?.data?.length > 0 ? (
+          <div className="space-y-4">
+            {latestUpdates.data.slice(0, 3).map((update, index) => (
               <Link
-                key={i}
-                href={data?.url}
+                key={index}
+                href={`https://www.reddit.com${update.permalink}`}
                 target="_blank"
-                className="text-[#1CB0F6] hover:text-[#58CC02] transition-colors block"
+                className="block bg-[#222222] p-4 rounded-xl hover:bg-[#2a2a2a] transition-all"
               >
-                {data?.title}
+                <h3 className="font-semibold text-white line-clamp-1">{update.title}</h3>
+                <p className="text-sm text-gray-400 mt-1 line-clamp-2">
+                  {update.description || update.selftext}
+                </p>
               </Link>
             ))}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+            <Link href="/dashboard/news" className="block text-center text-[#1CB0F6] hover:text-[#58CC02] transition-colors">
+              View all updates →
+            </Link>
+          </div>
+        ) : (
+          <div className="text-center text-gray-400">No news updates found</div>
+        )}
+      </div>
+
+      {/* Learning Progress - Simplified */}
+      <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
+        <h2 className="text-2xl font-bold text-white mb-4">Your Progress</h2>
+        <div className="h-[300px]">
+          <Radar
+            data={{
+              ...learningProgressData,
+              datasets: [learningProgressData.datasets[0]] // Only show current progress
+            }}
+            options={{
+              ...learningProgressOptions,
+              scales: {
+                r: {
+                  ...learningProgressOptions.scales.r,
+                  grid: { color: '#333333' },
+                  pointLabels: { color: '#FFFFFF' },
+                }
+              },
+              plugins: {
+                ...learningProgressOptions.plugins,
+                legend: {
+                  display: false // Hide legend for simplicity
+                }
+              }
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 };

@@ -133,7 +133,7 @@ export default function NetworkPage() {
                   </Avatar>
                   <Input
                     placeholder="Share your thoughts..."
-                    className="flex-1 bg-[#222222] border-[#444444] text-white placeholder:text-gray-400 h-12 text-lg"
+                    className="w-full px-4 py-2 bg-white dark:bg-[#1A1A1A] border border-gray-300 dark:border-[#333333] rounded-lg focus:ring-2 focus:ring-[#1CB0F6] focus:border-transparent transition-colors text-gray-900 dark:text-white"
                     value={post}
                     onChange={(e) => setPost(e.target.value)}
                   />
@@ -157,9 +157,8 @@ export default function NetworkPage() {
                   <div
                     key={post._id}
                     className="cursor-pointer transition-transform hover:scale-[1.02]"
-                    onClick={() => router.push(`/dashboard/network/posts/${post._id}`)}
                   >
-                    <Post post={post} />
+                    <Post post={post} gotoLink={`/dashboard/network/posts/${post._id}`} />
                   </div>
                 ))}
               </div>

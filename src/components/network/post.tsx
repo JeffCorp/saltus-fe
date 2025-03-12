@@ -7,14 +7,16 @@ import { timeAgo } from "@/utils";
 import { Spinner, Text } from "@chakra-ui/react";
 import { Heart, MessageCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const Post = ({ post }: { post: any }) => {
+const Post = ({ post, gotoLink }: { post: any, gotoLink?: string }) => {
   const { data: comments, isPending: isCommentsPending, mutate: getComments } = useGetComment();
   const { mutate: likePost } = useLikePost()
   const { mutate: createComment } = useCreateComment();
   const [commentText, setCommentText] = useState("");
   const { data: session } = useSession();
+  const router = useRouter();
 
   const handleAddComment = (e: any, postId: string) => {
     e.preventDefault();
@@ -52,7 +54,7 @@ const Post = ({ post }: { post: any }) => {
           </div>
         </div>
 
-        <Text className="text-white mt-4">{post.content}</Text>
+        <Text className="text-white mt-4" onClick={() => gotoLink ? router.push(gotoLink) : null}>{post.content}</Text>
 
         <div className="mt-4 pt-3 border-t border-[#333333]">
           <div className="flex items-center gap-6">
@@ -86,7 +88,7 @@ const Post = ({ post }: { post: any }) => {
                 placeholder="Add a comment..."
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                className="flex-1 bg-[#222222] border-[#333333] text-white placeholder:text-gray-500"
+                className="w-full px-4 py-2 bg-white dark:bg-[#1A1A1A] border border-gray-300 dark:border-[#333333] rounded-lg focus:ring-2 focus:ring-[#1CB0F6] focus:border-transparent transition-colors text-gray-900 dark:text-white"
               />
               <Button
                 type="submit"

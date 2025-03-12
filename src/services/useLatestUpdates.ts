@@ -53,3 +53,15 @@ export function useLatestUpdatesMutation() {
     },
   });
 }
+
+// Create mutation to get latest updates paginated
+export function useLatestNewsUpdatesMutation() {
+  return useMutation<FullResponse, Error, string>({
+    mutationFn: async (topic) => {
+      const { data } = await apiClient.get<FullResponse>(
+        `/reddit/news?topic=${encodeURIComponent(topic)}`
+      );
+      return data;
+    },
+  });
+}

@@ -15,6 +15,23 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Saltus AI is a platform that helps you learn new skills and improve your skills." />
+        <meta name="keywords" content="Saltus AI, learn, skills, improve, skills, learn, skills, improve, skills, learn, skills, improve, skills" />
+        <meta name="author" content="Saltus AI" />
+        <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="msapplication-TileImage" content="/favicon.ico" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="msapplication-starturl" content="/" />
+        <meta name="msapplication-navbutton-color" content="#000000" />
+        <meta name="msapplication-window" content="width=device-width, initial-scale=1.0" />
+        <meta name="msapplication-starturl" content="/" />
+        <meta name="msapplication-navbutton-color" content="#000000" />
+        <meta name="msapplication-window" content="width=device-width, initial-scale=1.0" />
       </head>
       <body className={inter.className}>
         <ClientProvider>{children}</ClientProvider>
