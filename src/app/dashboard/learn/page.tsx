@@ -77,20 +77,20 @@ export default function LearnPage() {
           <CardContent>
             <div className="space-y-4">
               {skillsToImprove.map((skill) => (
-                <div key={skill.skillModuleId._id} className="space-y-2">
+                <div key={typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id} className="space-y-2">
                   <Button
                     variant="outline"
-                    className={`w-full justify-start ${selectedSkill === skill.skillModuleId._id
-                        ? 'bg-[#8A2EFF] text-white'
-                        : 'bg-[#222222] text-gray-300'
+                    className={`w-full justify-start ${selectedSkill === skill.skillModuleId
+                      ? 'bg-[#8A2EFF] text-white'
+                      : 'bg-[#222222] text-gray-300'
                       }`}
                     onClick={() => {
-                      setSelectedSkill(skill.skillModuleId._id);
-                      fetchVideosAndQuestions(skill.skillModuleId.name);
+                      setSelectedSkill(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id);
+                      fetchVideosAndQuestions(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name);
                     }}
                   >
                     <Book className="mr-2 h-4 w-4" />
-                    {skill.skillModuleId.name}
+                    {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}
                   </Button>
                   <Progress
                     value={skill.progress}
