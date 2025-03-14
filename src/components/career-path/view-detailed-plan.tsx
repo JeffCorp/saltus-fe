@@ -18,12 +18,12 @@ const ViewDetailedPlan: React.FC<ViewDetailedPlanProps> = ({ isOpen, onClose, sk
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center !mt-[0px]">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white dark:bg-[#111111] rounded-xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden"
+        className="bg-white dark:bg-[#111111] rounded-xl shadow-xl w-full max-w-6xl max-h-[100vh] overflow-hidden"
       >
         {/* Header */}
         <div className="p-6 border-b border-gray-200 dark:border-[#333333]">
@@ -46,9 +46,9 @@ const ViewDetailedPlan: React.FC<ViewDetailedPlanProps> = ({ isOpen, onClose, sk
         </div>
 
         {/* Content */}
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 overflow-auto max-h-[calc(90vh-8rem)]">
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[calc(90vh-8rem)] p-3">
           {/* Skills List */}
-          <div className="space-y-4">
+          <div className="space-y-4 h-[50vh] scrollbar-thin scrollbar-thumb-[#1CB0F6] scrollbar-track-transparent overflow-auto">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Required Skills</h3>
             {skillsProgress.map((skill) => (
               <motion.div
@@ -56,8 +56,8 @@ const ViewDetailedPlan: React.FC<ViewDetailedPlanProps> = ({ isOpen, onClose, sk
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${selectedSkill?._id === skill._id
-                    ? 'border-[#1CB0F6] bg-[#1CB0F6]/5'
-                    : 'border-gray-200 dark:border-[#333333] hover:border-[#1CB0F6] dark:hover:border-[#1CB0F6]'
+                  ? 'border-[#1CB0F6] bg-[#1CB0F6]/5'
+                  : 'border-gray-200 dark:border-[#333333] hover:border-[#1CB0F6] dark:hover:border-[#1CB0F6]'
                   }`}
                 onClick={() => setSelectedSkill(skill)}
               >
@@ -87,7 +87,7 @@ const ViewDetailedPlan: React.FC<ViewDetailedPlanProps> = ({ isOpen, onClose, sk
 
           {/* Skill Details */}
           {selectedSkill ? (
-            <div className="bg-gray-50 dark:bg-[#1A1A1A] p-6 rounded-xl border border-gray-200 dark:border-[#333333]">
+            <div className="bg-gray-50 dark:bg-[#1A1A1A] p-6 rounded-xl border border-gray-200 dark:border-[#333333] h-[50vh] overflow-auto">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                 {typeof selectedSkill.skillModuleId === 'string'
                   ? selectedSkill.skillModuleId

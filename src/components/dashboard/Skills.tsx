@@ -69,7 +69,8 @@ export default function Skills() {
               skillsToLearn?.map((skill, index) => (
                 <Badge
                   key={index}
-                  className="!cursor-pointer bg-[#222222] hover:bg-[#333333] text-white border-[#444444]"
+                  style={{ color: "white", cursor: "pointer" }}
+                  className="!cursor-pointer hover:bg-[#333333] !text-white border-[#444444]"
                   onClick={() => router.push(`/dashboard/skills/workshop?skillId=${typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id
                     }`)}
                 >
@@ -109,6 +110,7 @@ export default function Skills() {
                       <Badge
                         className="cursor-pointer bg-[#1CB0F6] hover:bg-[#19A0E3] text-white border-none 
                           transition-all duration-300 hover:scale-105 flex items-center gap-2"
+                        style={{ color: "white", cursor: "pointer" }}
                       >
                         {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}
                         <RefreshCcw className="h-3 w-3" />

@@ -1,5 +1,6 @@
 "use client"
 
+import { FindMentorModal } from "@/components/dashboard/find-mentor-modal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCreateMentorRelationship, useGetMentorsByMentorId } from "@/services/useMentor"
@@ -12,6 +13,7 @@ import { useState } from "react"
 export default function MentorsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [expertise, setExpertise] = useState("");
+  const [showFindMentorModal, setShowFindMentorModal] = useState(false);
   const { profile } = useProfile();
   const toast = useToast();
   const { data: session } = useSession();
@@ -165,7 +167,7 @@ export default function MentorsPage() {
           <CardTitle className="text-xl font-bold text-white">Your Mentors</CardTitle>
           <Button
             className="bg-[#8A2EFF] hover:bg-[#7325D4]"
-            onClick={() => {/* TODO: Add find mentor functionality */ }}
+            onClick={() => setShowFindMentorModal(true)}
           >
             Find Mentor
           </Button>
@@ -254,6 +256,12 @@ export default function MentorsPage() {
           </CardContent>
         </Card>
       )}
+
+      <FindMentorModal
+        isOpen={showFindMentorModal}
+        onClose={() => setShowFindMentorModal(false)}
+        onRequestMentorship={handleConnect}
+      />
     </div>
   )
 }

@@ -1,10 +1,19 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenuItem
+} from "@/components/ui/dropdown-menu";
+import { useSocket } from "@/lib/socket";
+import { Box, HStack, Text } from "@chakra-ui/react";
 import {
   Bell,
   BookOpen,
   BriefcaseIcon,
+  ChevronDown,
+  Crown,
   GraduationCap,
   Home,
   LineChart,
@@ -12,13 +21,14 @@ import {
   MessageSquare,
   Rocket,
   Settings,
+  UserCircle,
   Users,
   X
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { IoIosMenu } from "react-icons/io";
 
 export default function Dashboard({ children }: { children: React.ReactNode }) {
@@ -26,7 +36,9 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname()
   const { data: session } = useSession();
-
+  const socket = useSocket();
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navItems = [
     { name: "Home", icon: Home, link: "/dashboard", color: "#58CC02" },
     { name: "Career Path", icon: LineChart, link: "/dashboard/career-path", color: "#FF9600" },
@@ -43,6 +55,18 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
     setIsSidebarOpen(false);
     setActiveTab(name)
   }
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("connect", () => {
+        console.log("Notification => Connected to socket");
+      });
+
+      socket.on("notification", (notification: Notification) => {
+        console.log("Notification =>", notification);
+      });
+    }
+  }, [socket]);
 
   return (
     <div className="flex h-screen bg-[#111111] flex-col md:flex-row">
@@ -96,7 +120,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto flex flex-col md:flex-[5] max-md:fixed max-md:w-full bg-[#111111]">
         {/* Header */}
-        <header className="bg-[#1A1A1A] text-white fixed top-0 md:right-0 w-[100%] md:w-[calc(100%-16rem)] z-[100] shadow-lg border-b border-[#333333]">
+        <header className="bg-[#1A1A1A] text-white fixed top-0 md:right-0 w-[100%] md:w-[calc(100%-16rem)] z-[1] shadow-lg border-b border-[#333333]">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div className="flex items-center">
               <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 hover:bg-[#222222]">
@@ -104,12 +128,49 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
               </Button>
             </div>
             <h2 className="text-2xl font-bold leading-7 text-white sm:truncate w-full ml-4">
-              {activeTab}
+              {navItems.find(item => item.link === pathname)?.name}
             </h2>
             <div className="flex items-center gap-2">
+              {/* <NotificationsDropdown /> */}
               <Button variant="outline" className="bg-[#222222] text-white border-[#333333] hover:bg-[#333333]">
                 <Bell className="h-5 w-5" />
               </Button>
+              <Box>
+                <Button onClick={() => setIsMenuOpen(!isMenuOpen)} variant="outline" className="bg-[#222222] text-white border-[#333333] hover:bg-[#333333] min-w-[230px] flex justify-between items-center gap-2">
+                  <div className="flex items-center gap-2 w-full">
+                    {/* <UserCircle className="h-5 w-5" /> */}
+                    <HStack gap="3">
+                      <Avatar>
+                        <AvatarFallback className="bg-[#8A2EFF]">
+                          {session?.user?.name?.charAt(0)}
+                        </AvatarFallback>
+                        <AvatarImage src={session?.user?.image} />
+                      </Avatar>
+                    </HStack>
+                    <div className="flex flex-col items-start w-full">
+                      <span className="text-sm font-medium">{session?.user?.name}</span>
+                      <span className="text-xs text-gray-400">Software Engineer</span>
+                    </div>
+                  </div>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </Button>
+                {isMenuOpen &&
+                  <Box className="absolute top-[90px] right-[30px] w-[230px] bg-[#222222] border-[#333333] text-white rounded-lg">
+                    <DropdownMenuItem className="hover:bg-[#333333] flex items-center cursor-pointer" onClick={() => router.push('/dashboard/profile')}>
+                      <UserCircle className="mr-2 h-4 w-4" />
+                      <Text color="white">Profile</Text>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:bg-[#333333] flex items-center cursor-pointer text-yellow-500">
+                      <Crown className="mr-2 h-4 w-4" />
+                      <Text color="white">Upgrade</Text>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:bg-[#333333] flex items-center cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <Text color="white">Settings</Text>
+                    </DropdownMenuItem>
+                  </Box>
+                }
+              </Box>
             </div>
           </div>
         </header>

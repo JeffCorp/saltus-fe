@@ -45,6 +45,7 @@ export function useLatestUpdates(topic: string) {
 // Create mutation to get latest updates
 export function useLatestUpdatesMutation() {
   return useMutation<FullResponse, Error, string>({
+    mutationKey: ["latestUpdates"],
     mutationFn: async (topic) => {
       const { data } = await apiClient.get<FullResponse>(
         `/reddit/new?topic=${encodeURIComponent(topic)}`

@@ -6,12 +6,27 @@ const getProfile = async () => {
   return data;
 };
 
+const getAllProfiles = async () => {
+  const { data } = await apiClient.get("users");
+  return data;
+};
+
+const getProfileById = async (id: string) => {
+  const { data } = await apiClient.get(`users/${id}`);
+  return data;
+};
+
 const updateProfile = async (profileData: any) => {
   const { data } = await apiClient.put("/users/me", profileData);
   return data;
 };
 
-export function useProfile() {
+const updateProfileData = async (profileData: any) => {
+  const { data } = await apiClient.put("/users/me/profile", profileData);
+  return data;
+};
+
+export function useProfile(id?: string) {
   const queryClient = useQueryClient();
 
   const profileQuery = useQuery<any, Error>({
@@ -19,8 +34,25 @@ export function useProfile() {
     queryFn: getProfile,
   });
 
+  const useGetAllProfiles = useQuery<any, Error>({
+    queryKey: ["profiles"],
+    queryFn: getAllProfiles,
+  });
+
+  const getProfileByIdQuery = useQuery<any, Error>({
+    queryKey: ["profile", id],
+    queryFn: () => getProfileById(id as string),
+  });
+
   const updateProfileMutation = useMutation<any, Error, Partial<any>>({
     mutationFn: updateProfile,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["profile"], data);
+    },
+  });
+
+  const updateProfileDataMutation = useMutation<any, Error, Partial<any>>({
+    mutationFn: updateProfileData,
     onSuccess: (data) => {
       queryClient.setQueryData(["profile"], data);
     },
@@ -32,6 +64,10 @@ export function useProfile() {
     isError: profileQuery.isError,
     error: profileQuery.error,
     updateProfile: updateProfileMutation.mutate,
+    getAllProfiles: useGetAllProfiles.data,
+    getProfileById: getProfileByIdQuery.data,
     isUpdating: updateProfileMutation.isPending,
+    updateProfileData: updateProfileDataMutation.mutate,
+    isUpdatingProfileData: updateProfileDataMutation.isPending,
   };
 }

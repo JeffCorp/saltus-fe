@@ -33,7 +33,7 @@ const Navbar: React.FC = () => {
         }}
       >
         {/* <img src="/logo.png" alt="Saltus" className="h-8 w-auto mr-2" /> */}
-        <Rocket className="h-6 w-6 mr-2 text-[#1CB0F6]" />
+        <Rocket className="h-6 w-6 mr-2 text-[#8A2EFF]" />
         <span className="font-bold text-lg">Saltus</span>
       </Link>
 
@@ -77,14 +77,14 @@ const Navbar: React.FC = () => {
             <Button
               onClick={() => router.push("/dashboard")}
               variant="outline"
-              className="border-2 border-[#1CB0F6] text-[#1CB0F6] hover:bg-[#1CB0F6]/10"
+              className="border-2 border-[#8A2EFF] text-[#8A2EFF] hover:bg-[#8A2EFF]/10"
             >
               Dashboard
             </Button>
             <Button
               onClick={() => signOut()}
               variant="default"
-              className="bg-[#1CB0F6] hover:bg-[#1890d0]"
+              className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white"
             >
               Logout
             </Button>
@@ -94,7 +94,7 @@ const Navbar: React.FC = () => {
             <Button
               onClick={() => router.push("/register")}
               variant="default"
-              className="bg-[#1CB0F6] hover:bg-[#1890d0]"
+              className="bg-[#8A2EFF] hover:bg-[#7325D4]"
             >
               Join us
             </Button>

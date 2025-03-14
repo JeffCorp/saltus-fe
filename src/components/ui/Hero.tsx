@@ -49,7 +49,7 @@ export default function Hero() {
 
             <div className="flex flex-wrap gap-4">
               <Button
-                className="bg-[#1CB0F6] hover:bg-[#1890d0] text-white px-6 py-2"
+                className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white px-6 py-2"
                 onClick={handleGetStarted}
               >
                 Join Us Now

@@ -109,15 +109,15 @@ export default function Home() {
           <Section className="bg-gray-50 dark:bg-[#1A1A1A]">
             <div className="container px-4 md:px-6">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-8" role="list" aria-label="Achievement statistics">
-                <div className="bg-[#1CB0F6] p-6 rounded-xl text-center" role="listitem">
+                <div className="bg-[#8A2EFF] p-6 rounded-xl text-center" role="listitem">
                   <div className="text-4xl font-bold text-white">1,500+</div>
                   <div className="text-white">Career Paths Explored</div>
                 </div>
-                <div className="bg-[#1CB0F6] p-6 rounded-xl text-center" role="listitem">
+                <div className="bg-[#8A2EFF] p-6 rounded-xl text-center" role="listitem">
                   <div className="text-4xl font-bold text-white">150+</div>
                   <div className="text-white">Users on Their Journey</div>
                 </div>
-                <div className="bg-[#1CB0F6] p-6 rounded-xl text-center" role="listitem">
+                <div className="bg-[#8A2EFF] p-6 rounded-xl text-center" role="listitem">
                   <div className="text-4xl font-bold text-white">25+</div>
                   <div className="text-white">Countries Represented</div>
                 </div>
@@ -194,7 +194,7 @@ export default function Home() {
                         aria-required="true"
                       />
                     </div>
-                    <Button className="bg-[#1CB0F6] hover:bg-[#1890d0] text-white">
+                    <Button className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white">
                       Send Your Inquiry
                     </Button>
                   </form>
