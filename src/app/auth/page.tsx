@@ -12,7 +12,7 @@ const AuthPage = () => {
   useEffect(() => {
     if (status === 'authenticated') {
       console.log("session", session)
-      // router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
+      router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
     } else if (status === 'unauthenticated') {
       router.push('/login');
     }

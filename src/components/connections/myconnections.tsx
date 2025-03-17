@@ -42,6 +42,7 @@ export default function MyConnections() {
   const { mutate: addConnection } = useAddConnection();
   const { data: connections, isPending, mutate: getConnections } = useGetConnections();
   const { mutate: acceptConnection } = useAcceptConnection();
+  const [connectionStatus, setConnectionStatus] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
     getUsers()
@@ -83,13 +84,28 @@ export default function MyConnections() {
       acceptConnection({
         _id: connection._id,
       })
+
+      setConnectionStatus({
+        ...connectionStatus,
+        [connection._id]: "accepted"
+      })
     }
 
     getConnections()
   }
 
   const rejectConnectionRequest = (userId: string) => {
-    // In a real application, this would be an API call
+    const connection = connections?.find((connection: any) => connection.recipient == session?.user.id && connection.requester == userId && connection.status.toLowerCase() === "pending")
+    if (connection) {
+      // rejectConnection({
+      //   _id: connection._id,
+      // })
+
+      setConnectionStatus({
+        ...connectionStatus,
+        [connection._id]: "rejected"
+      })
+    }
   }
 
   return (
@@ -151,29 +167,34 @@ export default function MyConnections() {
                   </VStack>
                 </Flex>
                 {
-                  connections?.find((connection: any) => connection.recipient == session?.user.id && connection.requester == user._id && connection.status.toLowerCase() === "pending") ?
-                    <Flex gap={2}>
-                      <Button size="xs" colorScheme="blue" variant="outline" onClick={() => acceptConnectionRequest(user._id)}>
-                        <Check className="w-4 h-4 mr-2" />
-                        Accept
-                      </Button>
-                      <Button size="xs" colorScheme="red" variant="outline" onClick={() => rejectConnectionRequest(user._id)}>
-                        <X className="w-4 h-4 mr-2" />
-                        Reject
-                      </Button>
-                    </Flex>
-                    :
-                    <Box>
-                      <Button
-                        size="xs"
-                        colorScheme="blue"
-                        variant="outline"
-                        onClick={() => sendConnectionRequest(user._id)}
-                      >
-                        <StatusIcon status={connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status} />
-                        {connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status ?? "Connect"}
-                      </Button>
-                    </Box>
+                  connectionStatus[connections?.find((connection: any) => connection.recipient == session?.user.id && connection.requester == user._id && connection.status.toLowerCase() === "pending")?._id] === "accepted" ?
+                    <Text>Accepted</Text>
+                    : connectionStatus[connections?.find((connection: any) => connection.recipient == session?.user.id && connection.requester == user._id && connection.status.toLowerCase() === "pending")?._id] === "rejected" ?
+                      <Text>Rejected</Text>
+                      :
+                      connections?.find((connection: any) => connection.recipient == session?.user.id && connection.requester == user._id && connection.status.toLowerCase() === "pending") ?
+                        <Flex gap={2}>
+                          <Button size="xs" colorScheme="blue" variant="outline" onClick={() => acceptConnectionRequest(user._id)}>
+                            <Check className="w-4 h-4 mr-2" />
+                            Accept
+                          </Button>
+                          <Button size="xs" colorScheme="red" variant="outline" onClick={() => rejectConnectionRequest(user._id)}>
+                            <X className="w-4 h-4 mr-2" />
+                            Reject
+                          </Button>
+                        </Flex>
+                        :
+                        <Box>
+                          <Button
+                            size="xs"
+                            colorScheme="blue"
+                            variant="outline"
+                            onClick={() => sendConnectionRequest(user._id)}
+                          >
+                            <StatusIcon status={connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status} />
+                            {connections?.find((connection: any) => (connection.recipient === session?.user.id || connection.requester === session?.user.id) && (connection.requester === user._id || connection.recipient === user._id))?.status ?? "Connect"}
+                          </Button>
+                        </Box>
                 }
               </Flex>
             </HStack>

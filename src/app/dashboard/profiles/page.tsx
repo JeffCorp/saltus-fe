@@ -5,6 +5,7 @@ import { useProfile } from "@/services/useProfile";
 import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { ArrowRight, Briefcase, GraduationCap, Search, User2, Users } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -15,10 +16,11 @@ const fadeInUp = {
 };
 
 export default function ProfilesPage() {
-  const { getAllProfiles, isLoading } = useProfile();
+  const { data: session } = useSession();
+  const { connections, isLoading } = useProfile();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredProfiles = getAllProfiles
+  const filteredProfiles = connections
 
   if (isLoading) {
     return (
@@ -40,8 +42,8 @@ export default function ProfilesPage() {
             <Users className="w-6 h-6 text-[#58CC02]" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-white">Community Profiles</h1>
-            <Text className="text-gray-400">Connect with other professionals in your field</Text>
+            <h1 className="text-3xl font-bold text-white">Connections</h1>
+            <Text className="text-gray-400">View your connections</Text>
           </div>
         </div>
 
@@ -60,58 +62,62 @@ export default function ProfilesPage() {
 
       {/* Profiles Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProfiles?.map((profile: any) => (
-          <motion.div
-            key={profile._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Link href={`/dashboard/profiles/${profile._id}`}>
-              <Card className="bg-[#1A1A1A] border-[#333333] text-white hover:border-[#58CC02] transition-colors p-6">
-                <Flex align="center" gap={4}>
-                  <Box className="w-12 h-12 rounded-full bg-[#222222] border border-[#333333] flex items-center justify-center">
-                    <User2 className="w-6 h-6 text-[#58CC02]" />
-                  </Box>
-                  <Box>
-                    <Text fontWeight="bold" fontSize="lg">{profile.name}</Text>
-                    <Text fontSize="sm" color="gray.400">{profile.email}</Text>
-                  </Box>
-                </Flex>
+        {filteredProfiles?.map((user: any) => {
+          const profile = user.requester._id === session?.user?.id ? user.recipient : user.requester;
 
-                <div className="mt-4 space-y-3">
-                  {profile.currentRole && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Briefcase className="w-4 h-4 text-[#1CB0F6]" />
-                      <Text>{profile.currentRole}</Text>
-                    </div>
+          return (
+            <motion.div
+              key={profile._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Link href={`/dashboard/profiles/${profile._id}`}>
+                <Card className="bg-[#1A1A1A] border-[#333333] text-white hover:border-[#58CC02] transition-colors p-6">
+                  <Flex align="center" gap={4}>
+                    <Box className="w-12 h-12 rounded-full bg-[#222222] border border-[#333333] flex items-center justify-center">
+                      <User2 className="w-6 h-6 text-[#58CC02]" />
+                    </Box>
+                    <Box>
+                      <Text fontWeight="bold" fontSize="lg">{profile.name}</Text>
+                      <Text fontSize="sm" color="gray.400">{profile.email}</Text>
+                    </Box>
+                  </Flex>
+
+                  <div className="mt-4 space-y-3">
+                    {profile.currentRole && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Briefcase className="w-4 h-4 text-[#1CB0F6]" />
+                        <Text>{profile.currentRole}</Text>
+                      </div>
+                    )}
+                    {profile.projectedRole && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <GraduationCap className="w-4 h-4 text-[#FFD700]" />
+                        <Text>Aspiring {profile.projectedRole}</Text>
+                      </div>
+                    )}
+                  </div>
+
+                  {profile.bio && (
+                    <Text className="mt-4 text-sm text-gray-400 line-clamp-2">
+                      {profile.bio}
+                    </Text>
                   )}
-                  {profile.projectedRole && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <GraduationCap className="w-4 h-4 text-[#FFD700]" />
-                      <Text>Aspiring {profile.projectedRole}</Text>
-                    </div>
-                  )}
-                </div>
 
-                {profile.bio && (
-                  <Text className="mt-4 text-sm text-gray-400 line-clamp-2">
-                    {profile.bio}
-                  </Text>
-                )}
-
-                <div className="mt-4 flex items-center justify-end text-[#58CC02] text-sm font-medium">
-                  View Profile <ArrowRight className="w-4 h-4 ml-1" />
-                </div>
-              </Card>
-            </Link>
-          </motion.div>
-        ))}
+                  <div className="mt-4 flex items-center justify-end text-[#58CC02] text-sm font-medium">
+                    View Profile <ArrowRight className="w-4 h-4 ml-1" />
+                  </div>
+                </Card>
+              </Link>
+            </motion.div>
+          )
+        })}
       </div>
 
-      {filteredProfiles?.length === 0 && (
+      {connections?.length === 0 && (
         <div className="text-center text-gray-400 mt-8">
-          No profiles found matching your search criteria.
+          No connections found matching your search criteria.
         </div>
       )}
     </div>

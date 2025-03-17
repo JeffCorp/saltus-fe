@@ -1,5 +1,6 @@
 "use client";
 
+import Notification from "@/components/notifications/Notification";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ import {
   Settings,
   UserCircle,
   Users,
+  UsersRound,
   X
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
@@ -39,11 +41,18 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
   const socket = useSocket();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [notification, setNotification] = useState<{
+    title: string,
+    message: string,
+    data: any,
+  }>({ title: '', message: '', data: {} });
+  const [open, setOpen] = useState(false);
   const navItems = [
     { name: "Home", icon: Home, link: "/dashboard", color: "#58CC02" },
     { name: "Career Path", icon: LineChart, link: "/dashboard/career-path", color: "#FF9600" },
     { name: "Mentors", icon: Users, link: "/dashboard/mentors", color: "#8A2EFF" },
     { name: "Network", icon: MessageSquare, link: "/dashboard/network", color: "#FF4B4B" },
+    { name: "Connections", icon: UsersRound, link: "/dashboard/profiles", color: "#1CB0F6" },
     { name: "Skills", icon: BookOpen, link: "/dashboard/skills", color: "#1CB0F6" },
     { name: "Projects", icon: BriefcaseIcon, link: "/dashboard/projects", color: "#B35AF4" },
     { name: "Trends", icon: LineChart, link: "/dashboard/trends", color: "#FF9600" },
@@ -62,14 +71,27 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
         console.log("Notification => Connected to socket");
       });
 
-      socket.on("notification", (notification: Notification) => {
+      socket.on("notification", (notification: any) => {
         console.log("Notification =>", notification);
+        setNotification({
+          title: notification?.title,
+          message: notification?.message,
+          data: notification?.data
+        });
+        setOpen(true);
       });
     }
   }, [socket]);
 
   return (
     <div className="flex h-screen bg-[#111111] flex-col md:flex-row">
+      <Notification
+        title={notification?.title}
+        message={notification?.message}
+        data={notification?.data}
+        open={open}
+        setOpen={setOpen}
+      />
       {/* Sidebar */}
       <aside className={`min-w-64 bg-[#1A1A1A] shadow-lg flex-1 md:flex-none md:w-64 h-full z-10 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
         <div className="p-4 flex items-center justify-between">
@@ -132,7 +154,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             </h2>
             <div className="flex items-center gap-2">
               {/* <NotificationsDropdown /> */}
-              <Button variant="outline" className="bg-[#222222] text-white border-[#333333] hover:bg-[#333333]">
+              <Button variant="outline" className="bg-[#222222] text-white border-[#333333] hover:bg-[#333333]" onClick={() => router.push('/dashboard/notifications')}>
                 <Bell className="h-5 w-5" />
               </Button>
               <Box>
@@ -180,11 +202,11 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Floating Action Button */}
-        <Button
-          className="fixed bottom-[50px] right-[50px] rounded-full shadow-lg w-[60px] h-[60px] bg-[#8A2EFF] hover:bg-[#7325D4] transition-all duration-300 hover:scale-110"
+        {/* <Button
+          className="fixed bottom-[50px] right-[50px] !rounded-full shadow-lg !p-0 !w-[60px] !h-[60px] bg-[#8A2EFF] hover:bg-[#7325D4] transition-all duration-300 hover:scale-110 flex items-center justify-center"
         >
           <MessageSquare className="h-6 w-6" />
-        </Button>
+        </Button> */}
       </main>
     </div>
   );

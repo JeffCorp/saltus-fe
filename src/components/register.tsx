@@ -197,14 +197,14 @@ const Register = () => {
 
             <Button
               type="submit"
-              className="w-full bg-[#1CB0F6] hover:bg-[#1890d0] text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              className="w-full bg-[#8A2EFF] hover:bg-[#7325D4] text-white font-medium py-2 px-4 rounded-lg transition-colors"
               disabled={isLoading}
             >
               {isLoading ? (
-                <>
+                <div className="flex items-center justify-center">
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Creating account...
-                </>
+                </div>
               ) : (
                 "Create account"
               )}

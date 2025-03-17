@@ -8,22 +8,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAddConnection, useGetConnections } from "@/services/useConnections";
 import { useGetUsers } from "@/services/useMentor";
-import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Spinner, Text, useToast } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { ArrowRight, Briefcase, Search, User2, Users } from "lucide-react";
+import { ArrowRight, Briefcase, Search, Users } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 
-interface FindMentorModalProps {
+interface FindConnectionsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onRequestMentorship: (mentorId: string) => void;
+  onRequestConnection: (mentorId: string) => void;
 }
 
-export function FindMentorModal({ isOpen, onClose, onRequestMentorship }: FindMentorModalProps) {
+export function FindConnectionsModal({ isOpen, onClose, onRequestConnection }: FindConnectionsModalProps) {
   // const { getAllProfiles, isLoading } = useProfile();
   const { data: users, isLoading } = useGetUsers();
   const [searchTerm, setSearchTerm] = useState("");
+  const { mutate: addConnection } = useAddConnection();
+  const { data: connections, isPending, mutate: getConnections } = useGetConnections();
+  const { data: session } = useSession();
+  const toast = useToast();
 
   const filteredProfiles = useMemo(() => {
     return users?.filter((profile: any) =>
@@ -35,8 +41,22 @@ export function FindMentorModal({ isOpen, onClose, onRequestMentorship }: FindMe
     );
   }, [users, searchTerm]);
 
-  console.log("users => ", users);
-  console.log("filteredProfiles => ", filteredProfiles);
+  const sendConnectionRequest = (userId: string) => {
+    // In a real application, this would be an API call
+    addConnection({
+      requester: session?.user?.id,
+      recipient: userId,
+    })
+
+    getConnections()
+
+    toast({
+      title: 'Connection request sent',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    })
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -46,10 +66,10 @@ export function FindMentorModal({ isOpen, onClose, onRequestMentorship }: FindMe
             <div className="p-2 rounded-xl bg-[#58CC02]/10">
               <Users className="w-6 h-6 text-[#58CC02]" />
             </div>
-            <span>Find a Mentor</span>
+            <span>Find a Connection</span>
           </DialogTitle>
           <DialogDescription className="text-gray-400">
-            Connect with experienced professionals who can guide you in your career journey
+            Connect with professionals or aspiring professionals who can guide you in your career journey
           </DialogDescription>
         </DialogHeader>
 
@@ -80,7 +100,7 @@ export function FindMentorModal({ isOpen, onClose, onRequestMentorship }: FindMe
                 <Flex justify="space-between" align="center">
                   <Flex align="center" gap={4}>
                     <Box className="w-12 h-12 rounded-full bg-[#2A2A2A] border border-[#333333] flex items-center justify-center">
-                      <User2 className="w-6 h-6 text-[#58CC02]" />
+                      <Avatar src={profile.avatar} name={profile.name} size="sm" />
                     </Box>
                     <Box>
                       <Text fontWeight="bold" fontSize="lg">{profile.name}</Text>
@@ -100,10 +120,10 @@ export function FindMentorModal({ isOpen, onClose, onRequestMentorship }: FindMe
                     </Box>
                   </Flex>
                   <Button
-                    onClick={() => onRequestMentorship(profile._id)}
+                    onClick={() => sendConnectionRequest(profile._id)}
                     className="bg-[#58CC02] hover:bg-[#46a102] text-white flex items-center gap-2"
                   >
-                    Request Mentorship
+                    Request Connection
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Flex>

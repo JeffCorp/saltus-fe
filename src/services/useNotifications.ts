@@ -78,7 +78,7 @@ export function useNotifications(userId?: string) {
         title: notification.title,
         description: notification.message,
         status: "info",
-        duration: 5000,
+        duration: 50000,
         isClosable: true,
         position: "top-right",
       });

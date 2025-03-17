@@ -1,14 +1,13 @@
 'use client'
 
-import MyConnections from "@/components/connections/myconnections"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { FindConnectionsModal } from "@/components/network/find-connections-modal"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCreateComment, useGetComment } from "@/services/useComments"
 import { useGetConnections, useGetTopConnections } from "@/services/useConnections"
+import { useGetMentees, useGetMentors } from "@/services/useMentor"
 import { useCreatePost, useGetPost, useLikePost } from "@/services/usePosts"
-import { otherUser } from "@/utils"
-import { Spinner, Text } from "@chakra-ui/react"
-import { Users } from "lucide-react"
+import { Text } from "@chakra-ui/react"
+import { Plus, Users } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 
@@ -59,6 +58,10 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
   const { mutate: likePost } = useLikePost()
   const [showComments, setShowComments] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
+  const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
+  // Add mentors and mentees to the network data
+  const { data: mentors } = useGetMentors();
+  const { data: mentees } = useGetMentees();
 
   useEffect(() => {
     getConnections();
@@ -97,14 +100,20 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
     setShowComments(postId);
   }
 
+  const handleConnect = (userId: string) => {
+    console.log("userId => ", userId);
+  }
+
   return (
-    <div className="bg-[#111111] min-h-[100vh] overflow-hidden">
-      <div className="container mx-auto py-6 px-4 overflow-hidden">
+    <div className="bg-[#111111] min-h-[80vh] overflow-hidden">
+      <div className="container mx-auto pt-6 px-4 overflow-hidden">
         <div className="flex gap-6">
           {/* Main Content */}
           <div className="flex-[3]">
             {topConnections?.length > 0 ? (
-              children
+              <div className="bg-[#1A1A1A] rounded-2xl border border-[#333333] p-8 h-[85vh] overflow-y-auto">
+                {children}
+              </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-[60vh] bg-[#1A1A1A] rounded-2xl border border-[#333333] p-8">
                 <Text className="text-gray-400 text-center">
@@ -116,7 +125,7 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
 
           {/* Right Sidebar */}
           <div className="space-y-6 flex-[1.1] w-[300px]">
-            <div className="w-[300px] space-y-6">
+            <div className="min-w-[300px] space-y-6">
               <Card className="bg-[#1A1A1A] border-[#333333] sticky top-[100px]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xl font-bold text-white">Network Overview</CardTitle>
@@ -135,13 +144,18 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
                     </div>
                   </div>
 
+                  <div className="flex flex-row gap-2 mt-6 cursor-pointer justify-center items-center" onClick={() => setIsUsersModalOpen(true)}>
+                    <Text className="text-sm font-medium text-gray-300">Grow Your Network</Text>
+                    <Plus className="w-4 h-4 text-[#1CB0F6]" />
+                  </div>
+
                   {/* Other Stats */}
                   <div className="space-y-3 mt-6">
                     {[
-                      { label: "Mentors", value: "0", color: "#58CC02" },
-                      { label: "Mentees", value: "0", color: "#1CB0F6" },
-                      { label: "Upcoming Events", value: "0", color: "#FF9600" },
-                      { label: "Recent Messages", value: "0", color: "#FF4B4B" },
+                      { label: "Mentors", value: mentors?.length || 0, color: "#58CC02" },
+                      { label: "Mentees", value: mentees?.length || 0, color: "#1CB0F6" },
+                      // { label: "Upcoming Events", value: "0", color: "#FF9600" },
+                      // { label: "Recent Messages", value: "0", color: "#FF4B4B" },
                     ].map((item, index) => (
                       <div
                         key={index}
@@ -160,8 +174,13 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
                 </CardContent>
               </Card>
             </div>
+            <FindConnectionsModal
+              isOpen={isUsersModalOpen}
+              onClose={() => setIsUsersModalOpen(false)}
+              onRequestConnection={handleConnect}
+            />
             {/* Top Connections */}
-            <Card className="bg-[#1A1A1A] border-[#333333]">
+            {/* <Card className="bg-[#1A1A1A] border-[#333333]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-md font-semibold text-white">Top Connections</CardTitle>
               </CardHeader>
@@ -198,16 +217,16 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
                   )}
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Grow Your Network */}
-            {!isPending && (
+            {/* {!isPending && (
               <Card className="bg-[#1A1A1A] border-[#333333]">
                 <CardContent className="p-4">
                   <MyConnections />
                 </CardContent>
               </Card>
-            )}
+            )} */}
           </div>
         </div>
       </div>

@@ -12,7 +12,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      // router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
+      router.push(session?.user.isOnboarded ? '/dashboard' : '/onboard');
     }
   }, [status, session, router]);
 

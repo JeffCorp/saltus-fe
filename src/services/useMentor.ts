@@ -1,4 +1,5 @@
 import apiClient from "@/lib/api-client";
+import { useToast } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 interface Mentor {
@@ -11,14 +12,23 @@ interface Mentor {
   focusAreas?: string[];
 }
 
-export function useGetMentorsByMentorId(mentorId?: string) {
+export function useGetMentors() {
   return useQuery({
-    queryKey: ["mentors", mentorId],
+    queryKey: ["mentors"],
     queryFn: async () => {
-      const { data } = await apiClient.get(`/mentors/mentor/${mentorId}`);
+      const { data } = await apiClient.get(`/mentorship/mentors`);
       return data;
     },
-    enabled: !!mentorId,
+  });
+}
+
+export function useGetUsers() {
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const { data } = await apiClient.get(`/mentorship/users`);
+      return data;
+    },
   });
 }
 
@@ -26,28 +36,58 @@ export function useGetMentorsByMenteeId(menteeId?: string) {
   return useQuery({
     queryKey: ["mentees", menteeId],
     queryFn: async () => {
-      const { data } = await apiClient.get(`/mentors/mentee/${menteeId}`);
+      const { data } = await apiClient.get(`/mentorship/mentee/${menteeId}`);
       return data;
     },
     enabled: !!menteeId,
   });
 }
 
-export function useCreateMentorRelationship() {
-  return useMutation({
-    mutationFn: async (mentorData: Omit<Mentor, "id">) => {
-      const { data } = await apiClient.post("/mentors", mentorData);
+export function useGetMentees() {
+  return useQuery({
+    queryKey: ["mentees"],
+    queryFn: async () => {
+      const { data } = await apiClient.get(`/mentorship/mentees`);
       return data;
     },
   });
 }
 
-export function useUpdateMentorStatus() {
+export function useCreateMentorRelationship({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: () => void;
+  onError: () => void;
+}) {
+  return useMutation({
+    mutationFn: async (mentorData: Omit<Mentor, "id">) => {
+      const { data } = await apiClient.post("/mentorship", mentorData);
+      return data;
+    },
+    onSuccess,
+    onError,
+  });
+}
+
+export function useUpdateMentorshipStatus() {
+  const toast = useToast();
+
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { data } = await apiClient.patch(`/mentors/${id}/status`, {
+      const { data } = await apiClient.patch(`/mentorship/${id}/status`, {
         status,
       });
+
+      if (data)
+        toast({
+          title: "The request has been " + status,
+          description: "The request been " + status,
+          status: "info",
+          duration: 50000,
+          isClosable: true,
+          position: "top-right",
+        });
       return data;
     },
   });

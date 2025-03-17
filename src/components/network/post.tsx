@@ -2,13 +2,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useCreateComment, useGetComment, useLikePost } from "@/services/useComments";
+import { useCreateComment, useGetComment } from "@/services/useComments";
+import { useLikePost } from "@/services/usePosts";
 import { timeAgo } from "@/utils";
 import { Spinner, Text } from "@chakra-ui/react";
 import { Heart, MessageCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const Post = ({ post, gotoLink }: { post: any, gotoLink?: string }) => {
   const { data: comments, isPending: isCommentsPending, mutate: getComments } = useGetComment();
@@ -17,6 +18,7 @@ const Post = ({ post, gotoLink }: { post: any, gotoLink?: string }) => {
   const [commentText, setCommentText] = useState("");
   const { data: session } = useSession();
   const router = useRouter();
+  const [showComments, setShowComments] = useState(false);
 
   const handleAddComment = (e: any, postId: string) => {
     e.preventDefault();
@@ -26,7 +28,9 @@ const Post = ({ post, gotoLink }: { post: any, gotoLink?: string }) => {
   }
 
   const handleShowComment = (postId: string) => {
+    setShowComments(!showComments)
     getComments(postId)
+
   }
 
   const handleLike = (postId: string) => {
@@ -34,15 +38,15 @@ const Post = ({ post, gotoLink }: { post: any, gotoLink?: string }) => {
     likePost(postId);
   }
 
-  useEffect(() => {
-    getComments(post._id)
-  }, [post._id])
+  // useEffect(() => {
+  //   getComments(post._id)
+  // }, [post._id])
 
   return (
     <Card className="bg-[#1A1A1A] border-[#333333] mb-8 p-4 w-full h-full">
       <CardContent>
-        <div className="flex gap-4 items-center">
-          <Avatar>
+        <div className="flex gap-4 items-center" onClick={() => router.push(`/dashboard/profiles/${post.user._id}`)}>
+          <Avatar style={{ backgroundColor: '#58CC0288', color: 'white' }}>
             <AvatarImage src={post.authorImage} alt={post.authorName} />
             <AvatarFallback className="bg-[#8A2EFF] text-white uppercase">
               {post.user?.name?.split(' ').map((n: string) => n[0]).join('')}
@@ -100,29 +104,32 @@ const Post = ({ post, gotoLink }: { post: any, gotoLink?: string }) => {
           </form>
 
           {/* Comments list */}
-          {isCommentsPending ? (
-            <div className="flex justify-center p-4">
-              <Spinner color="#8A2EFF" />
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {comments?.map((comment: any, idx: number) => (
-                <div key={idx} className="flex gap-3">
-                  <Avatar>
-                    <AvatarImage src={comment.authorImage} alt={comment.authorName} />
-                    <AvatarFallback className="bg-[#8A2EFF] text-white uppercase">
-                      {comment.user?.name?.split(' ').map((n: string) => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 bg-[#222222] rounded-lg p-3">
-                    <p className="text-sm font-semibold text-white">{comment.user.name}</p>
-                    <p className="text-sm text-gray-300">{comment.content}</p>
-                    <p className="text-xs text-gray-500 mt-1">{timeAgo(comment.createdAt)}</p>
-                  </div>
+          {showComments &&
+            <>
+              {isCommentsPending ? (
+                <div className="flex justify-center p-4">
+                  <Spinner color="#8A2EFF" />
                 </div>
-              ))}
-            </div>
-          )}
+              ) : (
+                <div className="space-y-3">
+                  {comments?.map((comment: any, idx: number) => (
+                    <div key={idx} className="flex gap-3">
+                      <Avatar>
+                        <AvatarImage src={comment.authorImage} alt={comment.authorName} />
+                        <AvatarFallback className="bg-[#8A2EFF] text-white uppercase">
+                          {comment.user?.name?.split(' ').map((n: string) => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 bg-[#222222] rounded-lg p-3">
+                        <p className="text-sm font-semibold text-white">{comment.user.name}</p>
+                        <p className="text-sm text-gray-300">{comment.content}</p>
+                        <p className="text-xs text-gray-500 mt-1">{timeAgo(comment.createdAt)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>}
         </div>
       </CardContent>
     </Card>

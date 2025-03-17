@@ -3,7 +3,7 @@
 import { FindMentorModal } from "@/components/dashboard/find-mentor-modal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useCreateMentorRelationship, useGetMentorsByMentorId } from "@/services/useMentor"
+import { useCreateMentorRelationship, useGetMentees, useGetMentors, useUpdateMentorshipStatus } from "@/services/useMentor"
 import { useProfile } from "@/services/useProfile"
 import { Spinner, useToast } from "@chakra-ui/react"
 import { Award, BookOpen, Calendar, MessageSquare, Star, Users } from "lucide-react"
@@ -54,12 +54,31 @@ export default function MentorsPage() {
     data: dummyMentors,
     isLoading: false
   };
-  const { mutate: createMentorship } = useCreateMentorRelationship();
-  const { data: mentors, isLoading: isLoadingMentors } = {
-    data: dummyMentors,
-    isLoading: false
-  };
-  const { data: mentees, isLoading: isLoadingMentees } = useGetMentorsByMentorId(profile?._id);
+  const { mutate: createMentorship } = useCreateMentorRelationship({
+    onSuccess: () => {
+      toast({
+        title: "Request sent",
+        description: "Your mentorship request has been sent",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to send mentorship request",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  });
+  const { data: mentees, isLoading: isLoadingMentors } = useGetMentees();
+  const { data: mentors, isLoading: isLoadingMentees } = useGetMentors();
+  const { mutate: updateMentorshipStatus } = useUpdateMentorshipStatus();
+
+  console.log("mentees ===>", mentees)
 
   if (isLoadingMentorships || isLoadingMentors || isLoadingMentees) {
     return (
@@ -71,19 +90,11 @@ export default function MentorsPage() {
 
   const handleConnect = async (mentorId: string) => {
     try {
-      await createMentorship({
+      createMentorship({
         mentorId,
         menteeId: profile?._id || '',
         status: 'pending',
         focusAreas: [],
-      });
-
-      toast({
-        title: "Request sent",
-        description: "Your mentorship request has been sent",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
       });
     } catch (error) {
       toast({
@@ -111,7 +122,7 @@ export default function MentorsPage() {
     },
     {
       title: "Sessions Completed",
-      value: "12",
+      value: "0",
       icon: Calendar,
       color: "#8A2EFF"
     }
@@ -246,8 +257,8 @@ export default function MentorsPage() {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button className="bg-[#58CC02] hover:bg-[#4CAD02]">Accept</Button>
-                  <Button variant="outline" className="border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10">
+                  <Button className="bg-[#58CC02] hover:bg-[#4CAD02]" onClick={() => updateMentorshipStatus({ id: request._id, status: 'active' })}>Accept</Button>
+                  <Button variant="outline" className="border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10" onClick={() => updateMentorshipStatus({ id: request._id, status: 'rejected' })}>
                     Decline
                   </Button>
                 </div>

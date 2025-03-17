@@ -32,6 +32,7 @@ export default function RootLayout({
         <meta name="msapplication-starturl" content="/" />
         <meta name="msapplication-navbutton-color" content="#000000" />
         <meta name="msapplication-window" content="width=device-width, initial-scale=1.0" />
+        <title>Saltus AI | Learn, Grow, Succeed</title>
       </head>
       <body className={inter.className}>
         <ClientProvider>{children}</ClientProvider>

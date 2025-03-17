@@ -7,7 +7,12 @@ const getProfile = async () => {
 };
 
 const getAllProfiles = async () => {
-  const { data } = await apiClient.get("users");
+  const { data } = await apiClient.get("users"); // TODO: Remove this ensure users only search for not fetch all profiles
+  return data;
+};
+
+const getConnections = async () => {
+  const { data } = await apiClient.get("users/connections");
   return data;
 };
 
@@ -39,6 +44,11 @@ export function useProfile(id?: string) {
     queryFn: getAllProfiles,
   });
 
+  const getConnectionsQuery = useQuery<any, Error>({
+    queryKey: ["connections"],
+    queryFn: getConnections,
+  });
+
   const getProfileByIdQuery = useQuery<any, Error>({
     queryKey: ["profile", id],
     queryFn: () => getProfileById(id as string),
@@ -63,6 +73,7 @@ export function useProfile(id?: string) {
     isLoading: profileQuery.isLoading,
     isError: profileQuery.isError,
     error: profileQuery.error,
+    connections: getConnectionsQuery.data,
     updateProfile: updateProfileMutation.mutate,
     getAllProfiles: useGetAllProfiles.data,
     getProfileById: getProfileByIdQuery.data,

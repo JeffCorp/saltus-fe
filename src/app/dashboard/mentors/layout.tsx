@@ -11,6 +11,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <title>Saltus AI | Mentors</title>
+      </head>
       <body className={inter.className}>
         <Suspense>
           <Dashboard>

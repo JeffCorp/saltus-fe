@@ -12,7 +12,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Saltus AI | Connections</title>
+        <title>Saltus AI | Notifications</title>
       </head>
       <body className={inter.className}>
         <Suspense>

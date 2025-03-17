@@ -109,9 +109,9 @@ export default function NetworkPage() {
     (connection: any) => connection.status === ConnectionStatus.APPROVED
   );
 
-  if (!approvedConnections || approvedConnections.length === 0) {
-    return null;
-  }
+  // if (!approvedConnections || approvedConnections.length === 0) {
+  //   return null;
+  // }
 
   return (
     <NetworkLayout>
@@ -125,9 +125,9 @@ export default function NetworkPage() {
             <Card className="bg-[#1A1A1A] border-[#333333]">
               <CardContent className="p-4">
                 <form onSubmit={handlePost} className="flex items-center gap-4">
-                  <Avatar className="h-12 w-12">
+                  <Avatar className="h-12 w-12" style={{ backgroundColor: '#8A2EFF88', color: 'white' }}>
                     <AvatarImage src={session?.user?.image || ""} />
-                    <AvatarFallback className="bg-[#8A2EFF] text-white uppercase text-lg">
+                    <AvatarFallback className="text-white uppercase text-lg">
                       {session?.user?.name?.split(" ").map((n: any) => n[0]).join("")}
                     </AvatarFallback>
                   </Avatar>
@@ -139,7 +139,7 @@ export default function NetworkPage() {
                   />
                   <Button
                     type="submit"
-                    className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white h-12 px-6 text-lg"
+                    className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white px-6 text-lg"
                     disabled={!post.trim()}
                   >
                     Post
