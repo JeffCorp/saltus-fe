@@ -127,15 +127,15 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="p-4">
-          <Button
-            variant="outline"
-            className="w-full flex items-center justify-center text-[#FF4B4B] border-[#FF4B4B] hover:bg-[#FF4B4B]/10"
+        <div className="p-4 w-full">
+          <Link
+            href="/"
+            className="w-full flex items-center px-6 py-3 justify-center text-[#FF4B4B] border-[#FF4B4B] hover:bg-[#FF4B4B]/10"
             onClick={() => signOut()}
           >
             <LogOut className="mr-2 h-4 w-4" />
             Logout
-          </Button>
+          </Link>
         </div>
       </aside>
 
