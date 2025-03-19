@@ -33,10 +33,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IoIosMenu } from "react-icons/io";
 
-export default function Dashboard({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [activeTab, setActiveTab] = useState("Home");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const pathname = usePathname()
+  const pathname = usePathname();
   const { data: session } = useSession();
   const socket = useSocket();
   const router = useRouter();
@@ -81,7 +81,23 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
         setOpen(true);
       });
     }
+
+    return () => {
+      if (socket) {
+        socket.off("connect");
+        socket.off("notification");
+      }
+    }
   }, [socket]);
+
+  useEffect(() => {
+    // Close menus when pathname changes
+
+    return () => {
+      setIsSidebarOpen(false);
+      setIsMenuOpen(false);
+    }
+  }, [pathname]); // Watch pathname instead of router.events
 
   return (
     <div className="flex h-screen bg-[#111111] flex-col md:flex-row">

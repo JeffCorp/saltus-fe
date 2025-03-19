@@ -13,7 +13,9 @@ const Navbar: React.FC = () => {
   const { data, status } = useSession();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleMenu = () => setIsOpen((prev) => !prev);
-  const handleNav = (path: string) => {
+
+  const handleNavigation = (path: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
     toggleMenu();
     router.push(path);
   };
@@ -27,10 +29,7 @@ const Navbar: React.FC = () => {
       <Link
         className="flex items-center justify-center text-white group"
         href="/"
-        onClick={() => {
-          router.push("/");
-          setIsOpen(false);
-        }}
+        onClick={handleNavigation('/')}
       >
         {/* <img src="/logo.png" alt="Saltus" className="h-8 w-auto mr-2" /> */}
         <Rocket className="h-6 w-6 mr-2 text-[#8A2EFF]" />
@@ -42,6 +41,7 @@ const Navbar: React.FC = () => {
         <Link
           className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
           href="/about"
+          onClick={handleNavigation('/about')}
         >
           About Us
         </Link>
@@ -49,6 +49,7 @@ const Navbar: React.FC = () => {
           <Link
             className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
             href="/career-tools"
+            onClick={handleNavigation('/career-tools')}
           >
             Career Tools
           </Link>
@@ -56,18 +57,21 @@ const Navbar: React.FC = () => {
         <Link
           className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
           href="/how-it-works"
+          onClick={handleNavigation('/how-it-works')}
         >
           How It Works
         </Link>
         <Link
           className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
           href="/support"
+          onClick={handleNavigation('/support')}
         >
           Support
         </Link>
         <Link
           className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
           href="/pricing"
+          onClick={handleNavigation('/pricing')}
         >
           Pricing
         </Link>
@@ -75,7 +79,7 @@ const Navbar: React.FC = () => {
         {status === "authenticated" ? (
           <div className="ml-8 flex gap-4">
             <Button
-              onClick={() => router.push("/dashboard")}
+              onClick={handleNavigation('/dashboard')}
               variant="outline"
               className="border-2 border-[#8A2EFF] text-[#8A2EFF] hover:bg-[#8A2EFF]/10"
             >
@@ -92,7 +96,7 @@ const Navbar: React.FC = () => {
         ) : status === "unauthenticated" && !isAuthPage ? (
           <div className="ml-8">
             <Button
-              onClick={() => router.push("/register")}
+              onClick={handleNavigation('/register')}
               variant="default"
               className="bg-[#8A2EFF] hover:bg-[#7325D4]"
             >
@@ -111,32 +115,32 @@ const Navbar: React.FC = () => {
         <nav className="flex lg:hidden flex-col fixed right-0 top-16 items-start w-full h-screen bg-[#1A1A1A] text-white z-50">
           <button
             className="p-8 hover:bg-[#1CB0F6]/10 w-full text-left transition-colors"
-            onClick={() => handleNav("/about")}
+            onClick={handleNavigation('/about')}
           >
             About Us
           </button>
           <button
             className="p-8 hover:bg-[#1CB0F6]/10 w-full text-left transition-colors"
-            onClick={() => handleNav("/career-tools")}
+            onClick={handleNavigation('/career-tools')}
           >
             Career Tools
           </button>
           <button
             className="p-8 hover:bg-[#1CB0F6]/10 w-full text-left transition-colors"
-            onClick={() => handleNav("/how-it-works")}
+            onClick={handleNavigation('/how-it-works')}
           >
             How It Works
           </button>
           <button
             className="p-8 hover:bg-[#1CB0F6]/10 w-full text-left transition-colors"
-            onClick={() => handleNav("/support")}
+            onClick={handleNavigation('/support')}
           >
             Support
           </button>
           {status === "authenticated" ? (
             <>
               <button
-                onClick={() => handleNav("/dashboard")}
+                onClick={handleNavigation('/dashboard')}
                 className="p-8 hover:bg-[#1CB0F6]/10 w-full text-left transition-colors"
               >
                 Dashboard
@@ -150,7 +154,7 @@ const Navbar: React.FC = () => {
             </>
           ) : status === "unauthenticated" && !isAuthPage ? (
             <button
-              onClick={() => handleNav("/register")}
+              onClick={handleNavigation('/register')}
               className="p-8 bg-[#1CB0F6] hover:bg-[#1890d0] w-full text-left transition-colors"
             >
               Join us
