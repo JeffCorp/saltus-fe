@@ -122,12 +122,12 @@ export default function NetworkPage() {
           {/* Right Column - Posts */}
           <div className="flex-1 space-y-6 min-w-0">
             {/* Create Post */}
-            <Card className="bg-[#1A1A1A] border-[#333333]">
+            <Card className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50">
               <CardContent className="p-4">
                 <form onSubmit={handlePost} className="flex items-center gap-4">
-                  <Avatar className="h-12 w-12" style={{ backgroundColor: '#8A2EFF88', color: 'white' }}>
+                  <Avatar className="h-12 w-12">
                     <AvatarImage src={session?.user?.image || ""} />
-                    <AvatarFallback className="text-white uppercase text-lg">
+                    <AvatarFallback className="dark:bg-[#8A2EFF] bg-gray-50 text-white uppercase text-lg">
                       {session?.user?.name?.split(" ").map((n: any) => n[0]).join("")}
                     </AvatarFallback>
                   </Avatar>
@@ -163,10 +163,10 @@ export default function NetworkPage() {
                 ))}
               </div>
             ) : (
-              <Card className="bg-[#1A1A1A] border-[#333333] p-8">
+              <Card className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 p-8">
                 <div className="text-center">
                   <MessageCircle className="mx-auto h-12 w-12 text-[#8A2EFF] opacity-50" />
-                  <Text className="mt-4 text-lg font-medium text-gray-300">
+                  <Text className="mt-4 text-lg font-medium dark:text-gray-300 text-gray-700">
                     No posts yet. Be the first to share!
                   </Text>
                 </div>

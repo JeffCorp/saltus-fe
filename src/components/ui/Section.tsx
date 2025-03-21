@@ -13,7 +13,7 @@ const Section: FC<SectionProps> = ({ children, variant, className, style }) => {
     <section
       className={cn(
         `w-full py-12 md:py-24 lg:py-32 xl:py-48 flex justify-center items-center ${className}`,
-        variant === "primary" ? "bg-white" : "bg-black"
+        variant === "primary" ? "bg-white" : "bg-gray-50 dark:bg-[#1A1A1A]"
       )}
       style={style}
     >

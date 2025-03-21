@@ -139,11 +139,11 @@ export default function MentorsPage() {
   return (
     <div className="container p-6 mx-auto space-y-8">
       {/* Welcome Section */}
-      <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
+      <div className="dark:bg-[#1A1A1A] bg-white rounded-2xl p-6 border dark:border-[#333333] border-gray-50">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
           Mentorship Hub
         </h1>
-        <p className="mt-2 text-gray-400">
+        <p className="mt-2 dark:text-gray-400 text-gray-700">
           Connect, learn, and grow with industry professionals
         </p>
       </div>
@@ -153,7 +153,7 @@ export default function MentorsPage() {
         {stats.map((stat, index) => (
           <Card
             key={index}
-            className="bg-[#1A1A1A] border-[#333333] transform hover:scale-105 transition-all duration-300"
+            className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 transform hover:scale-105 transition-all duration-300"
           >
             <CardHeader className="flex flex-row items-center justify-between">
               <div className="flex items-center gap-4">
@@ -161,7 +161,7 @@ export default function MentorsPage() {
                   <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
                 </div>
                 <div>
-                  <CardTitle className="text-lg font-bold text-white">{stat.title}</CardTitle>
+                  <CardTitle className="text-lg font-bold dark:text-white text-black">{stat.title}</CardTitle>
                 </div>
               </div>
               <span className="text-2xl font-bold" style={{ color: stat.color }}>
@@ -173,11 +173,11 @@ export default function MentorsPage() {
       </div>
 
       {/* Active Mentors */}
-      <Card className="bg-[#1A1A1A] border-[#333333]">
+      <Card className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-xl font-bold text-white">Your Mentors</CardTitle>
+          <CardTitle className="text-xl font-bold dark:text-white text-black">Your Mentors</CardTitle>
           <Button
-            className="bg-[#8A2EFF] hover:bg-[#7325D4]"
+            className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white"
             onClick={() => setShowFindMentorModal(true)}
           >
             Find Mentor
@@ -187,14 +187,14 @@ export default function MentorsPage() {
           {mentors?.filter((mentor: any) => mentor.status === 'active').map((mentor: any, index: any) => (
             <div
               key={index}
-              className="flex items-center gap-4 p-4 rounded-xl bg-[#222222] hover:bg-[#2A2A2A] transition-colors"
+              className="flex items-center gap-4 p-4 rounded-xl dark:bg-[#222222] bg-white dark:hover:bg-[#2A2A2A] hover:bg-gray-50 transition-colors"
             >
-              <div className="p-2 rounded-xl bg-[#58CC02]/20">
+              <div className="p-2 rounded-xl dark:bg-[#58CC02]/20 bg-white">
                 <Award className="w-6 h-6 text-[#58CC02]" />
               </div>
               <div className="flex-1">
-                <h3 className="text-white font-medium">{mentor.mentorId.name}</h3>
-                <p className="text-sm text-gray-400">{mentor.mentorId.currentRole}</p>
+                <h3 className="dark:text-white text-black font-medium">{mentor.mentorId.name}</h3>
+                <p className="text-sm dark:text-gray-400 text-gray-700">{mentor.mentorId.currentRole}</p>
               </div>
               <Button variant="outline" className="border-[#8A2EFF] text-[#8A2EFF] hover:bg-[#8A2EFF]/10">
                 <MessageSquare className="w-4 h-4" />
@@ -205,22 +205,22 @@ export default function MentorsPage() {
       </Card>
 
       {/* Your Mentees */}
-      <Card className="bg-[#1A1A1A] border-[#333333]">
+      <Card className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50">
         <CardHeader>
-          <CardTitle className="text-xl font-bold text-white">Your Mentees</CardTitle>
+          <CardTitle className="text-xl font-bold dark:text-white text-black">Your Mentees</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {mentees?.filter((mentee: any) => mentee.status === 'active').map((mentee: any, index: any) => (
             <div
               key={index}
-              className="flex items-center gap-4 p-4 rounded-xl bg-[#222222] hover:bg-[#2A2A2A] transition-colors"
+              className="flex items-center gap-4 p-4 rounded-xl dark:bg-[#222222] bg-white dark:hover:bg-[#2A2A2A] hover:bg-gray-50 transition-colors"
             >
-              <div className="p-2 rounded-xl bg-[#1CB0F6]/20">
+              <div className="p-2 rounded-xl dark:bg-[#1CB0F6]/20 bg-white">
                 <BookOpen className="w-6 h-6 text-[#1CB0F6]" />
               </div>
               <div className="flex-1">
-                <h3 className="text-white font-medium">{mentee.menteeId.name}</h3>
-                <p className="text-sm text-gray-400">{mentee.menteeId.currentRole}</p>
+                <h3 className="dark:text-white text-black font-medium">{mentee.menteeId.name}</h3>
+                <p className="text-sm dark:text-gray-400 text-gray-700">{mentee.menteeId.currentRole}</p>
               </div>
               <Button variant="outline" className="border-[#8A2EFF] text-[#8A2EFF] hover:bg-[#8A2EFF]/10">
                 <MessageSquare className="w-4 h-4" />

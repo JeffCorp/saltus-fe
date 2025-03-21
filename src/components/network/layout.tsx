@@ -105,17 +105,17 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
   }
 
   return (
-    <div className="bg-[#111111] min-h-[80vh] overflow-hidden">
+    <div className="dark:bg-[#111111] bg-white min-h-[80vh] overflow-hidden">
       <div className="container mx-auto pt-6 px-4 overflow-hidden">
         <div className="flex gap-6">
           {/* Main Content */}
           <div className="flex-[3]">
             {topConnections?.length > 0 ? (
-              <div className="bg-[#1A1A1A] rounded-2xl border border-[#333333] p-8 h-[85vh] overflow-y-auto">
+              <div className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 rounded-2xl p-8 h-[85vh] overflow-y-auto">
                 {children}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-[60vh] bg-[#1A1A1A] rounded-2xl border border-[#333333] p-8">
+              <div className="flex flex-col items-center justify-center h-[60vh] dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 rounded-2xl p-8">
                 <Text className="text-gray-400 text-center">
                   Make your first connection to view network posts
                 </Text>
@@ -126,26 +126,26 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
           {/* Right Sidebar */}
           <div className="space-y-6 flex-[1.1] w-[300px]">
             <div className="min-w-[300px] space-y-6">
-              <Card className="bg-[#1A1A1A] border-[#333333] sticky top-[100px]">
+              <Card className="dark:bg-[#1A1A1A] bg-gray-50 dark:border-[#333333] border-gray-50 sticky top-[100px]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xl font-bold text-white">Network Overview</CardTitle>
+                  <CardTitle className="text-xl font-bold dark:text-white text-black">Network Overview</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {/* Connection Stats */}
-                  <div className="p-4 rounded-xl bg-[#222222] border border-[#444444]">
+                  <div className="p-4 rounded-xl dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-50">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-[#8A2EFF]/20">
+                      <div className="p-3 rounded-xl dark:bg-[#8A2EFF]/20 bg-gray-50">
                         <Users className="w-7 h-7 text-[#8A2EFF]" />
                       </div>
                       <div>
-                        <Text className="text-3xl font-bold text-white">{connections?.length || 0}</Text>
-                        <Text className="text-sm font-medium text-gray-300">Total Connections</Text>
+                        <Text className="text-3xl font-bold dark:text-white text-black">{connections?.length || 0}</Text>
+                        <Text className="text-sm font-medium dark:text-gray-300 text-gray-700">Total Connections</Text>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex flex-row gap-2 mt-6 cursor-pointer justify-center items-center" onClick={() => setIsUsersModalOpen(true)}>
-                    <Text className="text-sm font-medium text-gray-300">Grow Your Network</Text>
+                    <Text className="text-sm font-medium dark:text-gray-300 text-gray-700">Grow Your Network</Text>
                     <Plus className="w-4 h-4 text-[#1CB0F6]" />
                   </div>
 
@@ -161,7 +161,7 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
                         key={index}
                         className="flex justify-between items-center p-3 rounded-lg hover:bg-[#222222] transition-colors border border-transparent hover:border-[#444444]"
                       >
-                        <span className="text-gray-300 font-medium">{item.label}</span>
+                        <span className="dark:text-gray-300 text-black font-medium">{item.label}</span>
                         <span
                           className="font-bold text-lg"
                           style={{ color: item.color }}

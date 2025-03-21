@@ -171,7 +171,7 @@ export default function Home() {
                       <Input
                         id="name"
                         placeholder="Your Name"
-                        className="bg-[#222222] border-[#444444]"
+                        className="dark:bg-[#222222] dark:border-[#444444] bg-white border-gray-200"
                         aria-required="true"
                       />
                     </div>
@@ -181,7 +181,7 @@ export default function Home() {
                         id="email"
                         placeholder="Email"
                         type="email"
-                        className="bg-[#222222] border-[#444444]"
+                        className="dark:bg-[#222222] dark:border-[#444444] bg-white border-gray-200"
                         aria-required="true"
                       />
                     </div>
@@ -190,7 +190,7 @@ export default function Home() {
                       <textarea
                         id="message"
                         placeholder="Your Message"
-                        className="w-full h-32 bg-[#222222] border-[#444444] rounded-md p-3"
+                        className="w-full h-32 dark:bg-[#222222] dark:border-[#444444] bg-white border-gray-200 rounded-md p-3"
                         aria-required="true"
                       />
                     </div>

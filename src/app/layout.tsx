@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeProvider } from "@/components/theme-provider";
 import { Inter } from "next/font/google";
 import ClientProvider from "./ClientProvider";
 import "./globals.css";
@@ -12,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -35,7 +36,9 @@ export default function RootLayout({
         <title>Saltus AI | Learn, Grow, Succeed</title>
       </head>
       <body className={inter.className}>
-        <ClientProvider>{children}</ClientProvider>
+        <ThemeProvider defaultTheme="dark">
+          <ClientProvider>{children}</ClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

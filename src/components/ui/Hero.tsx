@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 
+
 export default function Hero() {
   const router = useRouter()
   const { data: session } = useSession()
@@ -99,6 +100,13 @@ export default function Hero() {
                 height={500}
                 priority
               />
+              {/* <DotLottieReact
+                src="https://lottie.host/1cb62899-93a2-4f64-bc9a-fb32f810712b/9OdnpO0Vcc.lottie"
+                width="50vw"
+                loop
+                autoplay
+              /> */}
+
               <div className="absolute -top-4 -left-4 bg-[#FF4B4B] text-white px-4 py-1 rounded-full">
                 Track
               </div>

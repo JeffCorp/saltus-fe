@@ -43,24 +43,24 @@ const Post = ({ post, gotoLink }: { post: any, gotoLink?: string }) => {
   // }, [post._id])
 
   return (
-    <Card className="bg-[#1A1A1A] border-[#333333] mb-8 p-4 w-full h-full">
+    <Card className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 mb-8 p-4 w-full h-full">
       <CardContent>
         <div className="flex gap-4 items-center" onClick={() => router.push(`/dashboard/profiles/${post.user._id}`)}>
           <Avatar style={{ backgroundColor: '#58CC0288', color: 'white' }}>
             <AvatarImage src={post.authorImage} alt={post.authorName} />
-            <AvatarFallback className="bg-[#8A2EFF] text-white uppercase">
+            <AvatarFallback className="dark:bg-[#8A2EFF] bg-gray-50 text-white uppercase">
               {post.user?.name?.split(' ').map((n: string) => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <Text className="font-semibold text-white">{post.user?.name}</Text>
-            <Text className="text-sm text-gray-400">{timeAgo(post.createdAt)}</Text>
+            <Text className="font-semibold dark:text-white text-black">{post.user?.name}</Text>
+            <Text className="text-sm dark:text-gray-400 text-gray-700">{timeAgo(post.createdAt)}</Text>
           </div>
         </div>
 
-        <Text className="text-white mt-4" onClick={() => gotoLink ? router.push(gotoLink) : null}>{post.content}</Text>
+        <Text className="dark:text-white text-black mt-4" onClick={() => gotoLink ? router.push(gotoLink) : null}>{post.content}</Text>
 
-        <div className="mt-4 pt-3 border-t border-[#333333]">
+        <div className="mt-4 pt-3 border-t dark:border-[#333333] border-gray-50">
           <div className="flex items-center gap-6">
             <button
               className="flex items-center gap-2 text-gray-400 hover:text-[#FF4B4B] transition-colors"
@@ -116,7 +116,7 @@ const Post = ({ post, gotoLink }: { post: any, gotoLink?: string }) => {
                     <div key={idx} className="flex gap-3">
                       <Avatar>
                         <AvatarImage src={comment.authorImage} alt={comment.authorName} />
-                        <AvatarFallback className="bg-[#8A2EFF] text-white uppercase">
+                        <AvatarFallback className="dark:bg-[#8A2EFF] bg-gray-50 text-white uppercase">
                           {comment.user?.name?.split(' ').map((n: string) => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>

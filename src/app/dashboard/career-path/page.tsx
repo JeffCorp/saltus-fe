@@ -153,7 +153,7 @@ export default function CareerPath() {
     <>
       <div className="container p-6 mx-auto space-y-8">
         {/* Welcome Section */}
-        <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
+        <div className="dark:bg-[#1A1A1A] bg-white rounded-2xl p-6 border dark:border-[#333333] border-gray-50">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
             Your Career Journey
           </h1>
@@ -168,7 +168,7 @@ export default function CareerPath() {
             <Card
               key={index}
               onClick={() => handleMilestoneClick(milestone)}
-              className={`bg-[#1A1A1A] border-[#333333] transform hover:scale-105 transition-all duration-300 cursor-pointer min-w-[200px] flex-1
+              className={`dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 transform hover:scale-105 transition-all duration-300 cursor-pointer min-w-[200px] flex-1
                 ${milestone.completed ? 'border-l-4' : 'opacity-70'}`}
               style={{ borderLeftColor: milestone.completed ? milestone.color : 'transparent' }}
             >
@@ -177,8 +177,8 @@ export default function CareerPath() {
                   {milestone?.icon && <milestone.icon className="w-8 h-8" style={{ color: milestone.color }} />}
                 </div>
                 <div>
-                  <CardTitle className="text-lg font-bold text-white">{milestone.title}</CardTitle>
-                  <p className="text-sm text-gray-400 line-clamp-1">{milestone.description}</p>
+                  <CardTitle className="text-lg font-bold dark:text-white text-black">{milestone.title}</CardTitle>
+                  <p className="text-sm dark:text-gray-400 text-gray-400 line-clamp-1">{milestone.description}</p>
                 </div>
               </CardHeader>
               <CardContent>
@@ -186,7 +186,7 @@ export default function CareerPath() {
                   {milestone.skills.map((skill: any, i: number) => (
                     <div
                       key={i}
-                      className="flex items-center gap-2 text-sm text-gray-300"
+                      className="flex items-center gap-2 text-sm dark:text-gray-400 text-gray-700"
                     >
                       <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: milestone.color }} />
                       {skill}
@@ -203,7 +203,7 @@ export default function CareerPath() {
           {trends.map((trend, index) => (
             <Card
               key={index}
-              className="bg-[#1A1A1A] border-[#333333] transform hover:scale-105 transition-all duration-300"
+              className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 transform hover:scale-105 transition-all duration-300"
             >
               <CardHeader className="flex flex-row items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -211,8 +211,8 @@ export default function CareerPath() {
                     <trend.icon className="w-6 h-6" style={{ color: trend.color }} />
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-bold text-white">{trend.title}</CardTitle>
-                    <p className="text-sm text-gray-400">{trend.description}</p>
+                    <CardTitle className="text-lg font-bold dark:text-white text-black">{trend.title}</CardTitle>
+                    <p className="text-sm dark:text-gray-400 text-gray-400">{trend.description}</p>
                   </div>
                 </div>
                 <span
@@ -227,21 +227,21 @@ export default function CareerPath() {
         </div>
 
         {/* Skills Progress */}
-        <Card className="bg-[#1A1A1A] border-[#333333]">
+        <Card className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-white">Your Skills Progress</CardTitle>
+            <CardTitle className="text-xl font-bold dark:text-white text-black">Your Skills Progress</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {skillsProgress?.filter(skill => !skill.completed).slice(0, 3).map((skill, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 p-4 rounded-xl bg-[#222222] hover:bg-[#2A2A2A] transition-colors"
+                className="flex items-center gap-3 p-4 rounded-xl dark:bg-[#222222] bg-white hover:bg-gray-50 transition-colors"
               >
                 <div className="w-2 h-2 rounded-full bg-[#8A2EFF]" />
-                <span className="text-gray-300">
+                <span className="dark:text-gray-300 text-gray-500">
                   {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}
                 </span>
-                <div className="ml-auto text-sm text-gray-400">
+                <div className="ml-auto text-sm dark:text-gray-400 text-gray-700">
                   {skill.progress}% Complete
                 </div>
               </div>

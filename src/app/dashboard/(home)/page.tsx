@@ -1,4 +1,5 @@
 "use client";
+import { useTheme } from "@/components/theme-provider";
 import { useLatestUpdatesMutation } from "@/services/useLatestUpdates";
 import { useProfile } from "@/services/useProfile";
 import { Flex, Link, Spinner } from "@chakra-ui/react";
@@ -119,6 +120,33 @@ const newsTrends = {
   ]
 };
 
+const quickActions = [
+  {
+    href: "/dashboard/learn",
+    title: "Continue Learning",
+    description: "Pick up where you left off",
+    color: "#58CC02"
+  },
+  {
+    href: "/dashboard/news",
+    title: "Latest Updates",
+    description: "Check industry news",
+    color: "#1CB0F6"
+  },
+  {
+    href: "/dashboard/skills",
+    title: "Skill Assessment",
+    description: "Test your knowledge",
+    color: "#8A2EFF"
+  },
+  {
+    href: "/dashboard/network",
+    title: "Join Community",
+    description: "Connect with peers",
+    color: "#FF4B4B"
+  }
+];
+
 const Dashboard = () => {
   const { data: session } = useSession();
   const { profile, isLoading, isError, error, updateProfile, isUpdating } =
@@ -129,6 +157,7 @@ const Dashboard = () => {
     mutate: getLatestUpdates,
     isPending: isLoadingLatestUpdates,
   } = useLatestUpdatesMutation();
+  const theme = useTheme();
   const [newsTrendsData, setNewsTrendsData] = useState<any>(newsTrends);
   const [isGraphDataModalOpen, setIsGraphDataModalOpen] = useState(false);
   const [selectedGraphData, setSelectedGraphData] = useState<{ posts: { title: string; url: string }[] }>();
@@ -283,38 +312,29 @@ const Dashboard = () => {
   return (
     <div className="p-6 space-y-8">
       {/* Welcome Section with Quick Actions */}
-      <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
+      <div className="dark:bg-[#1A1A1A] bg-white rounded-2xl p-6 border dark:border-[#333333] border-gray-50">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">
           Welcome back, {session?.user?.name || session?.user?.email}!
         </h1>
 
         {/* Quick Actions Grid */}
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link href="/dashboard/learn" className="bg-[#222222] hover:bg-[#2a2a2a] p-4 rounded-xl border border-[#333333] transition-all hover:scale-105">
-            <h3 className="font-semibold text-[#58CC02]">Continue Learning</h3>
-            <p className="text-sm text-gray-400 mt-1">Pick up where you left off</p>
-          </Link>
-
-          <Link href="/dashboard/news" className="bg-[#222222] hover:bg-[#2a2a2a] p-4 rounded-xl border border-[#333333] transition-all hover:scale-105">
-            <h3 className="font-semibold text-[#1CB0F6]">Latest Updates</h3>
-            <p className="text-sm text-gray-400 mt-1">Check industry news</p>
-          </Link>
-
-          <Link href="/dashboard/skills" className="bg-[#222222] hover:bg-[#2a2a2a] p-4 rounded-xl border border-[#333333] transition-all hover:scale-105">
-            <h3 className="font-semibold text-[#8A2EFF]">Skill Assessment</h3>
-            <p className="text-sm text-gray-400 mt-1">Test your knowledge</p>
-          </Link>
-
-          <Link href="/dashboard/network" className="bg-[#222222] hover:bg-[#2a2a2a] p-4 rounded-xl border border-[#333333] transition-all hover:scale-105">
-            <h3 className="font-semibold text-[#FF4B4B]">Join Community</h3>
-            <p className="text-sm text-gray-400 mt-1">Connect with peers</p>
-          </Link>
+          {quickActions.map((action, index) => (
+            <Link
+              key={index}
+              href={action.href}
+              className="dark:bg-[#222222] bg-gray-100 dark:hover:bg-[#2a2a2a] hover:bg-gray-50 p-4 rounded-xl border dark:border-[#333333] border-gray-50 transition-all hover:scale-105"
+            >
+              <h3 className="font-semibold dark:text-white text-black" style={{ color: action.color }}>{action.title}</h3>
+              <p className="text-sm dark:text-gray-400 text-gray-400 mt-1">{action.description}</p>
+            </Link>
+          ))}
         </div>
       </div>
 
       {/* Latest News Section - Simplified */}
-      <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
-        <h2 className="text-2xl font-bold text-white mb-4">Latest Updates in {profile?.topic}</h2>
+      <div className="dark:bg-[#1A1A1A] bg-white rounded-2xl p-6 border dark:border-[#333333] border-gray-50">
+        <h2 className="text-2xl font-bold dark:text-white text-black mb-4">Latest Updates in {profile?.topic}</h2>
         {isLoadingLatestUpdates ? (
           <Flex justifyContent="center" alignItems="center" height="100px">
             <Spinner color="#8A2EFF" />
@@ -326,15 +346,15 @@ const Dashboard = () => {
                 key={index}
                 href={`https://www.reddit.com${update.permalink}`}
                 target="_blank"
-                className="block bg-[#222222] p-4 rounded-xl hover:bg-[#2a2a2a] transition-all"
+                className="block dark:bg-[#222222] bg-gray-100 p-4 rounded-xl dark:hover:bg-[#2a2a2a] hover:bg-gray-50 transition-all"
               >
-                <h3 className="font-semibold text-white line-clamp-1">{update.title}</h3>
+                <h3 className="font-semibold dark:text-white text-black line-clamp-1">{update.title}</h3>
                 <p className="text-sm text-gray-400 mt-1 line-clamp-2">
                   {update.description || update.selftext}
                 </p>
               </Link>
             ))}
-            <Link href="/dashboard/news" className="block text-center text-[#1CB0F6] hover:text-[#58CC02] transition-colors">
+            <Link href="/dashboard/news" className="block text-center dark:text-[#1CB0F6] text-[#58CC02] hover:text-[#58CC02] transition-colors">
               View all updates →
             </Link>
           </div>
@@ -344,8 +364,8 @@ const Dashboard = () => {
       </div>
 
       {/* Learning Progress - Simplified */}
-      <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333333]">
-        <h2 className="text-2xl font-bold text-white mb-4">Your Progress</h2>
+      <div className="dark:bg-[#1A1A1A] bg-white rounded-2xl p-6 border dark:border-[#333333] border-gray-50">
+        <h2 className="text-2xl font-bold dark:text-white text-black mb-4">Your Progress</h2>
         <div className="h-[300px]">
           <Radar
             data={{
@@ -358,7 +378,7 @@ const Dashboard = () => {
                 r: {
                   ...learningProgressOptions.scales.r,
                   grid: { color: '#333333' },
-                  pointLabels: { color: '#FFFFFF' },
+                  pointLabels: { color: theme.theme === 'dark' ? '#FFFFFF' : '#000000' },
                 }
               },
               plugins: {

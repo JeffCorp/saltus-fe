@@ -1,6 +1,7 @@
 "use client";
 
 import Notification from "@/components/notifications/Notification";
+import { useTheme } from "@/components/theme-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import {
   DropdownMenuItem
 } from "@/components/ui/dropdown-menu";
 import { useSocket } from "@/lib/socket";
+import { useProfile } from "@/services/useProfile";
 import { Box, HStack, Text } from "@chakra-ui/react";
 import {
   Bell,
@@ -20,8 +22,10 @@ import {
   LineChart,
   LogOut,
   MessageSquare,
+  Moon,
   Rocket,
   Settings,
+  Sun,
   UserCircle,
   Users,
   UsersRound,
@@ -34,6 +38,7 @@ import { useEffect, useState } from "react";
 import { IoIosMenu } from "react-icons/io";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("Home");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
@@ -41,6 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const socket = useSocket();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { profile, isLoading: isLoadingProfile, updateProfile, isUpdating, updateProfileData, isUpdatingProfileData } = useProfile();
   const [notification, setNotification] = useState<{
     title: string,
     message: string,
@@ -100,7 +106,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [pathname]); // Watch pathname instead of router.events
 
   return (
-    <div className="flex h-screen bg-[#111111] flex-col md:flex-row">
+    <div className="flex h-screen dark:bg-[#111111] bg-white flex-col md:flex-row">
       <Notification
         title={notification?.title}
         message={notification?.message}
@@ -109,11 +115,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setOpen={setOpen}
       />
       {/* Sidebar */}
-      <aside className={`min-w-64 bg-[#1A1A1A] shadow-lg flex-1 md:flex-none md:w-64 h-full z-10 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
+      <aside className={`min-w-64 dark:bg-[#1A1A1A] bg-white shadow-lg flex-1 md:flex-none md:w-64 h-full z-10 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
         <div className="p-4 flex items-center justify-between">
           <Link
             href="/"
-            className="text-2xl font-bold text-white flex items-center"
+            className="text-2xl font-bold text-black dark:text-white flex items-center"
           >
             <Rocket className="h-6 w-6 mr-2 text-[#8A2EFF]" />
             {process.env.NEXT_PUBLIC_APP_NAME}
@@ -127,9 +133,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Link
               key={item.name}
               href={item.link}
-              className={`flex items-center px-6 py-3 text-gray-300 hover:bg-[#222222] transition-all duration-300 
+              className={`flex items-center px-6 py-3 dark:text-gray-300 text-black dark:hover:bg-[#222222] hover:bg-gray-50 transition-all duration-300 
                 ${pathname === item.link ?
-                  "bg-[#222222] border-l-4 pl-5" : ""}`}
+                  "dark:bg-[#222222] bg-gray-100 border-l-4 pl-5" : ""}`}
               style={{
                 borderLeftColor: pathname === item.link ? item.color : 'transparent'
               }}
@@ -139,7 +145,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="h-5 w-5 mr-3"
                 style={{ color: item.color }}
               />
-              <span className={pathname === item.link ? "text-white" : ""}>{item.name}</span>
+              <span className={pathname === item.link ? "dark:text-white text-black" : ""}>{item.name}</span>
             </Link>
           ))}
         </nav>
@@ -156,30 +162,44 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto flex flex-col md:flex-[5] max-md:fixed max-md:w-full bg-[#111111]">
+      <main className="flex-1 overflow-y-auto flex flex-col md:flex-[5] max-md:fixed max-md:w-full dark:bg-[#111111] bg-white">
         {/* Header */}
-        <header className="bg-[#1A1A1A] text-white fixed top-0 md:right-0 w-[100%] md:w-[calc(100%-16rem)] z-[1] shadow-lg border-b border-[#333333]">
+        <header className="dark:bg-[#1A1A1A] bg-white text-black fixed top-0 md:right-0 w-[100%] md:w-[calc(100%-16rem)] z-[1] shadow-lg border-b dark:border-[#333333] border-gray-50">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div className="flex items-center">
               <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 hover:bg-[#222222]">
                 {isSidebarOpen ? <X className="h-5 w-5" /> : <IoIosMenu className="h-5 w-5" />}
               </Button>
             </div>
-            <h2 className="text-2xl font-bold leading-7 text-white sm:truncate w-full ml-4">
+            <h2 className="text-2xl font-bold leading-7 text-black dark:text-white sm:truncate w-full ml-4">
               {navItems.find(item => item.link === pathname)?.name}
             </h2>
             <div className="flex items-center gap-2">
               {/* <NotificationsDropdown /> */}
-              <Button variant="outline" className="bg-[#222222] text-white border-[#333333] hover:bg-[#333333]" onClick={() => router.push('/dashboard/notifications')}>
+              <button
+                onClick={() => {
+                  setTheme(theme === "dark" ? "light" : "dark")
+                  localStorage.setItem("theme", theme === "dark" ? "light" : "dark")
+                }}
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5 text-yellow-500" />
+                ) : (
+                  <Moon className="h-5 w-5 text-[#8A2EFF]" />
+                )}
+              </button>
+              <Button variant="outline" className="dark:bg-[#222222] dark:text-white dark:border-[#333333] dark:hover:bg-[#333333] hover:bg-gray-50" onClick={() => router.push('/dashboard/notifications')}>
                 <Bell className="h-5 w-5" />
               </Button>
               <Box>
-                <Button onClick={() => setIsMenuOpen(!isMenuOpen)} variant="outline" className="bg-[#222222] text-white border-[#333333] hover:bg-[#333333] min-w-[230px] flex justify-between items-center gap-2">
+                <Button onClick={() => setIsMenuOpen(!isMenuOpen)} variant="outline" className="dark:bg-[#222222] bg-gray-100 dark:text-white text-black border-[#333333] dark:hover:bg-[#333333] hover:bg-gray-200 min-w-[230px] flex justify-between items-center gap-2">
                   <div className="flex items-center gap-2 w-full">
                     {/* <UserCircle className="h-5 w-5" /> */}
                     <HStack gap="3">
                       <Avatar>
-                        <AvatarFallback className="bg-[#8A2EFF]">
+                        <AvatarFallback className="dark:bg-[#8A2EFF] bg-gray-50">
                           {session?.user?.name?.charAt(0)}
                         </AvatarFallback>
                         <AvatarImage src={session?.user?.image} />
@@ -187,22 +207,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </HStack>
                     <div className="flex flex-col items-start w-full">
                       <span className="text-sm font-medium">{session?.user?.name}</span>
-                      <span className="text-xs text-gray-400">Software Engineer</span>
+                      <span className="text-xs text-gray-400">{profile?.currentRole || 'Aspirant'}</span>
                     </div>
                   </div>
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
                 {isMenuOpen &&
-                  <Box className="absolute top-[90px] right-[30px] w-[230px] bg-[#222222] border-[#333333] text-white rounded-lg">
-                    <DropdownMenuItem className="hover:bg-[#333333] flex items-center cursor-pointer" onClick={() => router.push('/dashboard/profile')}>
+                  <Box className="absolute top-[90px] right-[30px] w-[230px] dark:bg-[#222222] dark:border-[#333333] border-gray-100 text-white rounded-lg">
+                    <DropdownMenuItem className="dark:hover:bg-[#333333] hover:bg-gray-100 flex items-center cursor-pointer" onClick={() => router.push('/dashboard/profile')}>
                       <UserCircle className="mr-2 h-4 w-4" />
                       <Text color="white">Profile</Text>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-[#333333] flex items-center cursor-pointer text-yellow-500">
+                    <DropdownMenuItem className="dark:hover:bg-[#333333] hover:bg-gray-100 flex items-center cursor-pointer text-yellow-500">
                       <Crown className="mr-2 h-4 w-4" />
                       <Text color="white">Upgrade</Text>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-[#333333] flex items-center cursor-pointer">
+                    <DropdownMenuItem className="dark:hover:bg-[#333333] hover:bg-gray-100 flex items-center cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       <Text color="white">Settings</Text>
                     </DropdownMenuItem>
@@ -213,7 +233,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        <div className="pt-[80px] bg-[#111111] overflow-y-scroll h-[100vh] text-white">
+        <div className="pt-[80px] dark:bg-[#111111] bg-gray-50 overflow-y-scroll h-[100vh] text-white">
           {children}
         </div>
 
