@@ -4,18 +4,36 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
+import { useMockInterview } from "@/services/useMockInterview"
+import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Spinner } from "@chakra-ui/react"
 import { FileText, Mic, Video } from 'lucide-react'
 import { useState } from 'react'
 
 export default function InterviewPreparation() {
-  const [selectedRole, setSelectedRole] = useState<string>('')
+  const [jobDescription, setJobDescription] = useState<string>('')
+  const [isInterviewQuestionOpens, setIsInterviewQuestionOpens] = useState<boolean>(false)
   const [feedback, setFeedback] = useState<string>('')
+  const { mutate, isPending, data } = useMockInterview({
+    onSuccess: (data) => {
+      console.log(data);
+      if (data.length > 0) {
+        setIsInterviewQuestionOpens(true)
+      }
+      // setFeedback(data)
+    },
+    onError: (error) => {
+      setFeedback(error.message)
+    }
+  })
+
+  console.log('data =>', data);
+
 
   const handleStartMockInterview = () => {
     setFeedback("Mock interview started. AI is analyzing your responses...")
+    mutate(jobDescription)
   }
 
   const handleAnalyzeCommunication = () => {
@@ -38,6 +56,9 @@ export default function InterviewPreparation() {
             <TabsTrigger value="mock-interview" className="data-[state=active]:bg-[#222222] text-white">
               AI Mock Interview
             </TabsTrigger>
+            <TabsTrigger value="mock-technical-interview" className="data-[state=active]:bg-[#222222] text-white">
+              AI Mock Technical Interview
+            </TabsTrigger>
             <TabsTrigger value="communication" className="data-[state=active]:bg-[#222222] text-white">
               Communication Analysis
             </TabsTrigger>
@@ -55,27 +76,72 @@ export default function InterviewPreparation() {
               <CardContent>
                 <form className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="role" className="text-gray-300">Select Role</Label>
-                    <Select
-                      onChange={(e) => setSelectedRole(e.target.value)}
-                      className="bg-[#222222] border-[#444444] text-white"
-                    >
-                      <option value="">Choose a role</option>
-                      <option value="software-engineer">Software Engineer</option>
-                      <option value="data-scientist">Data Scientist</option>
-                      <option value="product-manager">Product Manager</option>
-                      <option value="ux-designer">UX Designer</option>
-                    </Select>
+                    <Label htmlFor="role" className="dark:text-gray-300 text-gray-700">Paste Job Description</Label>
+                    <Textarea
+                      onChange={(e) => setJobDescription(e.target.value)}
+                      className="bg-[#222222] border-[#444444] text-white placeholder:text-gray-500 min-h-[100px]"
+                    />
                   </div>
                 </form>
               </CardContent>
               <CardFooter>
                 <Button
                   onClick={handleStartMockInterview}
-                  disabled={!selectedRole}
-                  className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white disabled:bg-[#333333]"
+                  disabled={!jobDescription}
+                  className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white disabled:bg-[#333333] flex items-center gap-2"
                 >
-                  Start Mock Interview
+                  Start Mock Interview {isPending ? <Spinner size="sm" /> : null}
+                </Button>
+              </CardFooter>
+            </Card>
+            <Modal isOpen={isInterviewQuestionOpens} onClose={() => setIsInterviewQuestionOpens(false)} size="4xl">
+              <ModalOverlay />
+              <ModalContent className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 rounded-lg h-[80vh]">
+                <ModalHeader>
+                  <ModalCloseButton />
+                </ModalHeader>
+                <ModalBody className="flex flex-col gap-2">
+                  <h1 className="text-2xl font-bold text-white">Possible Interview Questions</h1>
+                  <div className="flex flex-col gap-4 overflow-y-auto h-[60vh]">
+                    {
+                      data?.length > 0 &&
+                      data?.map((question: { question: string; answer: string }, index: number) => (
+                        <div key={index}>
+                          <p className="dark:text-white text-gray-700 font-bold">{question.question}</p>
+                          <p className="dark:text-white text-gray-700">{question.answer}</p>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+          </TabsContent>
+          <TabsContent value="technical-interview">
+            <Card className="bg-[#1A1A1A] border-[#333333]">
+              <CardHeader>
+                <CardTitle className="text-white">AI Mock Technical Interview</CardTitle>
+                <CardDescription className="text-gray-400">Practice technical interviews tailored to specific roles</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="role" className="dark:text-gray-300 text-gray-700">Paste Job Description</Label>
+                    <Textarea
+                      onChange={(e) => setJobDescription(e.target.value)}
+                      className="bg-[#222222] border-[#444444] text-white placeholder:text-gray-500 min-h-[100px]"
+                    />
+
+                  </div>
+                </form>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  onClick={handleStartMockInterview}
+                  disabled={!jobDescription}
+                  className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white disabled:bg-[#333333] flex items-center gap-2"
+                >
+                  Start Mock Interview {isPending ? <Spinner size="sm" /> : null}
                 </Button>
               </CardFooter>
             </Card>

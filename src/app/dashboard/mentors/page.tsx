@@ -129,12 +129,12 @@ export default function MentorsPage() {
   ];
 
   // Filter mentors based on search and expertise
-  const filteredMentors = mentors.filter((mentor: any) => {
-    const matchesSearch = mentor.mentorId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mentor.mentorId.currentRole.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesExpertise = !expertise || mentor.mentorId.expertise.includes(expertise);
-    return matchesSearch && matchesExpertise;
-  });
+  // const filteredMentors = mentors.filter((mentor: any) => {
+  //   const matchesSearch = mentor.mentorId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     mentor.mentorId.currentRole.toLowerCase().includes(searchTerm.toLowerCase());
+  //   const matchesExpertise = !expertise || mentor.mentorId.expertise.includes(expertise);
+  //   return matchesSearch && matchesExpertise;
+  // });
 
   return (
     <div className="container p-6 mx-auto space-y-8">

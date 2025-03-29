@@ -128,7 +128,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <X className="h-5 w-5" />
           </Button>
         </div>
-        <nav className="mt-6 min-h-[calc(100%-200px)]">
+        <nav className="mt-6 min-h-[calc(100%-200px)] max-h-[calc(100%-170px)] overflow-y-auto">
           {navItems.map((item) => (
             <Link
               key={item.name}
