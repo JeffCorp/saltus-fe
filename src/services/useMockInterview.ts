@@ -6,6 +6,13 @@ const mockInterview = async (jobDescription: string) => {
   return response.data;
 };
 
+const mockInterviewTechnical = async (jobDescription: string) => {
+  const response = await apiClient.post("/interviews/qa/technical", {
+    jobDescription,
+  });
+  return response.data;
+};
+
 export const useMockInterview = ({
   onSuccess,
   onError,
@@ -15,6 +22,20 @@ export const useMockInterview = ({
 }) => {
   return useMutation({
     mutationFn: mockInterview,
+    onSuccess,
+    onError,
+  });
+};
+
+export const useMockInterviewTechnical = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  return useMutation({
+    mutationFn: mockInterviewTechnical,
     onSuccess,
     onError,
   });
