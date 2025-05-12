@@ -3,16 +3,25 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import apiClient from "@/lib/api-client"
 import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
 import { Book, Play } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 interface Video {
-  id: string;
   title: string;
+  url: string;
+  videoId: string;
   thumbnail: string;
   description: string;
+  duration: string;
+  views: string;
+  channel: {
+    name: string;
+    url: string;
+  }
 }
 
 interface Question {
@@ -28,6 +37,9 @@ export default function LearnPage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+
+  const skillName = searchParams.get('skillName');
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -40,28 +52,36 @@ export default function LearnPage() {
     (skill) => skill.progress < 100
   ) || [];
 
-  const fetchVideosAndQuestions = async (skillName: string) => {
+  const fetchVideos = async (skillName: string) => {
     setLoading(true);
     try {
       // Replace with your actual API endpoint
-      const response = await fetch(`/api/youtube/search?q=${skillName}`);
-      const data = await response.json();
-      setVideos(data.videos);
+      const response = await apiClient.get(`/youtube/search?q=${skillName}`);
+      const data: Video[] = response.data;
+      setVideos(data);
 
       // Generate questions based on video transcripts
-      // Replace with your actual API endpoint
-      const questionsResponse = await fetch(`/api/questions/generate`, {
-        method: 'POST',
-        body: JSON.stringify({ skillName, videoIds: data.videos.map((v: Video) => v.id) })
-      });
-      const questionsData = await questionsResponse.json();
-      setQuestions(questionsData.questions);
+      // const questionsResponse = await apiClient.post(`/youtube/search`, {
+      //   skillName,
+      //   videoIds: response.videos.map((v: Video) => v.id)
+      // });
+      // const questionsData = await questionsResponse.json();
+      // setQuestions(questionsData.questions);
     } catch (error) {
       console.error('Error fetching content:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchQuestions = async (videoId: string) => {
+    setLoading(true);
+
+    const response = await apiClient.get(`/youtube/transcript?videoId=${videoId}`);
+    const data: string[] = response.data;
+    console.log(data);
+    // setQuestions(data);
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -75,18 +95,18 @@ export default function LearnPage() {
             <CardTitle className="text-white">Skills to Improve</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="flex flex-col gap-2 h-[60vh] overflow-y-auto p-2">
               {skillsToImprove.map((skill) => (
                 <div key={typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id} className="space-y-2">
                   <Button
-                    variant="outline"
-                    className={`w-full justify-start ${selectedSkill === skill.skillModuleId
+                    // variant="outline"
+                    className={`w-[70%] flex justify-start items-center ${selectedSkill === skill.skillModuleId
                       ? 'bg-[#8A2EFF] text-white'
                       : 'bg-[#222222] text-gray-300'
                       }`}
                     onClick={() => {
                       setSelectedSkill(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id);
-                      fetchVideosAndQuestions(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name);
+                      fetchVideos(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name);
                     }}
                   >
                     <Book className="mr-2 h-4 w-4" />
@@ -94,7 +114,7 @@ export default function LearnPage() {
                   </Button>
                   <Progress
                     value={skill.progress}
-                    className="w-full bg-[#222222] [&>div]:bg-gradient-to-r [&>div]:from-[#58CC02] [&>div]:to-[#1CB0F6]"
+                    className="w-full bg-[#787878] [&>div]:bg-gradient-to-r [&>div]:from-[#58CC02] [&>div]:to-[#1CB0F6]"
                   />
                 </div>
               ))}
@@ -113,24 +133,36 @@ export default function LearnPage() {
               <div className="text-center text-gray-400">Select a skill to start learning</div>
             ) : (
               <div className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2 h-[60vh] overflow-y-auto">
                   {videos.map((video) => (
-                    <Card key={video.id} className="bg-[#222222] border-[#444444]">
+                    <Card key={video.url} className="bg-[#222222] border-[#444444] flex flex-col justify-between items-center">
                       <CardContent className="p-4">
                         <img
                           src={video.thumbnail}
                           alt={video.title}
                           className="w-full rounded-lg mb-2"
                         />
-                        <h3 className="text-white font-medium mb-2">{video.title}</h3>
-                        <Button
-                          variant="outline"
-                          className="w-full bg-[#1CB0F6] hover:bg-[#19A0E3] text-white"
-                          onClick={() => window.open(`https://youtube.com/watch?v=${video.id}`, '_blank')}
-                        >
-                          <Play className="mr-2 h-4 w-4" />
-                          Watch Video
-                        </Button>
+                        <div className="flex flex-col items-center">
+                          <h3 className="text-white font-medium mb-2 line-clamp-2">{video.title}</h3>
+                          <div className="flex">
+                            <Button
+                              variant="outline"
+                              className="flex-1 md:w-[150px] bg-[#1CB0F6] hover:bg-[#19A0E3] text-white flex items-center justify-center"
+                              onClick={() => window.open(video.url, '_blank')}
+                            >
+                              <Play className="mr-2 h-4 w-4" />
+                              Watch Video
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="flex-1 md:w-[120px] bg-[#1CB0F6] hover:bg-[#19A0E3] text-white flex items-center justify-center"
+                              onClick={() => fetchQuestions(video.videoId)}
+                            >
+                              <Play className="mr-2 h-4 w-4" />
+                              Take Quiz
+                            </Button>
+                          </div>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}

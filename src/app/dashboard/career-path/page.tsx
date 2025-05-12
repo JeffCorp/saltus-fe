@@ -19,9 +19,13 @@ import { useSkillsProgressByUserId } from "@/services/useSkillsProgress";
 import { Spinner } from "@chakra-ui/react";
 import { Briefcase, GraduationCap, LineChart, Star, Trophy } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from "react";
+import { FaGoogle, FaLinkedin, FaYoutube } from 'react-icons/fa';
+import { SiGlassdoor, SiIndeed, SiQuora, SiReddit, SiWikipedia } from 'react-icons/si';
 
 export default function CareerPath() {
+  const router = useRouter();
   const { data: session } = useSession()
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { data: skillsProgress, mutate: getSkillsProgress, isPending: isLoadingSkillsProgress } = useSkillsProgressByUserId()
@@ -33,6 +37,7 @@ export default function CareerPath() {
   const [showMilestonesModal, setShowMilestonesModal] = useState(false)
   const [selectedMilestone, setSelectedMilestone] = useState<any>(null);
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<string>();
 
   useEffect(() => {
     if (profile) {
@@ -46,6 +51,10 @@ export default function CareerPath() {
       setShowMilestonesModal(true)
     }
   }, [isLoadingMilestones, milestonesData, profile?._id])
+
+  const handleSectionClick = (section: any) => {
+    router.push(section.href);
+  }
 
   const computeSkillsProgress = useMemo(() => {
     if (!skillsProgress || skillsProgress.length === 0) return 0
@@ -104,14 +113,16 @@ export default function CareerPath() {
       value: `${Math.round(computeSkillsProgress)}%`,
       description: "Overall completion of required skills",
       icon: LineChart,
-      color: "#FF4B4B"
+      color: "#FF4B4B",
+      href: "/dashboard/skills"
     },
     {
       title: "Certifications",
       value: certificates?.length || 0,
       description: "Completed certifications",
       icon: Star,
-      color: "#B35AF4"
+      color: "#B35AF4",
+      href: "/dashboard/certifications"
     }
   ]
 
@@ -183,7 +194,7 @@ export default function CareerPath() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {milestone.skills.map((skill: any, i: number) => (
+                  {milestone.skills.filter((_: any, i: number) => i < 3).map((skill: any, i: number) => (
                     <div
                       key={i}
                       className="flex items-center gap-2 text-sm dark:text-gray-400 text-gray-700"
@@ -198,12 +209,13 @@ export default function CareerPath() {
           ))}
         </div>
 
-        {/* Market Trends */}
+        {/* Sections */}
         <div className="grid gap-6 md:grid-cols-2">
           {trends.map((trend, index) => (
             <Card
               key={index}
-              className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 transform hover:scale-105 transition-all duration-300"
+              onClick={() => handleSectionClick(trend)}
+              className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 transform hover:scale-105 transition-all duration-300 cursor-pointer"
             >
               <CardHeader className="flex flex-row items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -298,8 +310,11 @@ export default function CareerPath() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isMilestoneModalOpen} onOpenChange={setIsMilestoneModalOpen}>
-        <DialogContent className="sm:max-w-lg">
+      <Dialog open={isMilestoneModalOpen} onOpenChange={() => {
+        setIsMilestoneModalOpen(!isMilestoneModalOpen)
+        setSelectedCourse(undefined)
+      }}>
+        <DialogContent className="sm:max-w-[800px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               {selectedMilestone?.icon && (
@@ -315,18 +330,36 @@ export default function CareerPath() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Required Skills</h3>
-              <div className="space-y-2">
-                {selectedMilestone?.skills.map((skill: string, i: number) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-gray-400">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: selectedMilestone.color }} />
-                    {skill}
+              <h3 className="text-lg font-semibold mb-2 text-[#8A2EFF]">Required Skills</h3>
+              <div className="flex flex-row gap-4">
+                <div className="space-y-2 flex-1">
+                  {selectedMilestone?.skills.map((skill: string, i: number) => (
+                    <div key={i}>
+                      <div className={`flex items-center gap-2 text-sm cursor-pointer ${selectedCourse === skill ? 'text-white' : 'text-gray-400'}`} onClick={() => setSelectedCourse(skill)}>
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: selectedMilestone.color }} />
+                        {skill}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {selectedCourse && (
+                  <div className="flex flex-col gap-4 flex-1 bg-gray-100 p-4 rounded-lg overflow-y-auto">
+                    {/* More information about the occupation */}
+                    <h3 className="text-lg font-bold capitalize">{selectedCourse}</h3>
+                    <a href={`http://youtube.com/results?search_query=${selectedCourse?.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2"><FaYoutube className="w-4 h-4" /> Youtube Learn more</a>
+                    <a href={`https://www.google.com/search?q=${selectedCourse?.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><FaGoogle className="w-4 h-4" /> Google Learn more</a>
+                    <a href={`https://www.linkedin.com/search/results/learning/?keywords=${selectedCourse?.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><FaLinkedin className="w-4 h-4" /> LinkedIn Learn more</a>
+                    <a href={`https://www.indeed.com/jobs?q=${selectedCourse?.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiIndeed className="w-4 h-4" /> Indeed Learn more</a>
+                    <a href={`https://www.glassdoor.com/search/?q=${selectedCourse?.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiGlassdoor className="w-4 h-4" /> Glassdoor Learn more</a>
+                    <a href={`https://www.reddit.com/search?q=${selectedCourse?.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiReddit className="w-4 h-4" /> Reddit Learn more</a>
+                    <a href={`https://www.quora.com/search?q=${selectedCourse?.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiQuora className="w-4 h-4" /> Quora Learn more</a>
+                    <a href={`https://www.wikipedia.org/wiki/${selectedCourse?.split(' ').join('_')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiWikipedia className="w-4 h-4" /> Wikipedia Learn more</a>
                   </div>
-                ))}
+                )}
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2">Progress</h3>
+              <h3 className="text-lg font-semibold mb-2 text-[#8A2EFF]">Progress</h3>
               <div className="text-sm text-gray-400">
                 Required Skill Grade: {selectedMilestone?.skillGrade}%
               </div>

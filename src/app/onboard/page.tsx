@@ -8,7 +8,9 @@ import { useProfile } from "@/services/useProfile"
 import { motion } from "framer-motion"
 import { Briefcase, BriefcaseConveyorBelt, ChevronLeft, ChevronRight, Lightbulb } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
+import { FaGoogle, FaLinkedin, FaYoutube } from "react-icons/fa"
+import { SiGlassdoor, SiIndeed, SiQuora, SiReddit, SiWikipedia } from "react-icons/si"
 
 // Constants moved outside component
 const STEPS = {
@@ -97,11 +99,17 @@ const getPreviousStep = (currentStep: StepType, selectedPath: string | null): St
   return (currentStep - 1) as StepType
 }
 
+// Add missing type and calculation for progressPercentage
+const calculateProgress = (step: StepType): number => {
+  const totalSteps = Object.keys(STEPS).length
+  return ((step + 1) / totalSteps) * 100
+}
+
 export default function OnboardingPage() {
   const [step, setStep] = useState<StepType>(STEPS.CHOOSE_PATH)
   const [selectedCareerPath, setSelectedCareerPath] = useState<string | null>(null)
   const [personalityAnswers, setPersonalityAnswers] = useState<string[]>([])
-  const [selectedOccupation, setSelectedOccupation] = useState<string | null>(null)
+  const [selectedOccupation, setSelectedOccupation] = useState<{ title: string, description: string } | null>(null)
 
   const router = useRouter()
   const { updateProfile, isUpdating } = useProfile()
@@ -110,6 +118,12 @@ export default function OnboardingPage() {
     useSuggestedOccupations(selectedCareerPath)
   const { data: suggestedOccupationsByPersonality, isPending: isLoadingSuggestionsByPersonality } =
     useSuggestedOccupationsByPersonality(personalityAnswers)
+
+  // Add missing StepIcon component reference
+  const StepIcon = STEP_ICONS[step]
+
+  // Add progress calculation
+  const progressPercentage = calculateProgress(step)
 
   const handleCareerPathSelect = useCallback((path: string) => {
     setSelectedCareerPath(path)
@@ -127,7 +141,7 @@ export default function OnboardingPage() {
     updateProfile(
       {
         careerPath: selectedCareerPath || selectedOccupation,
-        projectedRole: selectedOccupation,
+        projectedRole: selectedOccupation?.title,
         personalityAnswers,
         isOnboarded: true
       },
@@ -135,52 +149,66 @@ export default function OnboardingPage() {
         onSuccess: () => router.push('/dashboard')
       }
     )
-  }, [selectedCareerPath, selectedOccupation, personalityAnswers, updateProfile, router])
+  }, [selectedCareerPath, selectedOccupation, personalityAnswers, updateProfile, router]);
 
-  const progressPercentage = useMemo(() =>
-    ((step / Object.keys(STEPS).length) * 100), [step]
-  )
-
-  const StepIcon = STEP_ICONS[step]
-
-  const renderCareerPathButtons = useCallback(() => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {staticCareerRoles.map((role) => (
-        <motion.button
-          key={role}
-          onClick={() => handleCareerPathSelect(role)}
-          className={`${buttonStyles.base} ${selectedCareerPath === role ? buttonStyles.selected : buttonStyles.unselected
-            }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          {role}
-        </motion.button>
-      ))}
-    </div>
-  ), [selectedCareerPath, handleCareerPathSelect])
-
-  const renderOccupationsList = useCallback(() => {
-    const occupations = (suggestedOccupations || suggestedOccupationsByPersonality)?.occupations
-
-    if (isLoadingSuggestions || isLoadingSuggestionsByPersonality) {
-      return <p className="text-gray-600 dark:text-gray-400">Loading suggested occupations...</p>
-    }
-
+  // Add missing render functions
+  const renderCareerPathButtons = () => {
     return (
-      <div className="flex flex-col gap-4">
-        {occupations?.map((occupation: { title: string }) => (
+      <div className="grid gap-4">
+        {staticCareerRoles.map((role) => (
           <motion.button
-            key={occupation.title}
-            onClick={() => setSelectedOccupation(occupation.title)}
-            className={`${buttonStyles.base} ${selectedOccupation === occupation.title ? buttonStyles.selected : buttonStyles.unselected
+            key={role}
+            onClick={() => handleCareerPathSelect(role)}
+            className={`${buttonStyles.base} ${selectedCareerPath === role ? buttonStyles.selected : buttonStyles.unselected
               }`}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            {occupation.title}
+            {role}
           </motion.button>
         ))}
+      </div>
+    )
+  }
+
+  const renderOccupationsList = () => {
+    if (isLoadingSuggestions || isLoadingSuggestionsByPersonality) {
+      return <p>Loading suggested occupations...</p>
+    }
+
+    const occupations = suggestedOccupations?.occupations || suggestedOccupationsByPersonality?.occupations || []
+
+    return (
+      <div className="flex flex-col gap-4 h-[40vh]">
+        <div className="flex gap-4 overflow-y-hidden h-[40vh]">
+          <div className="flex flex-col gap-4 flex-1 overflow-y-auto">
+            {occupations?.map((occupation: { title: string, description: string }) => (
+              <motion.button
+                key={occupation.title}
+                onClick={() => setSelectedOccupation(occupation)}
+                className={`${buttonStyles.base} ${selectedOccupation?.title === occupation.title ? buttonStyles.selected : buttonStyles.unselected
+                  }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {occupation.title}
+              </motion.button>
+            ))}
+          </div>
+          {selectedOccupation && <div className="flex flex-col gap-4 flex-1 bg-gray-100 p-4 rounded-lg overflow-y-auto">
+            {/* More information about the occupation */}
+            <h3 className="text-lg font-bold capitalize">{selectedOccupation?.title}</h3>
+            <p className="text-sm text-gray-600">{selectedOccupation?.description}</p>
+            <a href={`http://youtube.com/results?search_query=${selectedOccupation?.title.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2"><FaYoutube className="w-4 h-4" /> Youtube Learn more</a>
+            <a href={`https://www.google.com/search?q=${selectedOccupation?.title.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><FaGoogle className="w-4 h-4" /> Google Learn more</a>
+            <a href={`https://www.linkedin.com/search/results/learning/?keywords=${selectedOccupation?.title.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><FaLinkedin className="w-4 h-4" /> LinkedIn Learn more</a>
+            <a href={`https://www.indeed.com/jobs?q=${selectedOccupation?.title.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiIndeed className="w-4 h-4" /> Indeed Learn more</a>
+            <a href={`https://www.glassdoor.com/search/?q=${selectedOccupation?.title.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiGlassdoor className="w-4 h-4" /> Glassdoor Learn more</a>
+            <a href={`https://www.reddit.com/search?q=${selectedOccupation?.title.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiReddit className="w-4 h-4" /> Reddit Learn more</a>
+            <a href={`https://www.quora.com/search?q=${selectedOccupation?.title.split(' ').join('+')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiQuora className="w-4 h-4" /> Quora Learn more</a>
+            <a href={`https://www.wikipedia.org/wiki/${selectedOccupation?.title.split(' ').join('_')}`} target="_blank" className="text-sm text-blue-500 flex items-center gap-2 "><SiWikipedia className="w-4 h-4" /> Wikipedia Learn more</a>
+          </div>}
+        </div>
         <Button
           onClick={() => fetchSuggestedOccupations()}
           className="mt-4 bg-[#1CB0F6] hover:bg-[#1890d0] text-white"
@@ -189,15 +217,7 @@ export default function OnboardingPage() {
         </Button>
       </div>
     )
-  }, [
-    selectedCareerPath,
-    suggestedOccupations,
-    suggestedOccupationsByPersonality,
-    isLoadingSuggestions,
-    isLoadingSuggestionsByPersonality,
-    selectedOccupation,
-    fetchSuggestedOccupations
-  ])
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#111111] py-8">
@@ -312,7 +332,7 @@ export default function OnboardingPage() {
                         className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-[#1A1A1A] dark:text-white"
                       />
                     </div>
-                    <Button onClick={handleCustomCareerPath} className="mt-4">Continue</Button>
+                    <Button onClick={handleCustomCareerPath} className="mt-4 bg-[#1CB0F6] hover:bg-[#1890d0] text-white">Continue</Button>
                   </>
                 )}
               </CardContent>

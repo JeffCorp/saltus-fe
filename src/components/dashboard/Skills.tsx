@@ -1,8 +1,8 @@
 'use client'
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
 import { useProfile } from "@/services/useProfile"
 import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
@@ -11,13 +11,17 @@ import { Book, RefreshCcw, Star, Target, TrendingUp } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 export default function Skills() {
   const { data: session } = useSession();
   const { mutate: getSkillsProgress, data: skillsProgress } = useSkillsProgressByUserId();
   const { profile } = useProfile()
   const router = useRouter();
+  const [isSkillsModalOpen, setIsSkillsModalOpen] = useState(false);
+  const [isYoutubeModalOpen, setIsYoutubeModalOpen] = useState(false);
+  const [selectedSkill, setSelectedSkill] = useState<any>(null);
+  const [selectedSkillUrl, setSelectedSkillUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -71,8 +75,11 @@ export default function Skills() {
                   key={index}
                   style={{ color: "white", cursor: "pointer" }}
                   className="!cursor-pointer hover:bg-[#333333] !text-white border-[#444444]"
-                  onClick={() => router.push(`/dashboard/skills/workshop?skillId=${typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id
-                    }`)}
+                  onClick={() => {
+                    setSelectedSkill(skill)
+                    setSelectedSkillUrl(`/dashboard/skills/workshop?skillId=${typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}`)
+                    setIsSkillsModalOpen(true)
+                  }}
                 >
                   {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}
                 </Badge>
@@ -82,7 +89,7 @@ export default function Skills() {
             )}
           </div>
         </CardContent>
-        <CardFooter>
+        {/* <CardFooter>
           <Link href="/dashboard/skills/workshop" className="w-full">
             <Button
               className="w-full bg-[#8A2EFF] hover:bg-[#7325D4] text-white"
@@ -91,8 +98,39 @@ export default function Skills() {
               Start Learning a New Skill
             </Button>
           </Link>
-        </CardFooter>
+        </CardFooter> */}
       </Card>
+
+      <Dialog open={isSkillsModalOpen} onOpenChange={setIsSkillsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <span>{selectedSkill?.skillModuleId?.name}</span>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex gap-4 mt-4">
+            <Card className="bg-[#1A1A1A] border-[#333333] h-[200px] flex-1 flex items-center justify-center cursor-pointer hover:bg-[#222222]" onClick={() => {
+              setIsSkillsModalOpen(false)
+              router.push(selectedSkillUrl || '');
+            }}>
+              <CardContent className="flex items-center justify-center h-full text-white">
+                Take a test
+              </CardContent>
+            </Card>
+            <Card className="bg-[#1A1A1A] border-[#333333] h-[200px] flex-1 flex items-center justify-center cursor-pointer hover:bg-[#222222]"
+              onClick={() => {
+                setIsSkillsModalOpen(false);
+                router.push(`/dashboard/learn?skillName=${selectedSkill?.skillModuleId?.name}`);
+              }}
+            >
+              <CardContent className="flex items-center justify-center text-white">
+                Learn the skill
+              </CardContent>
+            </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="bg-[#1A1A1A] border-[#333333]">
