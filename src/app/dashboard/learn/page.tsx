@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import apiClient from "@/lib/api-client"
 import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
+import clsx from "clsx"
 import { Book, Play } from "lucide-react"
 import { useSession } from "next-auth/react"
+import Image from "next/image"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -40,6 +42,13 @@ export default function LearnPage() {
   const searchParams = useSearchParams();
 
   const skillName = searchParams.get('skillName');
+
+  useEffect(() => {
+    if (skillName) {
+      console.log(skillName);
+      fetchVideos(skillName);
+    }
+  }, [skillName])
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -89,47 +98,46 @@ export default function LearnPage() {
         Learn & Practice
       </h1>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="bg-[#1A1A1A] border-[#333333]">
-          <CardHeader>
-            <CardTitle className="text-white">Skills to Improve</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-2 h-[60vh] overflow-y-auto p-2">
-              {skillsToImprove.map((skill) => (
-                <div key={typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id} className="space-y-2">
-                  <Button
-                    // variant="outline"
-                    className={`w-[70%] flex justify-start items-center ${selectedSkill === skill.skillModuleId
-                      ? 'bg-[#8A2EFF] text-white'
-                      : 'bg-[#222222] text-gray-300'
-                      }`}
-                    onClick={() => {
-                      setSelectedSkill(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id);
-                      fetchVideos(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name);
-                    }}
-                  >
-                    <Book className="mr-2 h-4 w-4" />
-                    {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}
-                  </Button>
-                  <Progress
-                    value={skill.progress}
-                    className="w-full bg-[#787878] [&>div]:bg-gradient-to-r [&>div]:from-[#58CC02] [&>div]:to-[#1CB0F6]"
-                  />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex flex-col gap-6">
+        {/* Horizontal scrollable pills */}
+        <div className="overflow-x-auto">
+          <div className="flex gap-2 min-w-max">
+            {skillsToImprove.map((skill) => (
+              <div key={typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}
+                className="flex flex-col items-center gap-2">
+                <Button
+                  className={clsx(`whitespace-nowrap flex !p-2 h-5 md:!h-5 justify-start items-center ${selectedSkill === skill.skillModuleId
+                    ? 'bg-[#8A2EFF] text-white'
+                    : 'bg-[#222222] text-gray-300'
+                    }`, {
+                    'bg-[#1CB0F6] text-white': skillName === (typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name)
+                  })}
+                  onClick={() => {
+                    setSelectedSkill(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id);
+                    fetchVideos(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name);
+                  }}
+                >
+                  <Book className="mr-2 h-4 w-4" />
+                  {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}
+                </Button>
+                <Progress
+                  value={skill.progress}
+                  className="w-full min-w-[100px] bg-[#787878] [&>div]:bg-gradient-to-r [&>div]:from-[#58CC02] [&>div]:to-[#1CB0F6]"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
-        <Card className="md:col-span-2 bg-[#1A1A1A] border-[#333333]">
+        {/* Learning Resources Card */}
+        <Card className="bg-[#1A1A1A] border-[#333333]">
           <CardHeader>
             <CardTitle className="text-white">Learning Resources</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
               <div className="text-center text-gray-400">Loading content...</div>
-            ) : !selectedSkill ? (
+            ) : (!selectedSkill && !skillName) ? (
               <div className="text-center text-gray-400">Select a skill to start learning</div>
             ) : (
               <div className="space-y-6">
@@ -137,11 +145,14 @@ export default function LearnPage() {
                   {videos.map((video) => (
                     <Card key={video.url} className="bg-[#222222] border-[#444444] flex flex-col justify-between items-center">
                       <CardContent className="p-4">
-                        <img
-                          src={video.thumbnail}
-                          alt={video.title}
-                          className="w-full rounded-lg mb-2"
-                        />
+                        <div className="relative w-full h-[200px] rounded-lg mb-2">
+                          <Image
+                            src={video.thumbnail}
+                            alt={video.title}
+                            fill
+                            className="rounded-lg object-cover"
+                          />
+                        </div>
                         <div className="flex flex-col items-center">
                           <h3 className="text-white font-medium mb-2 line-clamp-2">{video.title}</h3>
                           <div className="flex">
