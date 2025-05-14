@@ -328,7 +328,7 @@ export default function CareerPath() {
               {selectedMilestone?.description}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-y-auto max-h-[60vh]">
             <div>
               <h3 className="text-lg font-semibold mb-2 text-[#8A2EFF]">Required Skills</h3>
               <div className="flex flex-row gap-4">

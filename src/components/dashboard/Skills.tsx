@@ -110,21 +110,21 @@ export default function Skills() {
           </DialogHeader>
 
           <div className="flex gap-4 mt-4">
-            <Card className="bg-[#1A1A1A] border-[#333333] h-[200px] flex-1 flex items-center justify-center cursor-pointer hover:bg-[#222222]" onClick={() => {
+            <Card className="bg-[#1A1A1A] border-[#333333] !p-2 h-[200px] flex-1 flex items-center justify-center cursor-pointer hover:bg-[#222222]" onClick={() => {
               setIsSkillsModalOpen(false)
               router.push(selectedSkillUrl || '');
             }}>
-              <CardContent className="flex items-center justify-center h-full text-white">
+              <CardContent className="flex !p-2 items-center justify-center h-full text-white">
                 Take a test
               </CardContent>
             </Card>
-            <Card className="bg-[#1A1A1A] border-[#333333] h-[200px] flex-1 flex items-center justify-center cursor-pointer hover:bg-[#222222]"
+            <Card className="bg-[#1A1A1A] border-[#333333] !p-2 h-[200px] flex-1 flex items-center justify-center cursor-pointer hover:bg-[#222222]"
               onClick={() => {
                 setIsSkillsModalOpen(false);
                 router.push(`/dashboard/learn?skillName=${selectedSkill?.skillModuleId?.name}`);
               }}
             >
-              <CardContent className="flex items-center justify-center text-white">
+              <CardContent className="flex !p-2 items-center justify-center text-white">
                 Learn the skill
               </CardContent>
             </Card>

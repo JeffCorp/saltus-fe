@@ -67,10 +67,12 @@ export default function Hero() {
             {/* Testimonials */}
             <div className="space-y-4 mt-8">
               <div className="flex items-center gap-4 bg-gray-50 dark:bg-[#1A1A1A] p-4 rounded-lg border border-gray-200 dark:border-[#333333]">
-                <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-600" />
+                <div className="w-[100px] h-[70px] rounded-full bg-gray-200 dark:bg-gray-600">
+                  <Image src="/assets/images/jeff.jpg" className="rounded-full object-cover w-full h-full" alt="Profile" width={50} height={50} />
+                </div>
                 <div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-gray-900 dark:text-white font-semibold">Emily Smith</span>
+                  <div className="flex items-center gap-1 flex-[2]">
+                    <span className="text-gray-900 dark:text-white font-semibold">Jeffery Patrick</span>
                     {[...Array(5)].map((_, i) => (
                       <span key={i} className="text-[#FFD700]">★</span>
                     ))}

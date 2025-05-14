@@ -137,7 +137,7 @@ export default function MentorsPage() {
   // });
 
   return (
-    <div className="container p-6 mx-auto space-y-8">
+    <div className="container p-6 mx-auto space-y-8 mb-10">
       {/* Welcome Section */}
       <div className="dark:bg-[#1A1A1A] bg-white rounded-2xl p-6 border dark:border-[#333333] border-gray-50">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#8A2EFF] text-transparent bg-clip-text">

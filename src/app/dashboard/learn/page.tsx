@@ -2,11 +2,17 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
 import apiClient from "@/lib/api-client"
 import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
 import clsx from "clsx"
-import { Book, Play } from "lucide-react"
+import { Book, List, Play } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
@@ -36,10 +42,12 @@ export default function LearnPage() {
   const { data: session } = useSession();
   const { mutate: getSkillsProgress, data: skillsProgress } = useSkillsProgressByUserId();
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+  const [selectedSkillName, setSelectedSkillName] = useState<string | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
+  const [showAllSkills, setShowAllSkills] = useState(false);
 
   const skillName = searchParams.get('skillName');
 
@@ -47,6 +55,7 @@ export default function LearnPage() {
     if (skillName) {
       console.log(skillName);
       fetchVideos(skillName);
+      setSelectedSkillName(skillName);
     }
   }, [skillName])
 
@@ -98,23 +107,22 @@ export default function LearnPage() {
         Learn & Practice
       </h1>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 relative">
         {/* Horizontal scrollable pills */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto relative">
           <div className="flex gap-2 min-w-max">
             {skillsToImprove.map((skill) => (
               <div key={typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}
                 className="flex flex-col items-center gap-2">
                 <Button
-                  className={clsx(`whitespace-nowrap flex !p-2 h-5 md:!h-5 justify-start items-center ${selectedSkill === skill.skillModuleId
-                    ? 'bg-[#8A2EFF] text-white'
+                  className={clsx(`whitespace-nowrap flex !p-2 h-5 md:!h-5 justify-start items-center ${selectedSkill !== skill.skillModuleId
+                    ? '!bg-[#8A2EFF] text-white'
                     : 'bg-[#222222] text-gray-300'
-                    }`, {
-                    'bg-[#1CB0F6] text-white': skillName === (typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name)
-                  })}
+                    }`)}
                   onClick={() => {
                     setSelectedSkill(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id);
                     fetchVideos(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name);
+                    setSelectedSkillName(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name);
                   }}
                 >
                   <Book className="mr-2 h-4 w-4" />
@@ -127,6 +135,20 @@ export default function LearnPage() {
               </div>
             ))}
           </div>
+          <div className="absolute top-0 right-0 flex items-center bg-gradient-to-l from-black via-black/50 to-transparent pl-8">
+            <Button
+              variant="outline"
+              className="w-auto md:w-[120px] !h-auto bg-[#1CB0F6] hover:bg-[#19A0E3] text-white flex items-center justify-center"
+              onClick={() => setShowAllSkills(true)}
+            >
+              <List className="mr-2 h-4 w-4" />
+              All
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <h2 className="text-xl font-bold text-white mb-4">{selectedSkillName}</h2>
         </div>
 
         {/* Learning Resources Card */}
@@ -141,7 +163,7 @@ export default function LearnPage() {
               <div className="text-center text-gray-400">Select a skill to start learning</div>
             ) : (
               <div className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2 h-[60vh] overflow-y-auto">
+                <div className="grid gap-4 grid-cols-1 md:grid-cols-2 h-[60vh] overflow-y-auto">
                   {videos.map((video) => (
                     <Card key={video.url} className="bg-[#222222] border-[#444444] flex flex-col justify-between items-center">
                       <CardContent className="p-4">
@@ -158,7 +180,7 @@ export default function LearnPage() {
                           <div className="flex">
                             <Button
                               variant="outline"
-                              className="flex-1 md:w-[150px] bg-[#1CB0F6] hover:bg-[#19A0E3] text-white flex items-center justify-center"
+                              className="flex-1 w-auto md:w-[150px] bg-[#1CB0F6] hover:bg-[#19A0E3] text-white flex items-center justify-center"
                               onClick={() => window.open(video.url, '_blank')}
                             >
                               <Play className="mr-2 h-4 w-4" />
@@ -166,8 +188,10 @@ export default function LearnPage() {
                             </Button>
                             <Button
                               variant="outline"
-                              className="flex-1 md:w-[120px] bg-[#1CB0F6] hover:bg-[#19A0E3] text-white flex items-center justify-center"
-                              onClick={() => fetchQuestions(video.videoId)}
+                              className="flex-1 disabled:opacity-50 cursor-not-allowed w-auto md:w-[120px] bg-[#1CB0F6] hover:bg-[#19A0E3] !text-gray-300 flex items-center justify-center"
+                              onClick={() => {
+                                // fetchQuestions(video.videoId);
+                              }}
                             >
                               <Play className="mr-2 h-4 w-4" />
                               Take Quiz
@@ -209,6 +233,31 @@ export default function LearnPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={showAllSkills} onOpenChange={setShowAllSkills}>
+        <DialogContent className="bg-[#1A1A1A] border-[#333333] text-white">
+          <DialogHeader>
+            <DialogTitle>All Skills</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-wrap gap-4 max-h-[60vh] overflow-y-auto">
+            {skillsToImprove.map((skill) => (
+              <Button
+                key={typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id}
+                className="justify-start !bg-[#222222] hover:!bg-[#333333] text-white !p-2"
+                onClick={() => {
+                  setSelectedSkill(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId._id);
+                  fetchVideos(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name);
+                  setSelectedSkillName(typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name);
+                  setShowAllSkills(false);
+                }}
+              >
+                <Book className="mr-2 h-4 w-4" />
+                {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}
+              </Button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

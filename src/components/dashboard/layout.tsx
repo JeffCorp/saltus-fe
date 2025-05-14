@@ -124,7 +124,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Rocket className="h-6 w-6 mr-2 text-[#8A2EFF]" />
             {process.env.NEXT_PUBLIC_APP_NAME}
           </Link>
-          <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2">
+          <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden !p-2 md:p-5">
             <X className="h-5 w-5" />
           </Button>
         </div>
@@ -167,11 +167,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="dark:bg-[#1A1A1A] bg-white text-black fixed top-0 md:right-0 w-[100%] md:w-[calc(100%-16rem)] z-[1] shadow-lg border-b dark:border-[#333333] border-gray-50">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div className="flex items-center">
-              <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 hover:bg-[#222222]">
+              <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden !p-2 md:p-5 hover:bg-[#222222]">
                 {isSidebarOpen ? <X className="h-5 w-5" /> : <IoIosMenu className="h-5 w-5" />}
               </Button>
             </div>
-            <h2 className="text-2xl font-bold leading-7 text-black dark:text-white sm:truncate w-full ml-4">
+            <h2 className="text-2xl font-bold leading-7 text-black dark:text-white sm:truncate w-full ml-4 hidden md:block">
               {navItems.find(item => item.link === pathname)?.name}
             </h2>
             <div className="flex items-center gap-2">
@@ -194,7 +194,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Bell className="h-5 w-5" />
               </Button>
               <Box>
-                <Button onClick={() => setIsMenuOpen(!isMenuOpen)} variant="outline" className="dark:bg-[#222222] bg-gray-100 dark:text-white text-black border-[#333333] dark:hover:bg-[#333333] hover:bg-gray-200 min-w-[230px] flex justify-between items-center gap-2">
+                <Button onClick={() => setIsMenuOpen(!isMenuOpen)} variant="outline" className="dark:bg-[#222222] bg-gray-100 dark:text-white text-black border-[#333333] dark:hover:bg-[#333333] hover:bg-gray-200 min-w-[50px] md:min-w-[230px] flex justify-between items-center gap-2">
                   <div className="flex items-center gap-2 w-full">
                     {/* <UserCircle className="h-5 w-5" /> */}
                     <HStack gap="3">
@@ -205,7 +205,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <AvatarImage src={session?.user?.image} />
                       </Avatar>
                     </HStack>
-                    <div className="flex flex-col items-start w-full">
+                    <div className="hidden md:flex flex-col items-start w-full">
                       <span className="text-sm font-medium">{session?.user?.name}</span>
                       <span className="text-xs text-gray-400">{profile?.currentRole || 'Aspirant'}</span>
                     </div>
