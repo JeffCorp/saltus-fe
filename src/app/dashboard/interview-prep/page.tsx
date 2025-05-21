@@ -9,6 +9,7 @@ declare global {
 
 type SpeechRecognition = any;
 
+import { ResumeEditModal } from "@/components/resume/ResumeEditModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,10 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useMockInterview, useMockInterviewFeedback, useMockInterviewTechnical } from "@/services/useMockInterview";
+import { useResumeAnalysis } from '@/services/useResumeOptimization';
+import { useTextRecognition } from "@/services/useTextRecognition";
 import { useTTS } from "@/services/useTTS";
+import { ResumeData } from "@/types/resume";
 import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Spinner } from "@chakra-ui/react";
 import { FileText, Mic, Video } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -69,9 +73,36 @@ export default function InterviewPreparation() {
       setFeedback(error.message)
     }
   })
+  const { isRecording, startRecording: handleStartRecording, stopRecording: handleStopRecording } = useTextRecognition({
+    onTranscriptChange: (transcript: string) => {
+      // setCurrentResponse(transcript)
+      console.log(transcript)
+    }
+  });
 
   // Add new state for intro modal
   const [showIntroModal, setShowIntroModal] = useState(true);
+
+  // Add new state for resume edit modal
+  const [showResumeEditModal, setShowResumeEditModal] = useState(false);
+  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
+
+  const { mutate: optimizeResume, isPending: isOptimizing } = useResumeAnalysis({
+    onSuccess: (data) => {
+      console.log(data);
+      setResumeData(data);
+      setShowResumeEditModal(true);
+    },
+    onError: (error) => {
+      setFeedback(error.message)
+    }
+  });
+
+  const handleSaveResume = (data: ResumeData) => {
+    // Handle saving the resume data
+    console.log('Saving resume data:', data);
+    // Add your save logic here
+  };
 
   useEffect(() => {
     if (showIntroModal) {
@@ -93,9 +124,22 @@ export default function InterviewPreparation() {
     setFeedback("Analyzing your communication skills and body language...")
   }
 
-  const handleOptimizeResume = () => {
-    setFeedback("Analyzing your resume and generating optimization suggestions...")
-  }
+  const handleOptimizeResume = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const resumeFile = (form.elements.namedItem('resume') as HTMLInputElement).files?.[0];
+    const jobDesc = (form.elements.namedItem('job-description') as HTMLTextAreaElement).value;
+
+    if (!resumeFile || !jobDesc) {
+      return;
+    }
+
+    try {
+      await optimizeResume({ resume: resumeFile, jobDescription: jobDesc });
+    } catch (error) {
+      console.error('Failed to optimize resume:', error);
+    }
+  };
 
   const handleNextQuestion = () => {
     if (!data) return;
@@ -128,132 +172,6 @@ export default function InterviewPreparation() {
     speak(data[prevIndex].question);
   }
 
-  const [isRecording, setIsRecording] = useState(false);
-  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const createRecognition = () => {
-          const recognition = new SpeechRecognition();
-          recognition.continuous = true;
-          recognition.interimResults = true;
-          recognition.lang = 'en-US';
-
-          let transcript = '';
-
-          recognition.onresult = (event: any) => {
-            // Get only the latest result
-            const result = event.results[event.results.length - 1];
-
-            if (result.isFinal) {
-              transcript = result[0].transcript;
-
-              // Clean and format the transcript
-              transcript = transcript
-                .replace(/\s+/g, ' ')
-                .replace(/\s+\./g, '.')
-                .replace(/\s+,/g, ',')
-                .replace(/,+/g, ',')
-                .replace(/\.+/g, '.')
-                .replace(/\s+([,.!?])/g, '$1')
-                .trim();
-
-              // Capitalize first letter of sentences
-              transcript = transcript.replace(
-                /(^\w|\.\s+\w)/g,
-                letter => letter.toUpperCase()
-              );
-
-              setCurrentResponse(transcript);
-            }
-          };
-
-          recognition.onerror = (event: any) => {
-            console.error('Speech recognition error:', event.error);
-            setIsRecording(false);
-          };
-
-          recognition.onend = () => {
-            setIsRecording(false);
-          };
-
-          return recognition;
-        };
-
-        setRecognition(() => createRecognition());
-      }
-    }
-  }, []);
-
-  const handleStartRecording = () => {
-    if (recognition) {
-      try {
-        // Stop existing recognition
-        recognition.stop();
-        // Create new recognition instance
-        const newRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        newRecognition.continuous = true;
-        newRecognition.interimResults = true;
-        newRecognition.lang = 'en-US';
-
-        let transcript = '';
-
-        newRecognition.onresult = (event: any) => {
-          const result = event.results[event.results.length - 1];
-
-          if (result.isFinal) {
-            transcript = result[0].transcript;
-
-            // Clean and format the transcript
-            transcript = transcript
-              .replace(/\s+/g, ' ')
-              .replace(/\s+\./g, '.')
-              .replace(/\s+,/g, ',')
-              .replace(/,+/g, ',')
-              .replace(/\.+/g, '.')
-              .replace(/\s+([,.!?])/g, '$1')
-              .trim();
-
-            // Capitalize first letter of sentences
-            transcript = transcript.replace(
-              /(^\w|\.\s+\w)/g,
-              letter => letter.toUpperCase()
-            );
-
-            setCurrentResponse(transcript);
-          }
-        };
-
-        newRecognition.onerror = (event: any) => {
-          console.error('Speech recognition error:', event.error);
-          setIsRecording(false);
-        };
-
-        newRecognition.onend = () => {
-          setIsRecording(false);
-        };
-
-        setRecognition(newRecognition);
-        setCurrentResponse('');
-        newRecognition.start();
-        setIsRecording(true);
-      } catch (error) {
-        console.error('Error starting recording:', error);
-      }
-    } else {
-      setFeedback("Speech recognition is not supported in your browser");
-    }
-  };
-
-  const handleStopRecording = () => {
-    if (recognition) {
-      recognition.stop();
-      setIsRecording(false);
-    }
-  };
-
   // Add new function to handle interview completion
   const handleInterviewComplete = () => {
     const feedbackPayload = data?.map((item: any, index: any) => ({
@@ -266,13 +184,13 @@ export default function InterviewPreparation() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] py-8">
+    <div className="min-h-screen dark:bg-[#111111] bg-white py-8">
       {/* Add the intro modal */}
       <Modal isOpen={showIntroModal} onClose={() => setShowIntroModal(false)} size="lg">
         <ModalOverlay />
-        <ModalContent className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-50 rounded-lg pb-[50px]">
+        <ModalContent className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-200 rounded-lg pb-[50px]">
           <ModalHeader className="text-center">
-            <ModalCloseButton className="text-white" />
+            <ModalCloseButton className="dark:text-white text-black" />
           </ModalHeader>
           <ModalBody className="flex flex-col items-center gap-6 py-8">
             <div className="w-32 h-32 rounded-full bg-[#8A2EFF] flex items-center justify-center">
@@ -286,8 +204,8 @@ export default function InterviewPreparation() {
               </svg>
             </div>
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">Meet Sal, Your AI Interviewer</h2>
-              <p className="text-gray-300">
+              <h2 className="text-2xl font-bold dark:text-white text-black mb-2">Meet Sal, Your AI Interviewer</h2>
+              <p className="dark:text-gray-300 text-gray-600">
                 I'll be conducting your mock interview today. I'll ask you relevant questions based on the job description you provide and give you detailed feedback on your responses.
               </p>
             </div>
@@ -307,34 +225,34 @@ export default function InterviewPreparation() {
         </h1>
 
         <Tabs defaultValue="mock-interview" className="space-y-4">
-          <TabsList className="bg-[#1A1A1A] border-[#333333]">
-            <TabsTrigger value="mock-interview" className="data-[state=active]:bg-[#222222] text-white">
+          <TabsList className="dark:bg-[#1A1A1A] bg-gray-100">
+            <TabsTrigger value="mock-interview" className="dark:text-white text-black">
               AI Mock Interview
             </TabsTrigger>
-            <TabsTrigger value="technical-interview" className="data-[state=active]:bg-[#222222] text-white">
+            <TabsTrigger value="technical-interview" className="dark:text-white text-black">
               AI Mock Technical Interview
             </TabsTrigger>
-            <TabsTrigger value="communication" className="data-[state=active]:bg-[#222222] text-white">
+            <TabsTrigger value="communication" className="dark:text-white text-black">
               Communication Analysis
             </TabsTrigger>
-            <TabsTrigger value="resume" className="data-[state=active]:bg-[#222222] text-white">
+            <TabsTrigger value="resume" className="dark:text-white text-black">
               Resume Optimization
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="mock-interview">
-            <Card className="bg-[#1A1A1A] border-[#333333]">
+            <Card className="dark:bg-[#1A1A1A] bg-gray-100 dark:border-[#333333] border-gray-200">
               <CardHeader>
-                <CardTitle className="text-white">AI-Driven Mock Interview</CardTitle>
-                <CardDescription className="text-gray-400">Practice interviews tailored to specific roles</CardDescription>
+                <CardTitle className="dark:text-white text-black">AI-Driven Mock Interview</CardTitle>
+                <CardDescription className="dark:text-gray-300 text-gray-600">Practice interviews tailored to specific roles</CardDescription>
               </CardHeader>
               <CardContent>
                 <form className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="role" className="dark:text-gray-300 text-gray-700">Paste Job Description</Label>
+                    <Label htmlFor="role" className="dark:!text-gray-300 !text-gray-700" style={{ color: '#8A2EFF' }}>Paste Job Description</Label>
                     <Textarea
                       onChange={(e) => setJobDescription(e.target.value)}
-                      className="bg-[#222222] border-[#444444] text-white placeholder:text-gray-500 min-h-[100px]"
+                      className="dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-50 dark:text-white text-black placeholder:text-gray-500 min-h-[100px]"
                     />
                   </div>
                 </form>
@@ -432,13 +350,6 @@ export default function InterviewPreparation() {
                                   <p className="text-gray-300 mt-2">Recording in progress... Speak clearly into your microphone.</p>
                                 )}
                               </div>
-                              {/* <Textarea
-                                value={currentResponse}
-                                onChange={(e) => setCurrentResponse(e.target.value)}
-                                placeholder="Your speech will appear here..."
-                                className="bg-[#333333] border-[#444444] text-white placeholder:text-gray-500 min-h-[150px] w-full mt-4"
-                                readOnly={isRecording}
-                              /> */}
                             </div>
                           )}
 
@@ -467,15 +378,15 @@ export default function InterviewPreparation() {
             </Modal>
           </TabsContent>
           <TabsContent value="technical-interview">
-            <Card className="bg-[#1A1A1A] border-[#333333]">
+            <Card className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-200">
               <CardHeader>
-                <CardTitle className="text-white">AI Mock Technical Interview</CardTitle>
-                <CardDescription className="text-gray-400">Practice technical interviews tailored to specific roles</CardDescription>
+                <CardTitle className="dark:text-white text-black">AI Mock Technical Interview</CardTitle>
+                <CardDescription className="dark:text-gray-300 text-gray-600">Practice technical interviews tailored to specific roles</CardDescription>
               </CardHeader>
               <CardContent>
                 <form className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="role" className="dark:text-gray-300 text-gray-700">Paste Job Description</Label>
+                    <Label htmlFor="role" className="dark:text-gray-300 text-gray-700" style={{ color: '#8A2EFF' }}>Paste Job Description</Label>
                     <Textarea
                       onChange={(e) => setJobDescription(e.target.value)}
                       className="bg-[#222222] border-[#444444] text-white placeholder:text-gray-500 min-h-[100px]"
@@ -571,13 +482,6 @@ export default function InterviewPreparation() {
                                   <p className="text-gray-300 mt-2">Recording in progress... Speak clearly into your microphone.</p>
                                 )}
                               </div>
-                              {/* <Textarea
-                                value={currentResponse}
-                                onChange={(e) => setCurrentResponse(e.target.value)}
-                                placeholder="Your speech will appear here..."
-                                className="bg-[#333333] border-[#444444] text-white placeholder:text-gray-500 min-h-[150px] w-full mt-4"
-                                readOnly={isRecording}
-                              /> */}
                             </div>
                           )}
 
@@ -606,10 +510,10 @@ export default function InterviewPreparation() {
             </Modal>
           </TabsContent>
           <TabsContent value="communication">
-            <Card className="bg-[#1A1A1A] border-[#333333]">
+            <Card className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-200">
               <CardHeader>
-                <CardTitle className="text-white">Communication Skills Analysis</CardTitle>
-                <CardDescription className="text-gray-400">Get feedback on your communication and body language</CardDescription>
+                <CardTitle className="dark:text-white text-black">Communication Skills Analysis</CardTitle>
+                <CardDescription className="dark:text-gray-300 text-gray-600">Get feedback on your communication and body language</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -635,46 +539,56 @@ export default function InterviewPreparation() {
           </TabsContent>
 
           <TabsContent value="resume">
-            <Card className="bg-[#1A1A1A] border-[#333333]">
+            <Card className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-200">
               <CardHeader>
-                <CardTitle className="text-white">Resume Optimization</CardTitle>
-                <CardDescription className="text-gray-400">Get AI-powered suggestions to improve your resume</CardDescription>
+                <CardTitle className="dark:text-white text-black">Resume Optimization</CardTitle>
+                <CardDescription className="dark:text-gray-300 text-gray-600">Get AI-powered suggestions to improve your resume</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="resume" className="text-gray-300">Upload Your Resume</Label>
-                  <Input
-                    id="resume"
-                    type="file"
-                    className="bg-[#222222] border-[#444444] text-white file:bg-[#333333] file:text-white file:border-0"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="job-description" className="text-gray-300">Paste Job Description</Label>
-                  <Textarea
-                    id="job-description"
-                    placeholder="Paste the job description here..."
-                    className="bg-[#222222] border-[#444444] text-white placeholder:text-gray-500 min-h-[100px]"
-                  />
-                </div>
+                <form onSubmit={handleOptimizeResume} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="resume" className="dark:text-gray-300 text-gray-700">
+                      Upload Your Resume (PDF)
+                    </Label>
+                    <Input
+                      id="resume"
+                      name="resume"
+                      type="file"
+                      accept=".pdf"
+                      required
+                      className="dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-200 dark:text-white text-black file:bg-[#333333] file:text-white file:border-0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="job-description" className="dark:text-gray-300 text-gray-700">
+                      Paste Job Description
+                    </Label>
+                    <Textarea
+                      id="job-description"
+                      name="job-description"
+                      required
+                      placeholder="Paste the job description here..."
+                      className="dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-200 dark:text-white text-black placeholder:text-gray-500 min-h-[100px]"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={isOptimizing}
+                    className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    {isOptimizing ? 'Optimizing...' : 'Optimize Resume'}
+                  </Button>
+                </form>
               </CardContent>
-              <CardFooter>
-                <Button
-                  onClick={handleOptimizeResume}
-                  className="bg-[#8A2EFF] hover:bg-[#7325D4] text-white"
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  Optimize Resume
-                </Button>
-              </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
 
         {feedback && (
-          <Card className="mt-8 bg-[#1A1A1A] border-[#333333]">
+          <Card className="mt-8 dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-200">
             <CardHeader>
-              <CardTitle className="text-white text-xl">Interview Feedback</CardTitle>
+              <CardTitle className="dark:text-white text-black text-xl">Interview Feedback</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {typeof feedback === 'object' ? (
@@ -727,12 +641,22 @@ export default function InterviewPreparation() {
                   </div>
                 </>
               ) : (
-                <p className="text-gray-300">{feedback}</p>
+                <p className="dark:text-gray-300 text-gray-600">{feedback}</p>
               )}
             </CardContent>
           </Card>
         )}
       </div>
+
+      {/* Add ResumeEditModal */}
+      {showResumeEditModal && resumeData && (
+        <ResumeEditModal
+          isOpen={showResumeEditModal}
+          onClose={() => setShowResumeEditModal(false)}
+          data={resumeData}
+          onSave={handleSaveResume}
+        />
+      )}
     </div>
   )
 }
