@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useMockInterview, useMockInterviewFeedback, useMockInterviewTechnical } from "@/services/useMockInterview";
-import { useResumeAnalysis } from '@/services/useResumeOptimization';
+import { useGeneratePDF, useResumeAnalysis } from '@/services/useResumeOptimization';
 import { useTextRecognition } from "@/services/useTextRecognition";
 import { useTTS } from "@/services/useTTS";
 import { ResumeData } from "@/types/resume";
@@ -97,10 +97,12 @@ export default function InterviewPreparation() {
       setFeedback(error.message)
     }
   });
+  const { mutate: generatePDF, isPending: isGeneratingPDF } = useGeneratePDF();
 
   const handleSaveResume = (data: ResumeData) => {
     // Handle saving the resume data
     console.log('Saving resume data:', data);
+    generatePDF(data);
     // Add your save logic here
   };
 
@@ -547,7 +549,7 @@ export default function InterviewPreparation() {
               <CardContent className="space-y-4">
                 <form onSubmit={handleOptimizeResume} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="resume" className="dark:text-gray-300 text-gray-700">
+                    <Label htmlFor="resume" className="!text-gray-700 dark:!text-gray-300">
                       Upload Your Resume (PDF)
                     </Label>
                     <Input
@@ -556,11 +558,11 @@ export default function InterviewPreparation() {
                       type="file"
                       accept=".pdf"
                       required
-                      className="dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-200 dark:text-white text-black file:bg-[#333333] file:text-white file:border-0"
+                      className="dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-200 dark:text-white text-black file:mr-4 file:px-4 file:dark:bg-[#333333] file:bg-gray-100 file:dark:text-white file:text-black file:border-0 file:text-sm file:font-semibold hover:file:bg-gray-200 dark:hover:file:bg-[#444444] file:transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="job-description" className="dark:text-gray-300 text-gray-700">
+                    <Label htmlFor="job-description" className="!text-gray-700 dark:!text-gray-300">
                       Paste Job Description
                     </Label>
                     <Textarea
@@ -569,6 +571,7 @@ export default function InterviewPreparation() {
                       required
                       placeholder="Paste the job description here..."
                       className="dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-200 dark:text-white text-black placeholder:text-gray-500 min-h-[100px]"
+                      rows={6}
                     />
                   </div>
                   <Button

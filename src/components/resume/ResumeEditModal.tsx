@@ -24,7 +24,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="6xl">
       <ModalOverlay />
-      <ModalContent className="dark:bg-[#1A1A1A] bg-white dark:border-[#333333] border-gray-200">
+      <ModalContent className="dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-200">
         <ModalHeader className="text-2xl font-bold dark:text-white text-black">
           Edit Resume
           <ModalCloseButton />
@@ -35,7 +35,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
             <h3 className="text-lg font-semibold dark:text-white text-black">Personal Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Name</Label>
+                <Label className="dark:!text-white !text-black">Name</Label>
                 <Input
                   value={editedData.name}
                   onChange={(e) => setEditedData({ ...editedData, name: e.target.value })}
@@ -49,7 +49,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
             <h3 className="text-lg font-semibold dark:text-white text-black">Contact Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Email</Label>
+                <Label className="dark:!text-white !text-black">Email</Label>
                 <Input
                   value={editedData.contact.email}
                   onChange={(e) => setEditedData({
@@ -59,7 +59,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
                 />
               </div>
               <div>
-                <Label>Phone</Label>
+                <Label className="dark:!text-white !text-black">Phone</Label>
                 <Input
                   value={editedData.contact.phone}
                   onChange={(e) => setEditedData({
@@ -69,7 +69,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
                 />
               </div>
               <div>
-                <Label>Location</Label>
+                <Label className="dark:!text-white !text-black">Location</Label>
                 <Input
                   value={editedData.contact.location}
                   onChange={(e) => setEditedData({
@@ -79,7 +79,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
                 />
               </div>
               <div>
-                <Label>LinkedIn (optional)</Label>
+                <Label className="dark:!text-white !text-black">LinkedIn (optional)</Label>
                 <Input
                   value={editedData.contact.linkedin}
                   onChange={(e) => setEditedData({
@@ -93,17 +93,18 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
 
           {/* Summary */}
           <div className="space-y-2">
-            <Label>Professional Summary</Label>
+            <Label className="dark:!text-white !text-black">Professional Summary</Label>
             <Textarea
               value={editedData.summary}
               onChange={(e) => setEditedData({ ...editedData, summary: e.target.value })}
               rows={4}
+              className="dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-200 dark:text-white text-black"
             />
           </div>
 
           {/* Skills */}
           <div className="space-y-2">
-            <Label>Skills (comma-separated)</Label>
+            <Label className="dark:!text-white !text-black">Skills (comma-separated)</Label>
             <Input
               value={editedData.skills.join(", ")}
               onChange={(e) => setEditedData({
@@ -120,7 +121,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
               <div key={index} className="space-y-4 border dark:border-[#333333] border-gray-200 p-4 rounded">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Title</Label>
+                    <Label className="dark:!text-white !text-black">Title</Label>
                     <Input
                       value={exp.title}
                       onChange={(e) => {
@@ -131,7 +132,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
                     />
                   </div>
                   <div>
-                    <Label>Company</Label>
+                    <Label className="dark:!text-white !text-black">Company</Label>
                     <Input
                       value={exp.company}
                       onChange={(e) => {
@@ -144,7 +145,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Location</Label>
+                    <Label className="dark:!text-white !text-black">Location</Label>
                     <Input
                       value={exp.location}
                       onChange={(e) => {
@@ -155,7 +156,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
                     />
                   </div>
                   <div>
-                    <Label>Dates</Label>
+                    <Label className="dark:!text-white !text-black">Dates</Label>
                     <Input
                       value={exp.dates}
                       onChange={(e) => {
@@ -167,7 +168,7 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
                   </div>
                 </div>
                 <div>
-                  <Label>Description (one per line)</Label>
+                  <Label className="dark:!text-white !text-black">Description (one per line)</Label>
                   <Textarea
                     value={exp.description.join("\n")}
                     onChange={(e) => {
@@ -179,6 +180,75 @@ export function ResumeEditModal({ isOpen, onClose, data, onSave }: ResumeEditMod
                       setEditedData({ ...editedData, experience: newExp });
                     }}
                     rows={4}
+                    className="dark:bg-[#222222] bg-white dark:border-[#444444] border-gray-200 dark:text-white text-black"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Education */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold dark:text-white text-black">Education</h3>
+            {editedData.education.map((edu, index) => (
+              <div key={index} className="space-y-4 border dark:border-[#333333] border-gray-200 p-4 rounded">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="dark:!text-white !text-black">Degree</Label>
+                    <Input
+                      value={edu.degree}
+                      onChange={(e) => {
+                        const newEdu = [...editedData.education];
+                        newEdu[index] = { ...edu, degree: e.target.value };
+                        setEditedData({ ...editedData, education: newEdu });
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label className="dark:!text-white !text-black">Institution</Label>
+                    <Input
+                      value={edu.institution}
+                      onChange={(e) => {
+                        const newEdu = [...editedData.education];
+                        newEdu[index] = { ...edu, institution: e.target.value };
+                        setEditedData({ ...editedData, education: newEdu });
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="dark:!text-white !text-black">Location</Label>
+                    <Input
+                      value={edu.location}
+                      onChange={(e) => {
+                        const newEdu = [...editedData.education];
+                        newEdu[index] = { ...edu, location: e.target.value };
+                        setEditedData({ ...editedData, education: newEdu });
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label className="dark:!text-white !text-black">Dates</Label>
+                    <Input
+                      value={edu.dates}
+                      onChange={(e) => {
+                        const newEdu = [...editedData.education];
+                        newEdu[index] = { ...edu, dates: e.target.value };
+                        setEditedData({ ...editedData, education: newEdu });
+                      }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label className="dark:!text-white !text-black">Honors/Field of Study</Label>
+                  <Input
+                    value={edu.honors}
+                    onChange={(e) => {
+                      const newEdu = [...editedData.education];
+                      newEdu[index] = { ...edu, honors: e.target.value };
+                      setEditedData({ ...editedData, education: newEdu });
+                    }}
                   />
                 </div>
               </div>
