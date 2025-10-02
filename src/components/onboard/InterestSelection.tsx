@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { useTTS } from "@/services/useTTS";
 import Image from "next/image";
-import { useEffect } from "react";
 
 interface InterestSelectionProps {
   onSelect: (interest: 'tech' | 'unsure') => void;
@@ -13,10 +12,10 @@ interface InterestSelectionProps {
 export default function InterestSelection({ onSelect }: InterestSelectionProps) {
   const { speak, cancel } = useTTS();
 
-  useEffect(() => {
-    speak("What brings you to Saltus? You can choose between pursuing a career in tech, or exploring tech if you're not sure where to start.");
-    return () => cancel();
-  }, [speak, cancel]);
+  // useEffect(() => {
+  //   speak("What brings you to Saltus? You can choose between pursuing a career in tech, or exploring tech if you're not sure where to start.");
+  //   return () => cancel();
+  // }, [speak, cancel]);
 
   return (
     <Card className="bg-[#1A0B33] border-[#333333] max-w-6xl mx-auto">
@@ -57,8 +56,8 @@ export default function InterestSelection({ onSelect }: InterestSelectionProps) 
               <Button
                 variant="outline"
                 onClick={() => onSelect('tech')}
-                onMouseEnter={() => speak("I want to pursue a career in tech")}
-                onMouseLeave={() => cancel()}
+                // onMouseEnter={() => speak("I want to pursue a career in tech")}
+                // onMouseLeave={() => cancel()}
                 className="w-full !border-[#8A2EFF] hover:!border-[#7325D4] text-white p-6 text-left"
               >
                 I want to pursue a career in tech
@@ -66,8 +65,8 @@ export default function InterestSelection({ onSelect }: InterestSelectionProps) 
               <Button
                 variant="outline"
                 onClick={() => onSelect('unsure')}
-                onMouseEnter={() => speak("I'm interested in tech but not sure where to start")}
-                onMouseLeave={() => cancel()}
+                // onMouseEnter={() => speak("I'm interested in tech but not sure where to start")}
+                // onMouseLeave={() => cancel()}
                 className="w-full !border-[#8A2EFF] hover:!border-[#7325D4] text-white p-6 text-left"
               >
                 I'm interested in tech but not sure where to start

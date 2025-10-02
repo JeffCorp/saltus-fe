@@ -37,6 +37,7 @@ export function useProfile(id?: string) {
   const profileQuery = useQuery<any, Error>({
     queryKey: ["profile"],
     queryFn: getProfile,
+    // enabled: !!id,
   });
 
   const useGetAllProfiles = useQuery<any, Error>({
@@ -52,6 +53,7 @@ export function useProfile(id?: string) {
   const getProfileByIdQuery = useQuery<any, Error>({
     queryKey: ["profile", id],
     queryFn: () => getProfileById(id as string),
+    enabled: !!id,
   });
 
   const updateProfileMutation = useMutation<any, Error, Partial<any>>({

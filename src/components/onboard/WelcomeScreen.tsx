@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { useTTS } from "@/services/useTTS";
 import Image from "next/image";
-import { useEffect } from "react";
 
 interface WelcomeScreenProps {
   userName: string;
@@ -21,10 +20,10 @@ export default function WelcomeScreen({
 }: WelcomeScreenProps) {
   const { speak, cancel } = useTTS();
 
-  useEffect(() => {
-    speak(`Hi, welcome to Saltus.`);
-    return () => cancel();
-  }, [userName, speak, cancel]);
+  // useEffect(() => {
+  //   speak(`Hi, welcome to Saltus.`);
+  //   return () => cancel();
+  // }, [userName, speak, cancel]);
 
   return (
     <Card className="bg-[#333333] border-[#333333] max-w-6xl mx-auto">

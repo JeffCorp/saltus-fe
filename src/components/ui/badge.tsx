@@ -13,7 +13,7 @@ const badgeVariants = cva(
         default: "border-transparent bg-[#1A4B84] text-white",
         secondary: "border-transparent bg-[#00A9A5] text-white",
         destructive: "border-transparent bg-destructive text-destructive-foreground",
-        outline: "text-[#2C3E50] border-[#2C3E50]",
+        outline: "dark:text-[#cccccc] text-[#2C3E50] dark:border-[#2C3E50] border-[#2C3E50]",
         success: "border-transparent bg-[#FF6B35] text-white",
       },
     },
@@ -25,7 +25,7 @@ function Badge({ className, variant = "default", ...props }: BadgeProps) {
     default: "bg-primary text-primary-foreground hover:bg-primary/80",
     secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
     destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/80",
-    outline: "text-foreground border border-input hover:bg-accent hover:text-accent-foreground",
+    outline: "text-foreground dark:!text-[#cccccc] border border-input hover:bg-accent hover:text-accent-foreground",
     success: "bg-[#FF6B35] text-white hover:bg-[#FF6B35]/80"
   };
 

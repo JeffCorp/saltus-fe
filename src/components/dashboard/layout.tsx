@@ -5,12 +5,8 @@ import { useTheme } from "@/components/theme-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenuItem
-} from "@/components/ui/dropdown-menu";
 import { useSocket } from "@/lib/socket";
 import { useProfile } from "@/services/useProfile";
-import { Box, HStack, Text } from "@chakra-ui/react";
 import {
   Bell,
   BookOpen,
@@ -34,7 +30,7 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoIosMenu } from "react-icons/io";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -46,6 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const socket = useSocket();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { profile, isLoading: isLoadingProfile, updateProfile, isUpdating, updateProfileData, isUpdatingProfileData } = useProfile();
   const [notification, setNotification] = useState<{
     title: string,
@@ -104,6 +101,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       setIsMenuOpen(false);
     }
   }, [pathname]); // Watch pathname instead of router.events
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   return (
     <div className="flex h-screen dark:bg-[#111111] bg-white flex-col md:flex-row">
@@ -193,42 +207,83 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Button variant="outline" className="dark:bg-[#222222] dark:text-white dark:border-[#333333] dark:hover:bg-[#333333] hover:bg-gray-50" onClick={() => router.push('/dashboard/notifications')}>
                 <Bell className="h-5 w-5" />
               </Button>
-              <Box>
-                <Button onClick={() => setIsMenuOpen(!isMenuOpen)} variant="outline" className="dark:bg-[#222222] bg-gray-100 dark:text-white text-black border-[#333333] dark:hover:bg-[#333333] hover:bg-gray-200 min-w-[50px] md:min-w-[230px] flex justify-between items-center gap-2">
+              <div className="relative" ref={dropdownRef}>
+                <Button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  variant="outline"
+                  className="dark:bg-[#222222] bg-gray-100 dark:text-white text-black border-[#333333] dark:hover:bg-[#333333] hover:bg-gray-200 min-w-[50px] md:min-w-[230px] flex justify-between items-center gap-2 transition-all duration-200"
+                >
                   <div className="flex items-center gap-2 w-full">
-                    {/* <UserCircle className="h-5 w-5" /> */}
-                    <HStack gap="3">
-                      <Avatar>
-                        <AvatarFallback className="dark:bg-[#8A2EFF] bg-gray-50">
-                          {session?.user?.name?.charAt(0)}
-                        </AvatarFallback>
-                        <AvatarImage src={session?.user?.image} />
-                      </Avatar>
-                    </HStack>
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="dark:bg-[#8A2EFF] bg-gray-50 text-white font-medium">
+                        {session?.user?.name?.charAt(0)}
+                      </AvatarFallback>
+                      <AvatarImage src={session?.user?.image} />
+                    </Avatar>
                     <div className="hidden md:flex flex-col items-start w-full">
-                      <span className="text-sm font-medium">{session?.user?.name}</span>
-                      <span className="text-xs text-gray-400">{profile?.currentRole || 'Aspirant'}</span>
+                      <span className="text-sm font-medium truncate">{session?.user?.name}</span>
+                      <span className="text-xs text-gray-400 truncate">{profile?.currentRole || 'Aspirant'}</span>
                     </div>
                   </div>
-                  <ChevronDown className="h-4 w-4 opacity-50" />
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
                 </Button>
-                {isMenuOpen &&
-                  <Box className="absolute top-[90px] right-[30px] w-[230px] dark:bg-[#222222] dark:border-[#333333] border-gray-100 text-white rounded-lg">
-                    <DropdownMenuItem className="dark:hover:bg-[#333333] hover:bg-gray-100 flex items-center cursor-pointer" onClick={() => router.push('/dashboard/profile')}>
-                      <UserCircle className="mr-2 h-4 w-4" />
-                      <Text color="white">Profile</Text>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="dark:hover:bg-[#333333] hover:bg-gray-100 flex items-center cursor-pointer text-yellow-500">
-                      <Crown className="mr-2 h-4 w-4" />
-                      <Text color="white">Upgrade</Text>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="dark:hover:bg-[#333333] hover:bg-gray-100 flex items-center cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <Text color="white">Settings</Text>
-                    </DropdownMenuItem>
-                  </Box>
-                }
-              </Box>
+
+                {/* Dropdown Menu */}
+                {isMenuOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-[#222222] border border-gray-200 dark:border-[#333333] rounded-lg shadow-lg z-50 overflow-hidden">
+                    <div className="py-2">
+                      <button
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-[#333333] transition-colors duration-200 flex items-center gap-3 group"
+                        onClick={() => {
+                          router.push('/dashboard/profile');
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <UserCircle className="h-4 w-4 text-gray-500 dark:text-gray-400 group-hover:text-[#1CB0F6]" />
+                        <span className="text-gray-700 dark:text-white font-medium">Profile</span>
+                      </button>
+
+                      <button
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-[#333333] transition-colors duration-200 flex items-center gap-3 group"
+                        onClick={() => {
+                          // Handle upgrade action
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <Crown className="h-4 w-4 text-yellow-500 group-hover:text-yellow-400" />
+                        <span className="text-gray-700 dark:text-white font-medium">Upgrade</span>
+                        <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded-full">
+                          Pro
+                        </span>
+                      </button>
+
+                      <button
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-[#333333] transition-colors duration-200 flex items-center gap-3 group"
+                        onClick={() => {
+                          router.push('/dashboard/settings');
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <Settings className="h-4 w-4 text-gray-500 dark:text-gray-400 group-hover:text-[#1CB0F6]" />
+                        <span className="text-gray-700 dark:text-white font-medium">Settings</span>
+                      </button>
+
+                      <div className="border-t border-gray-200 dark:border-[#333333] my-1"></div>
+
+                      <button
+                        className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 flex items-center gap-3 group"
+                        onClick={() => {
+                          signOut();
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <LogOut className="h-4 w-4 text-red-500 group-hover:text-red-400" />
+                        <span className="text-red-600 dark:text-red-400 font-medium">Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>

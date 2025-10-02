@@ -80,10 +80,10 @@ export default function TestSummary() {
             <Progress
               value={score}
               className={`w-full h-3 ${score >= 70
-                  ? '[&>div]:bg-[#58CC02]'
-                  : score >= 50
-                    ? '[&>div]:bg-[#FF9600]'
-                    : '[&>div]:bg-[#FF4B4B]'
+                ? '[&>div]:bg-[#58CC02]'
+                : score >= 50
+                  ? '[&>div]:bg-[#FF9600]'
+                  : '[&>div]:bg-[#FF4B4B]'
                 } bg-[#222222]`}
             />
           </CardContent>
@@ -98,9 +98,10 @@ export default function TestSummary() {
                 <div className="flex items-center gap-2">
                   <Badge
                     className={`${q.isCorrect
-                        ? 'bg-[#58CC02] hover:bg-[#58CC02]'
-                        : 'bg-[#FF4B4B] hover:bg-[#FF4B4B]'
-                      } text-white border-none`}
+                      ? 'bg-[#58CC02] hover:bg-[#58CC02]'
+                      : 'bg-[#FF4B4B] hover:bg-[#FF4B4B]'
+                      } !text-white !border-none`}
+                    variant="outline"
                   >
                     Question {index + 1}
                   </Badge>

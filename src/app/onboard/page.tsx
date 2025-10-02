@@ -7,7 +7,7 @@ import WelcomeScreen from '@/components/onboard/WelcomeScreen';
 import { useCareerPath } from '@/services/useCareerPath';
 import { useProfile } from '@/services/useProfile';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function Onboard() {
   const [step, setStep] = useState(1);
@@ -16,6 +16,7 @@ export default function Onboard() {
   const router = useRouter();
   const { updateProfile, isUpdating } = useProfile()
   const { data: careerPaths, isPending: isLoadingCareerPaths } = useCareerPath()
+  const [loadingMessage, setLoadingMessage] = useState('Updating your profile...')
   // const { data: suggestedOccupations, isPending: isLoadingSuggestions, mutate: fetchSuggestedOccupations } =
   //   useSuggestedOccupations(selectedCareerPath)
   // const { data: suggestedOccupationsByPersonality, isPending: isLoadingSuggestionsByPersonality } =
@@ -73,6 +74,7 @@ export default function Onboard() {
   };
 
   const handleFinish = useCallback((careerPath: string) => {
+    console.log("careerPath => ", careerPath);
     updateProfile(
       {
         careerPath: careerPath,
@@ -85,6 +87,22 @@ export default function Onboard() {
       }
     )
   }, [careerPaths, updateProfile, router]);
+
+  useEffect(() => {
+    const messages = [
+      "Updating your profile...",
+      "Please wait while we process your information...",
+      "This may take a few seconds...",
+      "Almost there...",
+      "We're almost done...",
+      "Just a few more seconds...",
+    ]
+    const interval = setInterval(() => {
+      const message = messages[Math.floor(Math.random() * messages.length)]
+      setLoadingMessage(message)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [])
 
 
   return (
@@ -117,6 +135,28 @@ export default function Onboard() {
           />
         )}
       </div>
+
+      {/* Modal Spinner with Blurred Background */}
+      {isUpdating && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Blurred Background */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+
+          {/* Spinner Modal */}
+          <div className="relative z-10 flex flex-col items-center justify-center space-y-4 rounded-lg bg-white/10 p-8 backdrop-blur-md">
+            {/* Spinner */}
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white"></div>
+
+            {/* Loading Text */}
+            <p className="text-white text-lg font-medium">{loadingMessage}</p>
+
+            {/* Optional: Progress indicator */}
+            <div className="h-1 w-32 rounded-full bg-white/20">
+              <div className="h-1 w-full animate-pulse rounded-full bg-white/60"></div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

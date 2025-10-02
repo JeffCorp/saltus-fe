@@ -5,7 +5,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { useTextRecognition } from "@/services/useTextRecognition";
 import { useTTS } from "@/services/useTTS";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface Question {
   id: number;
@@ -101,11 +101,11 @@ export default function QuestionsGuide({ onComplete }: QuestionsGuideProps) {
     }
   });
 
-  useEffect(() => {
-    const question = questions[currentQuestion];
-    speak(question.voiceText || question.text);
-    return () => cancel();
-  }, [currentQuestion, speak, cancel]);
+  // useEffect(() => {
+  //   const question = questions[currentQuestion];
+  //   speak(question.voiceText || question.text);
+  //   return () => cancel();
+  // }, [currentQuestion, speak, cancel]);
 
   const handleAnswer = (answer: string) => {
     const newAnswers = [...answers, answer];
@@ -146,8 +146,8 @@ export default function QuestionsGuide({ onComplete }: QuestionsGuideProps) {
                 key={index}
                 variant="outline"
                 onClick={() => handleAnswer(option.value)}
-                onMouseEnter={() => speak(option.text)}
-                onMouseLeave={() => cancel()}
+                // onMouseEnter={() => speak(option.text)}
+                // onMouseLeave={() => cancel()}
                 className="w-full !h-auto !border-[#8A2EFF] hover:!border-[#7325D4] text-white p-6 group"
               >
                 <div>

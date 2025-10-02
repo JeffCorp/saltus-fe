@@ -39,6 +39,9 @@ export default function CareerPath() {
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<string>();
 
+  console.log("skillsProgress => ", skillsProgress);
+
+
   useEffect(() => {
     if (profile) {
       getSkillsProgress(profile._id)
@@ -127,8 +130,10 @@ export default function CareerPath() {
   ]
 
   const handleCreateMilestones = () => {
+    console.log("profile => ", profile);
     if (!profile?._id || !profile?.careerPath) return;
 
+    console.log("creating milestones");
     createMilestone({
       userId: profile._id,
       careerName: profile.careerPath,
@@ -251,7 +256,7 @@ export default function CareerPath() {
               >
                 <div className="w-2 h-2 rounded-full bg-[#8A2EFF]" />
                 <span className="dark:text-gray-300 text-gray-500">
-                  {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill.skillModuleId.name}
+                  {typeof skill.skillModuleId === 'string' ? skill.skillModuleId : skill?.skillModuleId?.name}
                 </span>
                 <div className="ml-auto text-sm dark:text-gray-400 text-gray-700">
                   {skill.progress}% Complete
@@ -270,7 +275,7 @@ export default function CareerPath() {
         <ViewDetailedPlan
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          careerPath={profile?.careerPath || ""}
+          careerPath={profile?.projectedRole || ""}
           skillsProgress={skillsProgress || []}
         />
       </div>

@@ -14,7 +14,6 @@ import { useSkillsProgressByUserId } from "@/services/useSkillsProgress"
 import clsx from "clsx"
 import { Book, List, Play } from "lucide-react"
 import { useSession } from "next-auth/react"
-import Image from "next/image"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -165,39 +164,50 @@ export default function LearnPage() {
               <div className="space-y-6">
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2 h-[60vh] overflow-y-auto">
                   {videos.map((video) => (
-                    <Card key={video.url} className="bg-[#222222] border-[#444444] flex flex-col justify-between items-center">
-                      <CardContent className="p-4">
-                        <div className="relative w-full h-[200px] rounded-lg mb-2">
-                          <Image
-                            src={video.thumbnail}
-                            alt={video.title}
-                            fill
-                            className="rounded-lg object-cover"
-                          />
-                        </div>
-                        <div className="flex flex-col items-center">
-                          <h3 className="text-white font-medium mb-2 line-clamp-2">{video.title}</h3>
-                          <div className="flex">
-                            <Button
-                              variant="outline"
-                              className="flex-1 w-auto md:w-[150px] bg-[#1CB0F6] hover:bg-[#19A0E3] text-white flex items-center justify-center"
-                              onClick={() => window.open(video.url, '_blank')}
-                            >
-                              <Play className="mr-2 h-4 w-4" />
-                              Watch Video
-                            </Button>
-                            <Button
-                              variant="outline"
-                              className="flex-1 disabled:opacity-50 cursor-not-allowed w-auto md:w-[120px] bg-[#1CB0F6] hover:bg-[#19A0E3] !text-gray-300 flex items-center justify-center"
-                              onClick={() => {
-                                // fetchQuestions(video.videoId);
-                              }}
-                            >
-                              <Play className="mr-2 h-4 w-4" />
-                              Take Quiz
-                            </Button>
+                    <Card key={video.url} className="bg-[#222222] border-[#444444] group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
+                      <CardContent className="p-4 w-full h-full">
+                        <div className="relative w-full h-[200px] rounded-lg mb-2 overflow-hidden">
+                          {/* Thumbnail */}
+                          <div
+                            style={{
+                              backgroundImage: `url(${video.thumbnail})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                              backgroundRepeat: 'no-repeat',
+                              objectFit: 'cover'
+                            }}
+                            className="w-full h-full rounded-lg transition-transform duration-300 group-hover:scale-110"
+                          ></div>
+
+                          {/* Overlay with buttons - only visible on hover */}
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                className="bg-[#1CB0F6] hover:bg-[#19A0E3] text-white flex items-center justify-center !px-3 !py-0"
+                                onClick={() => window.open(video.url, '_blank')}
+                              >
+                                <Play className="mr-2 h-4 w-4" />
+                                Watch Video
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="bg-[#1CB0F6] hover:bg-[#19A0E3] text-white flex items-center justify-center !px-3 !py-0 disabled:opacity-50 cursor-not-allowed"
+                                onClick={() => {
+                                  // fetchQuestions(video.videoId);
+                                }}
+                              >
+                                <Play className="mr-2 h-4 w-4" />
+                                Take Quiz
+                              </Button>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Video title */}
+                        <h3 className="text-white font-medium line-clamp-2 group-hover:text-[#1CB0F6] transition-colors duration-300">
+                          {video.title}
+                        </h3>
                       </CardContent>
                     </Card>
                   ))}
